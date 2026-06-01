@@ -1,49 +1,121 @@
 # 🚀 60 Days Claude Challenge
 
-Hi! I'm Anushka Bajpai, an MCA graduate passionate about software development, AI, problem-solving, and continuous learning.
+## 👋 About Me
 
-Welcome to my 60 Days Claude Challenge!
+Hi, I'm **Anushka Bajpai**.
 
-Over the next 60 days, I will explore Claude AI, prompt engineering, software development, automation, and AI-powered problem-solving. This repository documents my daily learnings, projects, experiments, notes, and progress throughout the challenge.
+I am an MCA graduate with a strong interest in Software Development, Artificial Intelligence, Problem Solving, and Continuous Learning.
 
-## Why I'm Doing This Challenge
+I am starting this **60 Days Claude Challenge** to improve my AI skills, explore prompt engineering, build practical projects, and document my learning journey publicly.
 
-I want to:
+---
 
-* Become more proficient with AI tools and workflows
+# 🎯 Goals for the Next 60 Days
+
+My goals for this challenge are:
+
 * Improve my prompt engineering skills
+* Learn advanced AI workflows
 * Build practical AI-powered projects
-* Learn in public and document my journey
-* Strengthen my software development and problem-solving abilities
-* Create a portfolio that showcases consistent growth and learning
+* Explore automation and productivity systems
+* Learn in public and document my progress
+* Develop a strong AI portfolio
+* Become a better software engineer and problem solver
 
-## Goals for the Next 60 Days
+---
 
-* Learn something new every day
-* Build and experiment with AI tools
-* Share daily progress and insights
-* Improve productivity using AI
-* Develop real-world projects
-* Stay consistent for all 60 days
+# 🤖 My AI Personality Profile
 
-## Tech & Topics
+## AI Title
+
+### The AI Architect
+
+Builder • Researcher • Problem Solver • Continuous Learner
+
+---
+
+## AI Working Style
+
+* Research-driven
+* Curious and detail-oriented
+* Learns by experimentation
+* Uses AI as a thinking partner
+* Focuses on understanding concepts deeply
+* Prefers practical learning through projects
+
+---
+
+## Strengths
+
+* Strong curiosity
+* Analytical thinking
+* Fast learner
+* Persistence and consistency
+* Good problem-solving approach
+* Willingness to explore new technologies
+
+---
+
+## Areas for Improvement
+
+* Avoid overthinking
+* Improve execution speed
+* Focus on fewer priorities at a time
+* Build more projects consistently
+
+---
+
+## Future Career Paths
+
+* Software Engineer
+* AI Engineer
+* Prompt Engineer
+* AI Product Builder
+* Machine Learning Engineer
+* Technical Consultant
+
+---
+
+
+# 🎬 Cinematic AI Portrait
+
+![AI Portrait](image/ai-profile.png)
+
+---
+
+# 📚 Topics I Will Explore
 
 * Claude AI
 * Prompt Engineering
 * Software Development
+* AI Tools
 * Automation
-* AI Workflows
 * Productivity Systems
-* Learning in Public
-
-## Progress
-
-* Day 01 ✅ Started the challenge
-* Day 02 ⏳
-* Day 03 ⏳
-* ...
-* Day 60 🎯
+* Generative AI
+* Real-World AI Applications
 
 ---
 
-*"Consistency beats intensity. One day at a time."*
+# 📅 Challenge Progress
+
+| Day    | Status              |
+| ------ | ------------------- |
+| Day 01 | ✅ Started Challenge |
+| Day 02 | ⏳                   |
+| Day 03 | ⏳                   |
+| Day 04 | ⏳                   |
+| Day 05 | ⏳                   |
+| ...    | ...                 |
+| Day 60 | 🎯 Goal             |
+
+---
+
+## Why This Challenge Matters
+
+I believe consistency creates growth.
+
+This challenge is an opportunity to learn new technologies, improve my AI skills, build useful projects, and create a public record of my progress over the next 60 days.
+
+---
+
+*"Consistency beats intensity. One day at a time."* 🚀
