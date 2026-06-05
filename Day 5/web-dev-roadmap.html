@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>30-Day Web Dev Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e11;
+    --surface: #16161a;
+    --surface2: #1e1e24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --text: #f0ede8;
+    --muted: #7a7a8a;
+    --accent: #c8f064;
+    --accent2: #6e9fff;
+    --accent3: #ff8c69;
+    --purple: #b89dff;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'Outfit', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-weight: 400;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    padding: 3rem 2rem 2rem;
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .header-left h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .header-left p {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .stat {
+    text-align: right;
+  }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--accent);
+    display: block;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    max-width: 860px;
+    margin: 0 auto 2rem;
+    padding: 0 2rem;
+  }
+
+  .progress-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+
+  .progress-pct {
+    font-size: 0.8rem;
+    font-family: var(--mono);
+    color: var(--accent);
+  }
+
+  .progress-track {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    width: 3%;
+  }
+
+  /* WEEK TABS */
+  .week-nav {
+    max-width: 860px;
+    margin: 0 auto 1.5rem;
+    padding: 0 2rem;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .wtab {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    padding: 6px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+
+  .wtab:hover { border-color: rgba(255,255,255,0.25); color: var(--text); }
+  .wtab.active { background: var(--accent); color: #0e0e11; border-color: var(--accent); font-weight: 500; }
+  .wtab.done { border-color: #4a8a2a; color: #7ec83a; }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  @media (max-width: 680px) {
+    .main { grid-template-columns: 1fr; }
+    header { flex-direction: column; align-items: flex-start; }
+    .header-stats { flex-direction: row; }
+    .stat { text-align: left; }
+  }
+
+  /* LEFT COLUMN */
+  .left-col { display: flex; flex-direction: column; gap: 1rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .week-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .week-tag {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .week-title {
+    font-family: var(--serif);
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1.2;
+  }
+
+  .week-milestone {
+    margin-top: 4px;
+    font-size: 0.83rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .week-milestone span {
+    color: var(--accent2);
+  }
+
+  /* DAYS GRID */
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 1.25rem;
+  }
+
+  .day-btn {
+    aspect-ratio: 1;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: all 0.15s;
+    line-height: 1.2;
+    text-align: center;
+    padding: 4px 2px;
+  }
+
+  .day-btn:hover { border-color: var(--border2); color: var(--text); background: #222228; }
+  .day-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,240,100,0.08); }
+  .day-btn.done { border-color: #3a6a1a; background: rgba(78,160,30,0.1); color: #7ec83a; }
+
+  .day-n { font-size: 0.65rem; opacity: 0.5; }
+
+  /* TASK PANEL */
+  .task-panel {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border-left: 3px solid var(--accent);
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .panel-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .task-text {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  /* NAV */
+  .nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  .btn:hover { background: var(--surface2); }
+  .btn:disabled { opacity: 0.3; cursor: default; }
+  .btn:active { transform: scale(0.97); }
+
+  .btn-accent {
+    background: rgba(200,240,100,0.1);
+    border-color: rgba(200,240,100,0.35);
+    color: var(--accent);
+  }
+
+  .btn-accent:hover { background: rgba(200,240,100,0.18); }
+  .btn-accent.marked { background: rgba(78,160,30,0.15); border-color: #4a8a2a; color: #7ec83a; }
+
+  .arrow { font-size: 1rem; }
+
+  /* RIGHT COLUMN */
+  .right-col { display: flex; flex-direction: column; gap: 1rem; }
+
+  .side-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem;
+  }
+
+  .side-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.875rem;
+  }
+
+  .res-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.875rem;
+    transition: color 0.1s;
+  }
+
+  .res-item:last-child { border-bottom: none; }
+  .res-item:hover { color: var(--accent2); }
+
+  .res-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--surface2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+  }
+
+  .project-block {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 1rem;
+  }
+
+  .project-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--purple);
+    margin-bottom: 4px;
+  }
+
+  .project-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+    font-weight: 300;
+  }
+
+  /* OUTCOME */
+  .outcome-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem;
+  }
+
+  .outcome-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .skill {
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(110,159,255,0.1);
+    border: 1px solid rgba(110,159,255,0.25);
+    color: var(--accent2);
+    font-family: var(--mono);
+  }
+
+  /* DONE BANNER */
+  .done-banner {
+    grid-column: 1 / -1;
+    display: none;
+    background: rgba(200,240,100,0.06);
+    border: 1px solid rgba(200,240,100,0.2);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .done-banner.show { display: block; }
+
+  .done-banner h2 {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .done-banner p {
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>30-Day<br><em>Web Dev</em> Roadmap</h1>
+    <p>Web Development &nbsp;·&nbsp; 1–2 hrs/day &nbsp;·&nbsp; Some basics</p>
+  </div>
+  <div class="header-stats">
+    <div class="stat">
+      <span class="stat-num" id="doneNum">0</span>
+      <span class="stat-label">days done</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">30</span>
+      <span class="stat-label">total days</span>
+    </div>
+  </div>
+</header>
+
+<div class="progress-section">
+  <div class="progress-top">
+    <span class="progress-label">Overall progress</span>
+    <span class="progress-pct" id="progPct">0%</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="progFill"></div>
+  </div>
+</div>
+
+<div class="week-nav" id="weekNav"></div>
+
+<div class="main">
+  <div class="left-col">
+    <div class="card">
+      <div class="week-header">
+        <div class="week-tag" id="weekTag">Week 1 of 4</div>
+        <div class="week-title" id="weekTitle"></div>
+        <div class="week-milestone" id="weekMilestone"></div>
+      </div>
+      <div class="days-grid" id="daysGrid"></div>
+      <div class="task-panel">
+        <div class="panel-label">Today's task — Day <span id="dayNum">1</span></div>
+        <div class="task-text" id="taskText"></div>
+      </div>
+      <div class="nav-row">
+        <button class="btn" id="prevBtn" onclick="move(-1)"><span class="arrow">←</span> Prev</button>
+        <button class="btn btn-accent" id="markBtn" onclick="markDone()">
+          <span id="markIcon">✓</span> <span id="markLabel">Mark done</span>
+        </button>
+        <button class="btn" id="nextBtn" onclick="move(1)">Next <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="side-card">
+      <div class="side-label">Resources this week</div>
+      <div id="resList"></div>
+    </div>
+    <div class="side-card">
+      <div class="side-label">Week project</div>
+      <div class="project-block">
+        <div class="project-name" id="projectName"></div>
+        <div class="project-desc" id="projectDesc"></div>
+      </div>
+    </div>
+    <div class="outcome-card">
+      <div class="outcome-title">By day 30 you'll be able to</div>
+      <div class="skills">
+        <span class="skill">Build webpages</span>
+        <span class="skill">Responsive CSS</span>
+        <span class="skill">Interactive JS</span>
+        <span class="skill">Fetch live APIs</span>
+        <span class="skill">Git & GitHub</span>
+        <span class="skill">Deploy sites</span>
+        <span class="skill">3 projects</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="done-banner" id="doneBanner">
+    <h2>Roadmap complete!</h2>
+    <p>You've finished all 30 days. Go build something real.</p>
+  </div>
+</div>
+
+<script>
+const weeks = [
+  {
+    title: "HTML & CSS foundations",
+    milestone: "Milestone — build a styled personal webpage",
+    days: [
+      "HTML document structure & semantic tags",
+      "Forms, links, images & attributes",
+      "CSS selectors, specificity & the box model",
+      "Flexbox — rows & column layouts",
+      "Typography, colors & CSS units",
+      "Build your personal profile page",
+      "Polish & review week 1 project"
+    ],
+    resources: [
+      { label: "MDN HTML Guide", url: "https://developer.mozilla.org/en-US/docs/Learn/HTML", icon: "📖" },
+      { label: "freeCodeCamp RWD", url: "https://www.freecodecamp.org/learn/responsive-web-design/", icon: "💻" },
+      { label: "Flexbox Froggy", url: "https://flexboxfroggy.com", icon: "🐸" }
+    ],
+    project: { name: "Personal profile page", desc: "Name, bio, photo placeholder & links — styled with Flexbox." }
+  },
+  {
+    title: "CSS layout & responsiveness",
+    milestone: "Milestone — a fully responsive multi-section site",
+    days: [
+      "CSS Grid — rows, columns & areas",
+      "Media queries & mobile-first breakpoints",
+      "CSS custom properties (variables)",
+      "Transitions, transforms & hover effects",
+      "Navigation bars & sticky footers",
+      "Build a responsive landing page",
+      "Polish & review week 2 project"
+    ],
+    resources: [
+      { label: "Grid Garden", url: "https://cssgridgarden.com", icon: "🌱" },
+      { label: "CSS-Tricks Grid Guide", url: "https://css-tricks.com/snippets/css/complete-guide-grid/", icon: "📖" },
+      { label: "web.dev RWD Basics", url: "https://web.dev/responsive-web-design-basics/", icon: "📱" }
+    ],
+    project: { name: "Responsive landing page", desc: "Hero, feature cards & contact section — great on mobile and desktop." }
+  },
+  {
+    title: "JavaScript essentials",
+    milestone: "Milestone — interactive page with live DOM updates",
+    days: [
+      "Variables, data types & operators",
+      "Functions, scope & arrow functions",
+      "Arrays, objects & loops",
+      "DOM selection, manipulation & events",
+      "Fetch API, promises & JSON basics",
+      "Build a to-do list app",
+      "Polish & review week 3 project"
+    ],
+    resources: [
+      { label: "javascript.info", url: "https://javascript.info", icon: "📖" },
+      { label: "freeCodeCamp JS", url: "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/", icon: "💻" },
+      { label: "MDN DOM Guide", url: "https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model", icon: "🗂" }
+    ],
+    project: { name: "To-do list app", desc: "Add, complete & delete tasks. Persists with localStorage." }
+  },
+  {
+    title: "Ship it",
+    milestone: "Milestone — deploy a real project online",
+    days: [
+      "Git basics — init, commit, push to GitHub",
+      "Deploy to Netlify or Vercel",
+      "Intro to Tailwind CSS utility classes",
+      "Live API project — weather or quote fetcher",
+      "Code review, refactoring & clean code",
+      "Build capstone — portfolio + API widget",
+      "Final polish & share your live site"
+    ],
+    resources: [
+      { label: "GitHub Docs", url: "https://docs.github.com/en/get-started", icon: "🐙" },
+      { label: "Tailwind CSS Docs", url: "https://tailwindcss.com/docs", icon: "💨" },
+      { label: "Netlify Docs", url: "https://docs.netlify.com", icon: "🚀" }
+    ],
+    project: { name: "Portfolio + live API widget", desc: "Showcase your 3 projects. Deployed live on Netlify or Vercel." }
+  }
+];
+
+let current = 0;
+const done = new Set();
+
+function weekOf(d) { return Math.floor(d / 7); }
+
+function render() {
+  const w = weekOf(current);
+  const week = weeks[w];
+  const dayInWeek = current - w * 7;
+
+  document.getElementById('weekTag').textContent = `Week ${w + 1} of 4`;
+  document.getElementById('weekTitle').textContent = week.title;
+  document.getElementById('weekMilestone').innerHTML = week.milestone.replace('Milestone —', 'Milestone — <span>') + '</span>';
+  document.getElementById('dayNum').textContent = current + 1;
+  document.getElementById('taskText').textContent = week.days[dayInWeek];
+
+  document.getElementById('projectName').textContent = week.project.name;
+  document.getElementById('projectDesc').textContent = week.project.desc;
+
+  const resList = document.getElementById('resList');
+  resList.innerHTML = week.resources.map(r =>
+    `<a class="res-item" href="${r.url}" target="_blank">
+      <span class="res-icon">${r.icon}</span>${r.label}
+    </a>`
+  ).join('');
+
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+  for (let i = w * 7; i < w * 7 + 7 && i < 30; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'day-btn' + (i === current ? ' active' : done.has(i) ? ' done' : '');
+    const label = weeks[weekOf(i)].days[i - weekOf(i) * 7].split(' ').slice(0, 2).join(' ');
+    btn.innerHTML = `<span class="day-n">D${i + 1}</span><span style="font-size:0.6rem;line-height:1.2">${label}</span>`;
+    btn.title = `Day ${i + 1}: ${weeks[weekOf(i)].days[i - weekOf(i) * 7]}`;
+    btn.onclick = (idx => () => { current = idx; render(); })(i);
+    grid.appendChild(btn);
+  }
+
+  const nav = document.getElementById('weekNav');
+  nav.innerHTML = weeks.map((wk, i) => {
+    const allDone = [0,1,2,3,4,5,6].every(d => done.has(i * 7 + d));
+    const cls = 'wtab' + (i === w ? ' active' : allDone ? ' done' : '');
+    return `<button class="${cls}" onclick="jumpWeek(${i})">Week ${i + 1}</button>`;
+  }).join('');
+
+  document.getElementById('prevBtn').disabled = current === 0;
+  document.getElementById('nextBtn').disabled = current === 29;
+
+  const isDone = done.has(current);
+  document.getElementById('markLabel').textContent = isDone ? 'Marked done' : 'Mark done';
+  document.getElementById('markBtn').classList.toggle('marked', isDone);
+
+  const total = done.size;
+  document.getElementById('doneNum').textContent = total;
+  const pct = Math.round(total / 30 * 100);
+  document.getElementById('progPct').textContent = pct + '%';
+  document.getElementById('progFill').style.width = Math.max(1, pct) + '%';
+  document.getElementById('doneBanner').classList.toggle('show', total === 30);
+}
+
+function move(dir) {
+  current = Math.min(29, Math.max(0, current + dir));
+  render();
+}
+
+function jumpWeek(w) {
+  current = w * 7;
+  render();
+}
+
+function markDone() {
+  if (done.has(current)) { done.delete(current); }
+  else { done.add(current); }
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
