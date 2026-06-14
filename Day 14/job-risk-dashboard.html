@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Job Risk Intelligence — Scan Report #JR-2026-0614</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#06080f;
+    --bg-1:#0b0f1a;
+    --bg-2:#111726;
+    --panel:rgba(18,24,40,0.55);
+    --panel-border:rgba(120,160,255,0.12);
+    --cyan:#3ee6e0;
+    --blue:#5b8cff;
+    --purple:#9d6bff;
+    --red:#ff4d6d;
+    --orange:#ff9f4d;
+    --yellow:#ffd95a;
+    --green:#3ee68c;
+    --text-0:#eef2fb;
+    --text-1:#a9b4cc;
+    --text-2:#6c7791;
+    --mono:'JetBrains Mono', monospace;
+    --sans:'Space Grotesk', sans-serif;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:var(--sans);
+    background:var(--bg-0);
+    color:var(--text-0);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ambient backdrop */
+  body::before{
+    content:'';
+    position:fixed; inset:0;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(91,140,255,0.16), transparent 40%),
+      radial-gradient(circle at 85% 0%, rgba(157,107,255,0.14), transparent 45%),
+      radial-gradient(circle at 50% 100%, rgba(255,77,109,0.10), transparent 50%);
+    pointer-events:none;
+    z-index:0;
+  }
+
+  body::after{
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(120,160,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,160,255,0.025) 1px, transparent 1px);
+    background-size:48px 48px;
+    pointer-events:none;
+    z-index:0;
+    mask-image:radial-gradient(circle at 50% 0%, rgba(0,0,0,0.6), transparent 70%);
+  }
+
+  .wrap{
+    position:relative;
+    z-index:1;
+    max-width:1180px;
+    margin:0 auto;
+    padding:32px 24px 80px;
+  }
+
+  /* ===== TOP BAR ===== */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding-bottom:28px;
+    border-bottom:1px solid var(--panel-border);
+    margin-bottom:36px;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .brand-mark{
+    width:38px; height:38px;
+    border-radius:10px;
+    background:linear-gradient(135deg, var(--cyan), var(--blue) 60%, var(--purple));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:700; font-size:16px;
+    color:#06121c;
+    box-shadow:0 0 24px rgba(91,140,255,0.45);
+    flex-shrink:0;
+  }
+
+  .brand-text .name{font-weight:600; font-size:15px; letter-spacing:0.02em;}
+  .brand-text .sub{font-family:var(--mono); font-size:11px; color:var(--text-2); letter-spacing:0.08em; text-transform:uppercase;}
+
+  .scan-meta{
+    display:flex; gap:24px; flex-wrap:wrap;
+    font-family:var(--mono); font-size:12px; color:var(--text-2);
+  }
+
+  .scan-meta .item{display:flex; flex-direction:column; gap:2px; align-items:flex-end;}
+  .scan-meta .item .label{text-transform:uppercase; letter-spacing:0.1em; font-size:10px; color:var(--text-2);}
+  .scan-meta .item .value{color:var(--text-0); font-size:13px; display:flex; align-items:center; gap:6px;}
+
+  .live-dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 8px var(--green);
+    animation:pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot{
+    0%,100%{opacity:1; transform:scale(1);}
+    50%{opacity:0.4; transform:scale(0.8);}
+  }
+
+  /* ===== HERO ===== */
+  .hero{
+    display:grid;
+    grid-template-columns:1.1fr 1fr;
+    gap:32px;
+    align-items:center;
+    margin-bottom:48px;
+  }
+
+  .hero-left .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--cyan);
+    text-transform:uppercase;
+    letter-spacing:0.2em;
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:18px;
+  }
+
+  .eyebrow::before{
+    content:'';
+    display:block;
+    width:24px; height:1px;
+    background:var(--cyan);
+    box-shadow:0 0 6px var(--cyan);
+  }
+
+  .hero-left h1{
+    font-size:46px;
+    font-weight:700;
+    line-height:1.12;
+    letter-spacing:-0.01em;
+    margin-bottom:18px;
+  }
+
+  .hero-left h1 .grad{
+    background:linear-gradient(135deg, var(--cyan), var(--blue) 55%, var(--purple));
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+
+  .hero-left p{
+    font-size:15px;
+    color:var(--text-1);
+    max-width:480px;
+    line-height:1.7;
+    margin-bottom:24px;
+  }
+
+  .hero-target{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:14px 18px;
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:14px;
+    backdrop-filter:blur(20px);
+    max-width:480px;
+  }
+
+  .hero-target .icn{
+    width:36px; height:36px; border-radius:10px;
+    background:rgba(157,107,255,0.12);
+    border:1px solid rgba(157,107,255,0.3);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--purple); font-size:16px; flex-shrink:0;
+  }
+
+  .hero-target .meta .role{font-weight:600; font-size:14px;}
+  .hero-target .meta .org{font-family:var(--mono); font-size:11px; color:var(--text-2); margin-top:2px;}
+
+  /* ===== GAUGE ===== */
+  .gauge-card{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:24px;
+    padding:36px;
+    backdrop-filter:blur(20px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    box-shadow:0 20px 60px -20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+
+  .gauge-card::before{
+    content:'';
+    position:absolute; inset:-1px;
+    border-radius:24px;
+    background:linear-gradient(135deg, rgba(255,77,109,0.5), transparent 40%, transparent 60%, rgba(255,77,109,0.3));
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    padding:1px;
+    pointer-events:none;
+    opacity:0.6;
+  }
+
+  .gauge-wrap{
+    position:relative;
+    width:240px; height:240px;
+    margin-bottom:8px;
+  }
+
+  .gauge-wrap svg{transform:rotate(-90deg);}
+
+  .gauge-track{
+    fill:none;
+    stroke:rgba(255,255,255,0.05);
+    stroke-width:14;
+  }
+
+  .gauge-fill{
+    fill:none;
+    stroke-width:14;
+    stroke-linecap:round;
+    stroke:var(--red);
+    filter:drop-shadow(0 0 10px rgba(255,77,109,0.7));
+    stroke-dasharray:628;
+    stroke-dashoffset:628;
+    animation:fillGauge 1.8s cubic-bezier(0.16,1,0.3,1) 0.3s forwards;
+  }
+
+  @keyframes fillGauge{
+    to{stroke-dashoffset:75.36;}
+  }
+
+  .gauge-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+
+  .gauge-score{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:56px;
+    line-height:1;
+    color:var(--text-0);
+    text-shadow:0 0 24px rgba(255,77,109,0.5);
+  }
+
+  .gauge-score sup{font-size:22px; color:var(--text-2); font-weight:500;}
+
+  .gauge-label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    color:var(--text-2);
+    margin-top:6px;
+  }
+
+  .gauge-scale{
+    display:flex; justify-content:space-between; width:100%;
+    font-family:var(--mono); font-size:10px; color:var(--text-2);
+    margin-top:8px; padding:0 6px;
+    letter-spacing:0.05em;
+  }
+
+  .verdict-badge{
+    margin-top:22px;
+    display:flex; align-items:center; gap:10px;
+    padding:10px 22px;
+    border-radius:999px;
+    background:rgba(255,77,109,0.12);
+    border:1px solid rgba(255,77,109,0.4);
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:14px;
+    letter-spacing:0.12em;
+    color:var(--red);
+    text-transform:uppercase;
+    box-shadow:0 0 30px rgba(255,77,109,0.25);
+    animation:badgePulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes badgePulse{
+    0%,100%{box-shadow:0 0 20px rgba(255,77,109,0.2);}
+    50%{box-shadow:0 0 36px rgba(255,77,109,0.45);}
+  }
+
+  .verdict-badge .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--red);
+    box-shadow:0 0 10px var(--red);
+  }
+
+  .verdict-sub{
+    margin-top:12px;
+    font-size:12px;
+    color:var(--text-2);
+    text-align:center;
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    margin-bottom:20px; flex-wrap:wrap; gap:8px;
+  }
+
+  .section-head h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.18em;
+    color:var(--text-1);
+    font-family:var(--mono);
+    display:flex; align-items:center; gap:10px;
+  }
+
+  .section-head h2::before{
+    content:'';
+    display:block; width:6px; height:6px;
+    background:var(--cyan);
+    box-shadow:0 0 8px var(--cyan);
+    border-radius:1px;
+    transform:rotate(45deg);
+  }
+
+  .section-head .count{
+    font-family:var(--mono); font-size:11px; color:var(--text-2);
+  }
+
+  /* ===== RISK CARDS ===== */
+  .risk-grid{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:16px;
+    margin-bottom:52px;
+  }
+
+  .risk-card{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:16px;
+    padding:20px 18px;
+    backdrop-filter:blur(20px);
+    transition:transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s, box-shadow 0.35s;
+    overflow:hidden;
+    cursor:default;
+  }
+
+  .risk-card::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:2px;
+    background:var(--accent);
+    box-shadow:0 0 12px var(--accent);
+  }
+
+  .risk-card::after{
+    content:'';
+    position:absolute;
+    top:-40%; right:-40%;
+    width:120px; height:120px;
+    background:var(--accent);
+    opacity:0.08;
+    border-radius:50%;
+    filter:blur(30px);
+    transition:opacity 0.35s;
+  }
+
+  .risk-card:hover{
+    transform:translateY(-6px);
+    border-color:var(--accent);
+    box-shadow:0 16px 40px -16px var(--accent-shadow, rgba(255,77,109,0.35));
+  }
+
+  .risk-card:hover::after{opacity:0.18;}
+
+  .risk-card .icn{
+    width:38px; height:38px;
+    border-radius:10px;
+    background:color-mix(in srgb, var(--accent) 16%, transparent);
+    border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--accent);
+    margin-bottom:14px;
+    font-size:17px;
+  }
+
+  .risk-card .cat{
+    font-size:14px; font-weight:600; margin-bottom:4px;
+  }
+
+  .risk-card .level{
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--accent);
+    margin-bottom:14px;
+    display:flex; align-items:center; gap:6px;
+  }
+
+  .risk-card .level::before{
+    content:'';
+    width:6px; height:6px; border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 8px var(--accent);
+  }
+
+  .risk-bar{
+    height:6px;
+    border-radius:4px;
+    background:rgba(255,255,255,0.06);
+    overflow:hidden;
+    margin-bottom:8px;
+  }
+
+  .risk-bar-fill{
+    height:100%;
+    border-radius:4px;
+    background:linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 60%, white));
+    width:0%;
+    box-shadow:0 0 10px var(--accent);
+    transition:width 1.4s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .risk-card .pct{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--text-2);
+    display:flex; justify-content:space-between;
+  }
+
+  .risk-card[data-cat="requirements"]{ --accent:#ff4d6d; --accent-shadow:rgba(255,77,109,0.35); }
+  .risk-card[data-cat="culture"]{ --accent:#ff4d6d; --accent-shadow:rgba(255,77,109,0.35); }
+  .risk-card[data-cat="remote"]{ --accent:#ff9f4d; --accent-shadow:rgba(255,159,77,0.35); }
+  .risk-card[data-cat="hiring"]{ --accent:#ff9f4d; --accent-shadow:rgba(255,159,77,0.35); }
+  .risk-card[data-cat="company"]{ --accent:#ff9f4d; --accent-shadow:rgba(255,159,77,0.35); }
+
+  .risk-card[data-cat="requirements"] .risk-bar-fill{ width:95%; }
+  .risk-card[data-cat="culture"] .risk-bar-fill{ width:90%; }
+  .risk-card[data-cat="remote"] .risk-bar-fill{ width:80%; }
+  .risk-card[data-cat="hiring"] .risk-bar-fill{ width:85%; }
+  .risk-card[data-cat="company"] .risk-bar-fill{ width:80%; }
+
+  /* ===== CHARTS ROW ===== */
+  .charts-row{
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:20px;
+    margin-bottom:52px;
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:18px;
+    padding:24px;
+    backdrop-filter:blur(20px);
+  }
+
+  .panel h3{
+    font-size:14px; font-weight:600; margin-bottom:4px;
+  }
+
+  .panel .panel-sub{
+    font-family:var(--mono); font-size:11px; color:var(--text-2); margin-bottom:18px;
+  }
+
+  .chart-box{position:relative; width:100%;}
+
+  /* ===== FLAG LIST ===== */
+  .flag-list{display:flex; flex-direction:column; gap:10px; margin-bottom:52px;}
+
+  .flag-row{
+    display:grid;
+    grid-template-columns:auto 1fr auto auto;
+    align-items:center;
+    gap:16px;
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    border-radius:14px;
+    padding:14px 18px;
+    backdrop-filter:blur(20px);
+    transition:border-color 0.3s, transform 0.3s;
+  }
+
+  .flag-row:hover{
+    border-color:rgba(255,77,109,0.35);
+    transform:translateX(4px);
+  }
+
+  .flag-sev{
+    font-family:var(--mono);
+    font-weight:700;
+    font-size:13px;
+    width:38px; height:38px;
+    border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,77,109,0.12);
+    border:1px solid rgba(255,77,109,0.35);
+    color:var(--red);
+    flex-shrink:0;
+  }
+
+  .flag-row.sev-mid .flag-sev{
+    background:rgba(255,159,77,0.12);
+    border-color:rgba(255,159,77,0.35);
+    color:var(--orange);
+  }
+
+  .flag-text{font-size:13.5px; color:var(--text-0); line-height:1.5;}
+
+  .flag-bar{
+    width:90px; height:5px; border-radius:4px;
+    background:rgba(255,255,255,0.06);
+    overflow:hidden;
+    justify-self:end;
+  }
+
+  .flag-bar-fill{
+    height:100%; border-radius:4px;
+    background:var(--red);
+    box-shadow:0 0 8px var(--red);
+  }
+
+  .flag-row.sev-mid .flag-bar-fill{background:var(--orange); box-shadow:0 0 8px var(--orange);}
+
+  .flag-tag{
+    font-family:var(--mono); font-size:10px; text-transform:uppercase; letter-spacing:0.1em;
+    color:var(--text-2); justify-self:end; white-space:nowrap;
+  }
+
+  /* ===== TWO COL: positives + questions ===== */
+  .bottom-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:52px;
+  }
+
+  .list-item{
+    display:flex; align-items:flex-start; gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid rgba(255,255,255,0.05);
+    font-size:13.5px; line-height:1.6; color:var(--text-1);
+  }
+
+  .list-item:last-child{border-bottom:none;}
+
+  .list-item .ic{
+    width:28px; height:28px; border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; font-size:13px; margin-top:1px;
+  }
+
+  .ic-green{background:rgba(62,230,140,0.12); border:1px solid rgba(62,230,140,0.3); color:var(--green);}
+  .ic-cyan{background:rgba(62,230,224,0.12); border:1px solid rgba(62,230,224,0.3); color:var(--cyan);}
+
+  .qnum{
+    font-family:var(--mono); font-weight:700; font-size:11px; color:var(--cyan);
+  }
+
+  /* ===== FOOTER ===== */
+  .footer{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top:28px; border-top:1px solid var(--panel-border);
+    font-family:var(--mono); font-size:11px; color:var(--text-2);
+    flex-wrap:wrap; gap:12px;
+  }
+
+  .footer .tag{
+    display:flex; align-items:center; gap:8px;
+  }
+
+  .footer .tag .sq{
+    width:8px; height:8px; background:var(--cyan); box-shadow:0 0 8px var(--cyan); border-radius:1px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width:980px){
+    .hero{grid-template-columns:1fr; gap:24px;}
+    .hero-left h1{font-size:36px;}
+    .risk-grid{grid-template-columns:repeat(3,1fr);}
+    .charts-row{grid-template-columns:1fr;}
+    .bottom-grid{grid-template-columns:1fr;}
+    .scan-meta{justify-content:flex-start; width:100%;}
+    .scan-meta .item{align-items:flex-start;}
+  }
+
+  @media (max-width:640px){
+    .wrap{padding:20px 16px 60px;}
+    .hero-left h1{font-size:28px;}
+    .risk-grid{grid-template-columns:repeat(2,1fr);}
+    .gauge-wrap{width:200px; height:200px;}
+    .gauge-score{font-size:44px;}
+    .flag-row{grid-template-columns:auto 1fr; grid-template-areas:"sev text" ". bar";}
+    .flag-bar{display:none;}
+    .flag-tag{justify-self:start; grid-column:2;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">JR</div>
+      <div class="brand-text">
+        <div class="name">Job Risk Intelligence</div>
+        <div class="sub">AI Recruitment Scanner v2.6</div>
+      </div>
+    </div>
+    <div class="scan-meta">
+      <div class="item">
+        <span class="label">Scan ID</span>
+        <span class="value">#JR-2026-0614-A8</span>
+      </div>
+      <div class="item">
+        <span class="label">Status</span>
+        <span class="value"><span class="live-dot"></span>Analysis complete</span>
+      </div>
+      <div class="item">
+        <span class="label">Confidence</span>
+        <span class="value">94%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="eyebrow">AI-Powered Job Opportunity Risk Analysis</div>
+      <h1>Decode the listing<br>before it <span class="grad">decodes you.</span></h1>
+      <p>Our model parsed this posting against 40+ red-flag signals spanning unrealistic requirements, toxic culture language, remote-work authenticity, and company stability indicators.</p>
+      <div class="hero-target">
+        <div class="icn"><i data-icon="briefcase"></i></div>
+        <div class="meta">
+          <div class="role">Junior Full Stack Developer</div>
+          <div class="org">8-month-old startup · 12 employees · Remote (conditional)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gauge-card">
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 220 220" width="240" height="240">
+          <circle class="gauge-track" cx="110" cy="110" r="100"></circle>
+          <circle class="gauge-fill" cx="110" cy="110" r="100"></circle>
+        </svg>
+        <div class="gauge-center">
+          <div class="gauge-score">88<sup>/100</sup></div>
+          <div class="gauge-label">Risk Score</div>
+        </div>
+      </div>
+      <div class="gauge-scale">
+        <span>0</span><span>30</span><span>60</span><span>80</span><span>100</span>
+      </div>
+      <div class="verdict-badge"><span class="dot"></span>Final verdict: Avoid</div>
+      <div class="verdict-sub">9 red flags detected · avg. severity 8.2 / 10</div>
+    </div>
+  </div>
+
+  <!-- RISK OVERVIEW CARDS -->
+  <div class="section-head">
+    <h2>Risk Category Breakdown</h2>
+    <span class="count">5 categories scanned</span>
+  </div>
+  <div class="risk-grid">
+
+    <div class="risk-card" data-cat="requirements">
+      <div class="icn"><i data-icon="list-check"></i></div>
+      <div class="cat">Requirements</div>
+      <div class="level">Very high risk</div>
+      <div class="risk-bar"><div class="risk-bar-fill"></div></div>
+      <div class="pct"><span>Score</span><span>95/100</span></div>
+    </div>
+
+    <div class="risk-card" data-cat="culture">
+      <div class="icn"><i data-icon="flame"></i></div>
+      <div class="cat">Culture</div>
+      <div class="level">Very high risk</div>
+      <div class="risk-bar"><div class="risk-bar-fill"></div></div>
+      <div class="pct"><span>Score</span><span>90/100</span></div>
+    </div>
+
+    <div class="risk-card" data-cat="remote">
+      <div class="icn"><i data-icon="map-pin"></i></div>
+      <div class="cat">Remote</div>
+      <div class="level">High risk</div>
+      <div class="risk-bar"><div class="risk-bar-fill"></div></div>
+      <div class="pct"><span>Score</span><span>80/100</span></div>
+    </div>
+
+    <div class="risk-card" data-cat="hiring">
+      <div class="icn"><i data-icon="users"></i></div>
+      <div class="cat">Hiring</div>
+      <div class="level">High risk</div>
+      <div class="risk-bar"><div class="risk-bar-fill"></div></div>
+      <div class="pct"><span>Score</span><span>85/100</span></div>
+    </div>
+
+    <div class="risk-card" data-cat="company">
+      <div class="icn"><i data-icon="building"></i></div>
+      <div class="cat">Company</div>
+      <div class="level">High risk</div>
+      <div class="risk-bar"><div class="risk-bar-fill"></div></div>
+      <div class="pct"><span>Score</span><span>80/100</span></div>
+    </div>
+
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-row">
+    <div class="panel">
+      <h3>Severity ranking</h3>
+      <div class="panel-sub">All detected red flags, scored 1–10</div>
+      <div class="chart-box" style="height:340px;">
+        <canvas id="severityChart" role="img" aria-label="Horizontal bar chart ranking nine red flags by severity from 7 to 9 out of 10">Severity ranking of red flags, from highest to lowest, ranging from 9 to 7 out of 10.</canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Risk radar</h3>
+      <div class="panel-sub">Category exposure, 0–100</div>
+      <div class="chart-box" style="height:340px;">
+        <canvas id="radarChart" role="img" aria-label="Radar chart showing risk levels of 95 for requirements, 90 for culture, 80 for remote, 85 for hiring, and 80 for company, all out of 100">Risk levels by category: requirements 95, culture 90, remote 80, hiring 85, company 80.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLAG LIST -->
+  <div class="section-head">
+    <h2>Top red flags detected</h2>
+    <span class="count">9 findings</span>
+  </div>
+  <div class="flag-list">
+
+    <div class="flag-row">
+      <div class="flag-sev">9</div>
+      <div class="flag-text">"Junior" role demands 5+ years of experience — a fundamental level mismatch</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:90%"></div></div>
+      <div class="flag-tag">Requirements</div>
+    </div>
+
+    <div class="flag-row">
+      <div class="flag-sev">9</div>
+      <div class="flag-text">Demands mastery of 3 frontend frameworks, 4 backend languages, and 3 cloud platforms</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:90%"></div></div>
+      <div class="flag-tag">Requirements</div>
+    </div>
+
+    <div class="flag-row">
+      <div class="flag-sev">9</div>
+      <div class="flag-text">"24/7 support when needed" signals always-on availability with no boundaries</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:90%"></div></div>
+      <div class="flag-tag">Culture</div>
+    </div>
+
+    <div class="flag-row">
+      <div class="flag-sev">9</div>
+      <div class="flag-text">"Remote" listing hides a relocation-to-Bengaluru clause after probation</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:90%"></div></div>
+      <div class="flag-tag">Remote</div>
+    </div>
+
+    <div class="flag-row sev-mid">
+      <div class="flag-sev">8</div>
+      <div class="flag-text">"Work hard play hard," "fast-paced," "thrive under pressure," and "like a family" — classic hustle-culture language</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:80%"></div></div>
+      <div class="flag-tag">Culture</div>
+    </div>
+
+    <div class="flag-row sev-mid">
+      <div class="flag-sev">8</div>
+      <div class="flag-text">A "junior" hire is expected to lead client meetings, design architecture, and mentor others</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:80%"></div></div>
+      <div class="flag-tag">Requirements</div>
+    </div>
+
+    <div class="flag-row sev-mid">
+      <div class="flag-sev">8</div>
+      <div class="flag-text">Recent employee reviews cite consistently long working hours</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:80%"></div></div>
+      <div class="flag-tag">Company</div>
+    </div>
+
+    <div class="flag-row sev-mid">
+      <div class="flag-sev">7</div>
+      <div class="flag-text">No salary range disclosed anywhere in the listing</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:70%"></div></div>
+      <div class="flag-tag">Hiring</div>
+    </div>
+
+    <div class="flag-row sev-mid">
+      <div class="flag-sev">7</div>
+      <div class="flag-text">8-month-old startup, no public funding info, and a rapid hiring phase signal instability</div>
+      <div class="flag-bar"><div class="flag-bar-fill" style="width:70%"></div></div>
+      <div class="flag-tag">Company</div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM GRID -->
+  <div class="bottom-grid">
+
+    <div class="panel">
+      <h3>Positive signals</h3>
+      <div class="panel-sub">What's actually working in this listing</div>
+      <div class="list-item">
+        <div class="ic ic-green"><i data-icon="check"></i></div>
+        <div>Mentions AI/ML exposure — could support skill-building if the workload claim is realistic</div>
+      </div>
+      <div class="list-item">
+        <div class="ic ic-green"><i data-icon="check"></i></div>
+        <div>Small team size may offer broad learning and high visibility into decision-making</div>
+      </div>
+      <div class="list-item">
+        <div class="ic ic-green"><i data-icon="check"></i></div>
+        <div>Remote work option is offered, though it carries a conditional relocation clause</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Smart interview questions</h3>
+      <div class="panel-sub">Use these to validate the flags above</div>
+      <div class="list-item">
+        <div class="ic ic-cyan"><span class="qnum">01</span></div>
+        <div>Can you clarify the salary range and how it's set for this "junior" role given the experience requirements?</div>
+      </div>
+      <div class="list-item">
+        <div class="ic ic-cyan"><span class="qnum">02</span></div>
+        <div>What does "24/7 support when needed" mean in practice, and is on-call time compensated?</div>
+      </div>
+      <div class="list-item">
+        <div class="ic ic-cyan"><span class="qnum">03</span></div>
+        <div>Is relocation after probation mandatory, and what support is provided if so?</div>
+      </div>
+      <div class="list-item">
+        <div class="ic ic-cyan"><span class="qnum">04</span></div>
+        <div>How is workload distributed across the 12-person team, and what's the average weekly hours?</div>
+      </div>
+      <div class="list-item">
+        <div class="ic ic-cyan"><span class="qnum">05</span></div>
+        <div>What's the company's funding status and runway, and how has headcount changed this year?</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="tag"><span class="sq"></span>Generated by Job Risk Intelligence — for guidance only, always verify with the employer</div>
+    <div>Scan completed in 1.84s</div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  // Minimal inline icon set (no external icon font dependency)
+  const icons = {
+    'briefcase': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+    'list-check': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M3 6h2"/><path d="M3 12h2"/><path d="M3 18h2"/><path d="M9 6h12"/><path d="M9 12h12"/><path d="M9 18h12"/></svg>',
+    'flame': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2.5 2.5 0 0 0 2.5-2.5c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3 1.072-2.143 2.224-4.054 4-6"/></svg>',
+    'map-pin': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+    'users': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'building': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg>',
+    'check': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M20 6 9 17l-5-5"/></svg>'
+  };
+  document.querySelectorAll('[data-icon]').forEach(el => {
+    const name = el.getAttribute('data-icon');
+    if (icons[name]) el.innerHTML = icons[name];
+  });
+
+  Chart.defaults.color = '#a9b4cc';
+  Chart.defaults.font.family = "'JetBrains Mono', monospace";
+  Chart.defaults.font.size = 11;
+
+  const severityData = [
+    { label: '"Junior" requires 5+ yrs exp', value: 9 },
+    { label: '10 tech stacks across 3 layers', value: 9 },
+    { label: '24/7 support expected', value: 9 },
+    { label: 'Hidden relocation clause', value: 9 },
+    { label: 'Hustle culture language', value: 8 },
+    { label: 'Junior leads clients & mentors', value: 8 },
+    { label: 'Reviews cite long hours', value: 8 },
+    { label: 'No salary disclosed', value: 7 },
+    { label: '8mo startup, rapid hiring', value: 7 }
+  ];
+
+  new Chart(document.getElementById('severityChart'), {
+    type: 'bar',
+    data: {
+      labels: severityData.map(d => d.label),
+      datasets: [{
+        data: severityData.map(d => d.value),
+        backgroundColor: (ctx) => {
+          const v = ctx.raw;
+          return v >= 9 ? '#ff4d6d' : '#ff9f4d';
+        },
+        borderRadius: 6,
+        barThickness: 18
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          min: 0, max: 10,
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { stepSize: 2 }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#eef2fb', font: { size: 11 } }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: ['Requirements', 'Culture', 'Remote', 'Hiring', 'Company'],
+      datasets: [{
+        label: 'Risk level',
+        data: [95, 90, 80, 85, 80],
+        backgroundColor: 'rgba(255,77,109,0.15)',
+        borderColor: '#ff4d6d',
+        pointBackgroundColor: '#ff4d6d',
+        pointBorderColor: '#0b0f1a',
+        pointRadius: 4,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, backdropColor: 'transparent', color: '#6c7791' },
+          grid: { color: 'rgba(255,255,255,0.08)' },
+          angleLines: { color: 'rgba(255,255,255,0.08)' },
+          pointLabels: { color: '#a9b4cc', font: { size: 12, family: "'Space Grotesk', sans-serif" } }
+        }
+      },
+      plugins: { legend: { display: false } }
+    }
+  });
+</script>
+</body>
+</html>
