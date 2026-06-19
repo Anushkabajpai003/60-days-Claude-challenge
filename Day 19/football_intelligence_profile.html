@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Football Intelligence Report</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0b1020;
+  --bg-secondary:#111827;
+  --card:rgba(255,255,255,.06);
+  --card-border:rgba(255,255,255,.08);
+
+  --text:#ffffff;
+  --text-secondary:#a1a9c0;
+
+  --purple:#7c6cff;
+  --purple-light:#9c90ff;
+
+  --green:#22c55e;
+  --blue:#3b82f6;
+  --orange:#f59e0b;
+  --red:#ef4444;
+
+  --radius:28px;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Inter,sans-serif;
+  background:
+    radial-gradient(circle at top left,
+    rgba(124,108,255,.18),
+    transparent 30%),
+
+    radial-gradient(circle at bottom right,
+    rgba(34,197,94,.12),
+    transparent 30%),
+
+    var(--bg);
+
+  color:var(--text);
+  min-height:100vh;
+  padding:32px;
+}
+
+.container{
+  max-width:1400px;
+  margin:auto;
+}
+
+.section{
+  margin-top:24px;
+}
+
+.grid{
+  display:grid;
+  gap:20px;
+}
+
+.grid-2{
+  grid-template-columns:repeat(2,1fr);
+}
+
+.grid-3{
+  grid-template-columns:repeat(3,1fr);
+}
+
+.grid-4{
+  grid-template-columns:repeat(4,1fr);
+}
+
+.card{
+  background:var(--card);
+  backdrop-filter:blur(18px);
+  border:1px solid var(--card-border);
+  border-radius:var(--radius);
+  padding:24px;
+  transition:.3s ease;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.25);
+}
+
+.label{
+  font-size:11px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+  margin-bottom:10px;
+}
+
+.title{
+  font-size:18px;
+  font-weight:700;
+}
+
+.sub{
+  color:var(--text-secondary);
+  line-height:1.7;
+  margin-top:10px;
+}
+
+/* HERO */
+
+.hero{
+  position:relative;
+  overflow:hidden;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:40px;
+
+  border-radius:36px;
+
+  background:
+      radial-gradient(circle at top left,
+      rgba(124,108,255,.6),
+      transparent 45%),
+
+      radial-gradient(circle at bottom right,
+      rgba(34,197,94,.25),
+      transparent 35%),
+
+      linear-gradient(
+      135deg,
+      #111827,
+      #0f172a
+      );
+
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.hero h1{
+  font-size:42px;
+  margin-top:8px;
+  margin-bottom:10px;
+}
+
+.hero p{
+  color:#cfd4e6;
+  max-width:600px;
+}
+
+.hero-score{
+  text-align:center;
+}
+
+.hero-score .value{
+  font-size:72px;
+  font-weight:800;
+}
+
+.hero-score .caption{
+  color:#cfd4e6;
+}
+
+/* KPI */
+
+.kpi{
+  text-align:left;
+}
+
+.kpi-number{
+  font-size:40px;
+  font-weight:800;
+  margin-top:12px;
+}
+
+.kpi-text{
+  color:var(--text-secondary);
+  margin-top:8px;
+}
+
+/* MESSI CARD */
+
+.compare{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+  border-radius:24px;
+  margin-top:20px;
+}
+
+.side{
+  padding:28px;
+}
+
+.messi{
+  background:linear-gradient(
+  135deg,
+  #635bff,
+  #897bff
+  );
+}
+
+.ronaldo{
+  background:rgba(255,255,255,.04);
+}
+
+.side h3{
+  font-size:18px;
+}
+
+.percent{
+  font-size:58px;
+  font-weight:800;
+  margin-top:12px;
+}
+
+/* ARCHETYPE */
+
+.archetype{
+  text-align:center;
+  padding:36px;
+}
+
+.archetype-icon{
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:linear-gradient(
+  135deg,
+  var(--purple),
+  var(--purple-light)
+  );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin:auto;
+  font-size:36px;
+}
+
+.archetype h2{
+  margin-top:18px;
+  font-size:30px;
+}
+
+.archetype p{
+  margin-top:14px;
+  color:var(--text-secondary);
+  line-height:1.8;
+}
+
+/* TRAITS */
+
+.traits{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+  margin-top:20px;
+}
+
+.trait{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:16px;
+  padding:14px;
+  text-align:center;
+}
+
+.trait small{
+  display:block;
+  color:var(--text-secondary);
+  margin-bottom:6px;
+}
+
+.trait strong{
+  font-size:14px;
+}
+
+/* RECOMMENDATIONS */
+
+.recommend{
+  padding:22px;
+}
+
+.rec-icon{
+  font-size:26px;
+  margin-bottom:12px;
+}
+
+.recommend h4{
+  margin-bottom:8px;
+}
+
+/* WC */
+
+.prediction{
+  position:relative;
+  overflow:hidden;
+}
+
+.prediction.winner{
+  background:linear-gradient(
+  135deg,
+  #16a34a,
+  #22c55e
+  );
+}
+
+.prediction.runner{
+  background:linear-gradient(
+  135deg,
+  #2563eb,
+  #3b82f6
+  );
+}
+
+.prediction.dark{
+  background:linear-gradient(
+  135deg,
+  #7c3aed,
+  #a855f7
+  );
+}
+
+.prediction.watch{
+  background:linear-gradient(
+  135deg,
+  #ea580c,
+  #f97316
+  );
+}
+
+.prediction .country{
+  font-size:28px;
+  font-weight:700;
+  margin-top:8px;
+}
+
+.prediction .confidence{
+  margin-top:8px;
+  opacity:.85;
+}
+
+/* IQ */
+
+.iq-wrap{
+  display:flex;
+  align-items:center;
+  gap:40px;
+}
+
+.circle{
+  width:180px;
+  height:180px;
+  border-radius:50%;
+  background:
+    conic-gradient(
+    var(--orange) 0 62%,
+    rgba(255,255,255,.08) 62%
+    );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.circle-inner{
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  background:#0f172a;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:42px;
+  font-weight:800;
+}
+
+/* INSIGHTS */
+
+.insight{
+  display:flex;
+  gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.insight:last-child{
+  border-bottom:none;
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  margin-top:8px;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1100px){
+
+  .grid-4{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .traits{
+    grid-template-columns:repeat(3,1fr);
+  }
+}
+
+@media(max-width:768px){
+
+  body{
+    padding:16px;
+  }
+
+  .hero{
+    flex-direction:column;
+    gap:24px;
+    text-align:center;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4{
+    grid-template-columns:1fr;
+  }
+
+  .compare{
+    grid-template-columns:1fr;
+  }
+
+  .traits{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .iq-wrap{
+    flex-direction:column;
+  }
+
+  .hero h1{
+    font-size:32px;
+  }
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+
+  <div class="hero">
+
+
+  <div>
+      <div class="label">Football Intelligence Profile</div>
+
+      <h1>Your Complete Football Report</h1>
+
+      <p>
+          Compiled from World Cup predictions,
+          Football IQ assessment and personality profiling.
+      </p>
+  </div>
+
+  <div class="hero-score">
+      <div class="value">68%</div>
+      <div class="caption">Messi Match</div>
+  </div>
+
+
+  </div>
+
+  <!-- KPI -->
+
+  <div class="section grid grid-4">
+
+
+  <div class="card kpi">
+      <div class="label">Football IQ</div>
+      <div class="kpi-number">62</div>
+      <div class="kpi-text">Football Follower</div>
+  </div>
+
+  <div class="card kpi">
+      <div class="label">Archetype</div>
+      <div class="kpi-number">🎨</div>
+      <div class="kpi-text">Creative Playmaker</div>
+  </div>
+
+  <div class="card kpi">
+      <div class="label">Work Ethic</div>
+      <div class="kpi-number">8/10</div>
+      <div class="kpi-text">Strong consistency</div>
+  </div>
+
+  <div class="card kpi">
+      <div class="label">World Cup Pick</div>
+      <div class="kpi-number">🇦🇷</div>
+      <div class="kpi-text">Argentina</div>
+  </div>
+
+
+  </div>
+
+  <!-- MESSI VS RONALDO -->
+
+  <div class="card section">
+
+
+  <div class="label">Messi vs Ronaldo Match</div>
+
+  <h2 class="title">
+      You lean Messi — with Ronaldo's engine
+  </h2>
+
+  <p class="sub">
+      Instinctive decisions, reflective learning and
+      process-driven growth align strongly with Messi,
+      while your competitiveness and work ethic bring
+      Ronaldo's relentless edge.
+  </p>
+
+  <div class="compare">
+
+      <div class="side messi">
+          <h3>🐐 Messi</h3>
+          <div class="percent">68%</div>
+          <p>Creative • Intuitive • Process Driven</p>
+      </div>
+
+      <div class="side ronaldo">
+          <h3>💪 Ronaldo</h3>
+          <div class="percent">32%</div>
+          <p>Driven • Competitive • Disciplined</p>
+      </div>
+
+  </div>
+
+  <div class="traits">
+
+      <div class="trait"><small>Ambition</small><strong>Process-led</strong></div>
+      <div class="trait"><small>Leadership</small><strong>Adaptive</strong></div>
+      <div class="trait"><small>Teamwork</small><strong>Balanced</strong></div>
+      <div class="trait"><small>Creativity</small><strong>Balanced</strong></div>
+      <div class="trait"><small>Confidence</small><strong>Situational</strong></div>
+
+      <div class="trait"><small>Work Ethic</small><strong>8/10</strong></div>
+      <div class="trait"><small>Competition</small><strong>7/10</strong></div>
+      <div class="trait"><small>Learning</small><strong>Intuitive</strong></div>
+      <div class="trait"><small>Decision</small><strong>Instinctive</strong></div>
+      <div class="trait"><small>Discipline</small><strong>Balanced</strong></div>
+
+  </div>
+
+
+  </div>
+
+  <!-- ARCHETYPE -->
+
+  <div class="card archetype section">
+
+
+  <div class="archetype-icon">🎯</div>
+
+  <h2>Creative Playmaker</h2>
+
+  <p>
+      You thrive when given freedom, trust and room
+      to create. You solve problems instinctively,
+      adapt quickly and often spot opportunities
+      before others do.
+  </p>
+
+
+  </div>
+
+  <!-- RECOMMENDATIONS -->
+
+  <div class="section grid grid-4">
+
+
+  <div class="card recommend">
+      <div class="rec-icon">🇦🇷</div>
+      <h4>Lionel Messi</h4>
+      <p class="sub">Your strongest player match.</p>
+  </div>
+
+  <div class="card recommend">
+      <div class="rec-icon">🏴</div>
+      <h4>Jude Bellingham</h4>
+      <p class="sub">Creative + driven hybrid.</p>
+  </div>
+
+  <div class="card recommend">
+      <div class="rec-icon">🔵</div>
+      <h4>Inter Miami</h4>
+      <p class="sub">Freedom-first football.</p>
+  </div>
+
+  <div class="card recommend">
+      <div class="rec-icon">🇪🇸</div>
+      <h4>Spain</h4>
+      <p class="sub">Fluid and creative style.</p>
+  </div>
+
+
+  </div>
+
+  <!-- WORLD CUP -->
+
+  <div class="section grid grid-4">
+
+
+  <div class="card prediction winner">
+      <div class="label">Winner</div>
+      <div class="country">🇦🇷 Argentina</div>
+      <div class="confidence">78% confidence</div>
+  </div>
+
+  <div class="card prediction runner">
+      <div class="label">Runner-up</div>
+      <div class="country">🇫🇷 France</div>
+      <div class="confidence">65% confidence</div>
+  </div>
+
+  <div class="card prediction dark">
+      <div class="label">Dark Horse</div>
+      <div class="country">🇩🇪 Germany</div>
+      <div class="confidence">42% confidence</div>
+  </div>
+
+  <div class="card prediction watch">
+      <div class="label">Player To Watch</div>
+      <div class="country">🇳🇴 Haaland</div>
+      <div class="confidence">25 goals so far</div>
+  </div>
+
+
+  </div>
+
+  <!-- IQ -->
+
+  <div class="card section">
+
+
+  <div class="label">Football IQ</div>
+
+  <div class="iq-wrap">
+
+      <div class="circle">
+          <div class="circle-inner">62</div>
+      </div>
+
+      <div>
+          <h2 class="title">Football Follower</h2>
+          <p class="sub">
+              3 of 5 correct answers. Strong on current
+              football events with room to grow in
+              World Cup history and records.
+          </p>
+      </div>
+
+  </div>
+
+
+  </div>
+
+  <!-- INSIGHTS -->
+
+  <div class="card section">
+
+
+  <div class="label">Key Insights</div>
+
+  <div class="insight">
+      <div class="dot" style="background:#7c6cff"></div>
+      <div>Creative Playmaker with strong instinctive decision making.</div>
+  </div>
+
+  <div class="insight">
+      <div class="dot" style="background:#f59e0b"></div>
+      <div>Football IQ score of 62 with strongest knowledge in current football topics.</div>
+  </div>
+
+  <div class="insight">
+      <div class="dot" style="background:#22c55e"></div>
+      <div>Argentina remains your strongest World Cup prediction.</div>
+  </div>
+
+  <div class="insight">
+      <div class="dot" style="background:#3b82f6"></div>
+      <div>Your profile aligns closely with creative, possession-oriented football systems.</div>
+  </div>
+
+  <div class="insight">
+      <div class="dot" style="background:#ef4444"></div>
+      <div>Exploring World Cup history will raise your Football IQ significantly.</div>
+  </div>
+
+
+  </div>
+
+</div>
+
+</body>
+</html>
