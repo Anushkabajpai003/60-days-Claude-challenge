@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prior Authorization — Slide Simulator</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --blue-50:#e6f1fb; --blue-100:#b5d4f4; --blue-200:#85b7eb;
+  --blue-400:#378add; --blue-600:#185fa5; --blue-800:#0c447c; --blue-900:#042c53;
+  --green-50:#eaf3de; --green-100:#c0dd97; --green-400:#639922;
+  --green-600:#3b6d11; --green-800:#27500a;
+  --amber-50:#faeeda; --amber-100:#fac775; --amber-400:#ba7517;
+  --amber-600:#854f0b; --amber-800:#633806;
+  --red-50:#fcebeb; --red-100:#f7c1c1; --red-400:#e24b4a;
+  --red-600:#a32d2d; --red-800:#791f1f;
+  --purple-50:#eeedfe; --purple-100:#cecbf6; --purple-400:#7f77dd;
+  --purple-600:#534ab7; --purple-800:#3c3489;
+  --teal-50:#e1f5ee; --teal-100:#9fe1cb; --teal-400:#1d9e75;
+  --teal-600:#0f6e56; --teal-800:#085041;
+  --gray-50:#f1efe8; --gray-100:#d3d1c7; --gray-200:#b4b2a9;
+  --gray-400:#888780; --gray-600:#5f5e5a; --gray-800:#444441; --gray-900:#2c2c2a;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0a1628;
+  color: #1a1a1a;
+  overflow: hidden;
+}
+
+/* ── SLIDE STAGE ── */
+#stage {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(60px);
+  transition: opacity 0.42s cubic-bezier(.4,0,.2,1),
+              transform 0.42s cubic-bezier(.4,0,.2,1);
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+
+.slide.exit-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: opacity 0.32s ease, transform 0.32s ease;
+}
+
+/* ── SLIDE CHROME ── */
+.slide-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px 12px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  flex-shrink: 0;
+}
+
+.slide-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255,255,255,0.7);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.slide-logo-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--blue-400);
+}
+
+.slide-counter {
+  color: rgba(255,255,255,0.45);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.slide-progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.slide-progress-fill {
+  height: 100%;
+  background: var(--blue-400);
+  transition: width 0.5s cubic-bezier(.4,0,.2,1);
+  border-radius: 0 3px 3px 0;
+}
+
+/* ── SLIDE BODY ── */
+.slide-body {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* ── LEFT PANEL (lane indicator) ── */
+.slide-lane {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 24px;
+  gap: 12px;
+  background: rgba(255,255,255,0.02);
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+.lane-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.3);
+  border: 1px solid transparent;
+  transition: all 0.3s;
+}
+
+.lane-pill.active-lane {
+  color: #fff;
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+}
+
+.lane-pill.done-lane {
+  color: rgba(255,255,255,0.45);
+}
+
+.lane-icon-box {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.lp { background: rgba(55,138,221,0.2); }
+.lpr { background: rgba(127,119,221,0.2); }
+.lpa { background: rgba(29,158,117,0.2); }
+
+.lane-pill.active-lane .lp  { background: var(--blue-600); }
+.lane-pill.active-lane .lpr { background: var(--purple-600); }
+.lane-pill.active-lane .lpa { background: var(--teal-600); }
+
+.lane-stages {
+  margin-top: 4px;
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lane-stage-dot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  padding: 3px 0;
+}
+
+.lane-stage-dot.done { color: rgba(255,255,255,0.5); }
+.lane-stage-dot.current { color: rgba(255,255,255,0.9); font-weight: 600; }
+
+.dot-indicator {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+}
+
+.lane-stage-dot.done .dot-indicator { background: var(--green-400); }
+.lane-stage-dot.current .dot-indicator { background: var(--blue-400); box-shadow: 0 0 6px rgba(55,138,221,0.7); }
+
+.divider-lane {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 8px 0;
+}
+
+/* ── MAIN CONTENT AREA ── */
+.slide-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 36px 48px 28px;
+  overflow-y: auto;
+  gap: 20px;
+}
+
+.slide-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.tag-patient  { background: rgba(55,138,221,0.15); color: var(--blue-200); }
+.tag-provider { background: rgba(127,119,221,0.15); color: #afa9ec; }
+.tag-payer    { background: rgba(29,158,117,0.15);  color: var(--teal-100); }
+.tag-outcome  { background: rgba(99,153,34,0.15);   color: var(--green-100); }
+.tag-warning  { background: rgba(186,117,23,0.15);  color: var(--amber-100); }
+.tag-danger   { background: rgba(226,75,74,0.15);   color: var(--red-100); }
+
+.slide-headline {
+  font-size: 34px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.18;
+  letter-spacing: -0.5px;
+}
+
+.slide-headline span {
+  color: var(--blue-200);
+}
+
+.slide-subtitle {
+  font-size: 15px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.6;
+  max-width: 560px;
+}
+
+/* ── CARDS GRID ── */
+.info-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.info-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.info-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.info-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.info-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-card.highlight {
+  background: rgba(55,138,221,0.1);
+  border-color: rgba(55,138,221,0.25);
+}
+
+.info-card.success-card {
+  background: rgba(99,153,34,0.1);
+  border-color: rgba(99,153,34,0.25);
+}
+
+.info-card.warn-card {
+  background: rgba(186,117,23,0.1);
+  border-color: rgba(186,117,23,0.25);
+}
+
+.info-card.danger-card {
+  background: rgba(226,75,74,0.1);
+  border-color: rgba(226,75,74,0.25);
+}
+
+.info-card.purple-card {
+  background: rgba(127,119,221,0.1);
+  border-color: rgba(127,119,221,0.25);
+}
+
+.info-card.teal-card {
+  background: rgba(29,158,117,0.1);
+  border-color: rgba(29,158,117,0.25);
+}
+
+.card-icon { font-size: 22px; }
+.card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+.card-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.35;
+}
+.card-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.4;
+}
+
+/* ── FLOW DIAGRAM ── */
+.flow-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+
+.flow-node {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+  transition: all 0.3s;
+}
+
+.flow-node.active-node {
+  background: rgba(55,138,221,0.2);
+  border-color: var(--blue-400);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(55,138,221,0.25);
+}
+
+.flow-node.done-node {
+  background: rgba(99,153,34,0.15);
+  border-color: var(--green-400);
+  color: rgba(255,255,255,0.8);
+}
+
+.flow-arrow {
+  color: rgba(255,255,255,0.2);
+  font-size: 18px;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+
+/* ── CHECKLIST ── */
+.check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.check-item:hover {
+  background: rgba(55,138,221,0.08);
+  border-color: rgba(55,138,221,0.2);
+}
+
+.check-item.checked {
+  background: rgba(99,153,34,0.1);
+  border-color: rgba(99,153,34,0.3);
+}
+
+.check-bubble {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.2s;
+}
+
+.check-item.checked .check-bubble {
+  background: var(--green-600);
+  border-color: var(--green-600);
+}
+
+.check-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.45;
+}
+
+.check-text strong { color: #fff; }
+
+/* ── OUTCOME PICKER ── */
+.outcome-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.outcome-btn {
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.outcome-btn:hover { transform: translateY(-2px); }
+
+.outcome-btn.approve-btn { border-color: rgba(99,153,34,0.4); }
+.outcome-btn.approve-btn:hover { background: rgba(99,153,34,0.12); box-shadow: 0 4px 20px rgba(99,153,34,0.2); }
+.outcome-btn.approve-btn.picked { background: rgba(99,153,34,0.2); border-color: var(--green-400); }
+
+.outcome-btn.pend-btn { border-color: rgba(186,117,23,0.4); }
+.outcome-btn.pend-btn:hover { background: rgba(186,117,23,0.12); box-shadow: 0 4px 20px rgba(186,117,23,0.2); }
+.outcome-btn.pend-btn.picked { background: rgba(186,117,23,0.2); border-color: var(--amber-400); }
+
+.outcome-btn.deny-btn { border-color: rgba(226,75,74,0.4); }
+.outcome-btn.deny-btn:hover { background: rgba(226,75,74,0.12); box-shadow: 0 4px 20px rgba(226,75,74,0.2); }
+.outcome-btn.deny-btn.picked { background: rgba(226,75,74,0.2); border-color: var(--red-400); }
+
+.outcome-btn.peer-btn { border-color: rgba(29,158,117,0.4); }
+.outcome-btn.peer-btn:hover { background: rgba(29,158,117,0.12); box-shadow: 0 4px 20px rgba(29,158,117,0.2); }
+.outcome-btn.peer-btn.picked { background: rgba(29,158,117,0.2); border-color: var(--teal-400); }
+
+.ob-icon { font-size: 24px; }
+.ob-title { font-size: 14px; font-weight: 700; color: #fff; }
+.ob-desc  { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.4; }
+
+/* ── STATS ROW ── */
+.stat-row {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-box {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.stat-lbl {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+/* ── NECESSITY METER ── */
+.meter-wrap {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.meter-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); }
+.meter-value { font-size: 22px; font-weight: 800; color: #fff; }
+
+.meter-bar-bg {
+  height: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.meter-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+.meter-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.25);
+}
+
+/* ── TIMELINE ── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.tl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.tl-item:last-child { border-bottom: none; }
+
+.tl-dot {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.tl-dot.p  { background: var(--blue-600); }
+.tl-dot.pr { background: var(--purple-600); }
+.tl-dot.pa { background: var(--teal-600); }
+.tl-dot.ok { background: var(--green-600); }
+.tl-dot.wn { background: var(--amber-600); }
+.tl-dot.er { background: var(--red-600); }
+
+.tl-body { flex: 1; }
+.tl-step { font-size: 13px; font-weight: 600; color: #fff; }
+.tl-detail { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+.tl-day { font-size: 11px; color: rgba(255,255,255,0.25); min-width: 50px; text-align: right; flex-shrink: 0; margin-top: 4px; }
+
+/* ── BOTTOM NAV ── */
+.slide-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 70px;
+  background: rgba(10,22,40,0.95);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.nav-left, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border-color: rgba(255,255,255,0.25);
+}
+
+.nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.nav-btn.primary-nav {
+  background: var(--blue-600);
+  border-color: var(--blue-600);
+  color: #fff;
+}
+
+.nav-btn.primary-nav:hover:not(:disabled) {
+  background: var(--blue-800);
+  border-color: var(--blue-800);
+}
+
+.nav-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.nav-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  transition: all 0.25s;
+  cursor: pointer;
+}
+
+.nav-dot.active {
+  width: 20px;
+  border-radius: 3px;
+  background: var(--blue-400);
+}
+
+.nav-dot.done { background: rgba(99,153,34,0.6); }
+
+/* ── SCENARIO SELECTOR (slide 0) ── */
+.scenario-pick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sc-card {
+  background: rgba(255,255,255,0.04);
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sc-card:hover {
+  background: rgba(55,138,221,0.08);
+  border-color: rgba(55,138,221,0.3);
+  transform: translateY(-2px);
+}
+
+.sc-card.selected {
+  background: rgba(55,138,221,0.12);
+  border-color: var(--blue-400);
+  box-shadow: 0 0 20px rgba(55,138,221,0.15);
+}
+
+.sc-emoji { font-size: 28px; }
+.sc-name  { font-size: 14px; font-weight: 700; color: #fff; }
+.sc-proc  { font-size: 12px; color: rgba(255,255,255,0.5); }
+.sc-tags  { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.sc-badge {
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  background: rgba(55,138,221,0.15);
+  color: var(--blue-200);
+}
+
+/* ── CELEBRATION ── */
+.confetti-wrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.cp {
+  position: absolute;
+  top: -16px;
+  border-radius: 3px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to { transform: translateY(105vh) rotateZ(600deg); opacity: 0; }
+}
+
+/* ── SUMMARY SLIDE ── */
+.summary-hero-icon { font-size: 52px; text-align: center; }
+.summary-title { font-size: 30px; font-weight: 800; color: #fff; text-align: center; letter-spacing: -0.4px; }
+.summary-sub { font-size: 14px; color: rgba(255,255,255,0.5); text-align: center; }
+
+.score-ring {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 4px solid var(--blue-400);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: #fff;
+  margin: 0 auto;
+}
+
+/* ── EDU BANNER ── */
+.edu-banner {
+  background: rgba(55,138,221,0.08);
+  border: 1px solid rgba(55,138,221,0.2);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.edu-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.edu-body {}
+.edu-title { font-size: 11px; font-weight: 700; color: var(--blue-200); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.edu-text  { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.55; }
+
+/* keyboard shortcut hint */
+.kbd-hint {
+  font-size: 11px;
+  color: rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kbd {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+}
+
+@media (max-width: 700px) {
+  .slide-lane { display: none; }
+  .slide-content { padding: 24px 20px 20px; }
+  .slide-headline { font-size: 24px; }
+  .info-grid.cols-2,
+  .info-grid.cols-3,
+  .info-grid.cols-4 { grid-template-columns: 1fr; }
+  .outcome-grid { grid-template-columns: 1fr; }
+  .scenario-pick-grid { grid-template-columns: 1fr; }
+  .stat-row { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<div id="stage"></div>
+
+<nav class="slide-nav">
+  <div class="nav-left">
+    <button class="nav-btn" id="btnBack" onclick="goBack()">&#8592; Back</button>
+    <div class="kbd-hint">
+      <span class="kbd">&#8592;</span><span class="kbd">&#8594;</span> navigate &nbsp;|&nbsp; <span class="kbd">Space</span> advance
+    </div>
+  </div>
+  <div class="nav-dots" id="navDots"></div>
+  <div class="nav-right">
+    <button class="nav-btn" id="btnRestart" onclick="restart()" style="opacity:0.5;">&#x1F504; Restart</button>
+    <button class="nav-btn primary-nav" id="btnNext" onclick="goNext()">Next &#8594;</button>
+  </div>
+</nav>
+
+<script>
+/* =========================================================
+   SCENARIO DATA — edit this array to customise cases
+   ========================================================= */
+const SCENARIOS = [
+  {
+    id:'surgery', name:'Sarah Mitchell', age:45, icon:'🔪',
+    type:'Elective Surgery', typeKey:'surgery',
+    procedure:'Knee Arthroscopy', cpt:'CPT 29881',
+    icd10:'M17.11 — Primary osteoarthritis, right knee',
+    urgency:'Elective (non-urgent)', insurance:'BlueCross Preferred PPO',
+    diagnosis:'6-month history of right knee pain. Failed conservative therapy: 12 PT sessions, NSAIDs, and two cortisone injections with no lasting relief.',
+    necessityBase:58, approvalChance:0.80,
+    denialReason:'Additional PT sessions required before surgery authorization per plan step-therapy protocol.',
+    appealNote:'MRI shows Grade III meniscal tear. Surgical intervention medically necessary per AAOS guidelines.',
+    peerNote:'Orthopedic surgeon presents surgical necessity findings to payer medical director; cites objective MRI findings.',
+    docs:['Letter of Medical Necessity','Physical Therapy Records (6 months)','Imaging Reports (X-ray + MRI)','Physician Notes (3 visits)','Failed Conservative Treatment Docs'],
+    eduCheckin:'Elective surgeries almost always require PA. The process can take 3–14 business days. Emergent procedures bypass PA but may face retrospective review.',
+    eduNecessity:'Medical necessity means the treatment is appropriate and not experimental. Payers use MCG or InterQual clinical criteria to evaluate the request.',
+    eduDocs:'For elective surgery, payers want evidence of failed conservative treatment ("step therapy"). Missing docs are the #1 cause of initial denial.',
+    eduSubmit:'Submission starts the formal review clock. CMS requires payers to decide within 14 days (non-urgent) or 3 days (urgent).',
+    eduReview:'A payer nurse or physician reviews against clinical criteria. ~30% of PA requests are initially denied — but 60–70% of appealed denials are overturned.',
+  },
+  {
+    id:'mri', name:'James Ortega', age:52, icon:'🧲',
+    type:'MRI Imaging', typeKey:'imaging',
+    procedure:'Brain MRI with Contrast', cpt:'CPT 70553',
+    icd10:'R51.9 — Headache, unspecified',
+    urgency:'Semi-urgent (within 2 weeks)', insurance:'Aetna Select HMO',
+    diagnosis:'New-onset severe headaches with visual disturbances. Neurologist suspects intracranial pathology. No prior imaging on file.',
+    necessityBase:70, approvalChance:0.90,
+    denialReason:'Standard headache MRI criteria not met — plan guidelines require CT first.',
+    appealNote:'New-onset neurological symptoms with visual changes meet urgent imaging criteria. Neurologist attestation included.',
+    peerNote:'Neurologist discusses clinical urgency and describes exam findings that justify skipping CT per AAN guidelines.',
+    docs:['Neurologist Referral Letter','Symptom Log (3 weeks)','Neurological Exam Notes','Headache Diary'],
+    eduCheckin:'Imaging (MRI, CT, PET) is one of the most common PA categories. HMOs often require PA for any advanced imaging, even urgent cases.',
+    eduNecessity:'For brain MRI, payers look for "red flag" symptoms: sudden onset, neurological deficits, cancer history, or immunocompromised status. This patient has multiple red flags.',
+    eduDocs:'Imaging PA requires fewer documents, but clinical notes must clearly document symptoms prompting the scan — vague notes lead to denials.',
+    eduSubmit:'For semi-urgent imaging, many payers have an expedited pathway (24–72 hrs). Always flag urgency level in the submission form.',
+    eduReview:'Imaging denials are often "criteria not met" — meaning documentation didn\'t satisfy guidelines, not that the scan is medically unnecessary.',
+  },
+  {
+    id:'med', name:'Elena Vasquez', age:38, icon:'💊',
+    type:'Specialty Medication', typeKey:'medication',
+    procedure:'Adalimumab (Humira) — Crohn\'s Disease', cpt:'J0135',
+    icd10:'K50.10 — Crohn\'s disease of large intestine',
+    urgency:'Routine (within 30 days)', insurance:'United Healthcare Choice Plus',
+    diagnosis:'Moderate-to-severe Crohn\'s. Failed 5-ASA agents and azathioprine (6 months). GI recommends biologic therapy.',
+    necessityBase:55, approvalChance:0.72,
+    denialReason:'Step therapy incomplete — documentation of 6-month azathioprine trial not included.',
+    appealNote:'Additional lab records show immunomodulator failure. GI attestation of clinical necessity for biologic included.',
+    peerNote:'GI specialist discusses Harvey-Bradshaw disease severity score and explains why delayed biologic treatment risks hospitalization.',
+    docs:['GI Specialist Clinical Notes','Colonoscopy Report (diagnosis)','Step Therapy Failure Records','Lab Results (TB, hepatitis panel)','Prior Treatment Failure Docs','Financial Assistance Enrollment'],
+    eduCheckin:'Specialty medications (biologics, cancer drugs) cost $10K–$700K/year. Nearly all require PA, and most have step-therapy — you must try cheaper drugs first.',
+    eduNecessity:'For biologics, necessity means confirmed diagnosis, adequate severity, and documented failure of required prior therapies per the payer\'s step-therapy protocol.',
+    eduDocs:'Documentation is critical: dates of prior treatment, drug names and doses, why they failed, and current disease severity scores.',
+    eduSubmit:'Specialty drug submissions often go through a Pharmacy Benefit Manager (PBM) like Express Scripts rather than directly to the health plan.',
+    eduReview:'Specialty drug denials are the fastest-growing PA category. Step-therapy denials are most common — payers want proof every required alternative was tried.',
+  },
+  {
+    id:'inpatient', name:'Robert Chen', age:67, icon:'🛏️',
+    type:'Inpatient Admission', typeKey:'inpatient',
+    procedure:'Inpatient Cardiac Monitoring', cpt:'DRG 310',
+    icd10:'I48.0 — Paroxysmal atrial fibrillation',
+    urgency:'⚠️ URGENT — within 24 hours', insurance:'Medicare Advantage (Humana)',
+    diagnosis:'New-onset atrial fibrillation with rapid ventricular response. HR 140s. Requires rate control and anticoagulation initiation under monitoring.',
+    necessityBase:75, approvalChance:0.92,
+    denialReason:'Patient clinically stable — payer suggests outpatient management with 24-hr Holter monitor.',
+    appealNote:'New-onset AF with RVR requires inpatient monitoring. CHA₂DS₂-VASc score = 4 (high stroke risk). Anticoagulation cannot safely be initiated outpatient.',
+    peerNote:'Cardiologist stresses stroke risk score and inability to safely initiate anticoagulation outpatient — risk of hemodynamic decompensation if discharged.',
+    docs:['Emergency Department Notes','12-Lead ECG Report','Cardiac Enzyme Results','Attending Physician Admission Order'],
+    eduCheckin:'For inpatient admissions, PA is often concurrent. Urgent admissions may proceed without prior approval, but the hospital must notify the payer within 24 hours.',
+    eduNecessity:'Inpatient criteria use InterQual or Milliman Care Guidelines. Key factors: severity of illness (vital sign instability, lab abnormalities) and intensity of services required.',
+    eduDocs:'Inpatient PA documentation is usually the admitting physician\'s notes, ED record, and nursing assessment. Hospital UM teams typically handle submission.',
+    eduSubmit:'Hospitals have dedicated Utilization Management (UM) nurses who manage concurrent PA and communicate directly with payer case managers.',
+    eduReview:'Payer may approve initial 1–3 days and require concurrent review for continued stay. Denials may be appealed under the patient\'s plan rights.',
+  }
+];
+
+/* =========================================================
+   APP STATE
+   ========================================================= */
+let G = {
+  scenario: null,
+  slideIndex: 0,
+  slides: [],           // array of slide-definition objects
+  days: 0,
+  score: 100,
+  docsChecked: [],
+  necessityScore: 0,
+  outcome: null,
+  timeline: [],
+  history: [],          // breadcrumb of slide indices for back nav
+};
+
+/* =========================================================
+   LANE / STAGE META
+   ========================================================= */
+const LANES = [
+  { id:'patient',  label:'Patient',       icon:'🧑', cls:'lp'  },
+  { id:'provider', label:'Provider',      icon:'🏥', cls:'lpr' },
+  { id:'payer',    label:'Payer (Insurer)', icon:'📋', cls:'lpa' },
+];
+
+const STAGE_LANE = {
+  pick:'none', intro:'patient', checkin:'patient',
+  necessity:'provider', docs:'provider', submit:'provider',
+  review:'payer', decision:'payer', appeal:'payer', peer:'payer',
+  summary:'none',
+};
+
+/* =========================================================
+   SLIDE BUILDER — returns an HTML string for each stage
+   ========================================================= */
+function buildSlides() {
+  const s = G.scenario;
+  G.slides = [];
+
+  // 0 — PICKER (no scenario yet)
+  G.slides.push({ id:'pick', lane:'none', title:'Select patient', html: buildPickSlide() });
+
+  if (!s) return;
+
+  // 1 — INTRO
+  G.slides.push({ id:'intro', lane:'patient', title:'Case intake', html: buildIntroSlide() });
+  // 2 — CHECK-IN
+  G.slides.push({ id:'checkin', lane:'patient', title:'Clinical check-in', html: buildCheckinSlide() });
+  // 3 — NECESSITY
+  G.slides.push({ id:'necessity', lane:'provider', title:'Medical necessity', html: buildNecessitySlide() });
+  // 4 — DOCS
+  G.slides.push({ id:'docs', lane:'provider', title:'Document collection', html: buildDocsSlide() });
+  // 5 — SUBMIT
+  G.slides.push({ id:'submit', lane:'provider', title:'PA submission', html: buildSubmitSlide() });
+  // 6 — REVIEW
+  G.slides.push({ id:'review', lane:'payer', title:'Payer review', html: buildReviewSlide() });
+  // 7 — DECISION
+  G.slides.push({ id:'decision', lane:'payer', title:'Decision', html: buildDecisionSlide() });
+  // 8+ — outcome slides added dynamically
+  // summary always last
+}
+
+/* ── PICK ── */
+function buildPickSlide() {
+  return `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:40px;">
+      <div style="max-width:680px;width:100%;display:flex;flex-direction:column;gap:28px;">
+        <div style="text-align:center;">
+          <div style="font-size:44px;margin-bottom:12px;">🏥</div>
+          <div style="font-size:32px;font-weight:800;color:#fff;letter-spacing:-0.4px;margin-bottom:8px;">Prior Authorization<br><span style="color:var(--blue-200);">Workflow Simulator</span></div>
+          <div style="font-size:14px;color:rgba(255,255,255,0.45);">Choose a patient scenario to begin the interactive walkthrough</div>
+        </div>
+        <div class="scenario-pick-grid">
+          ${SCENARIOS.map(sc => `
+            <div class="sc-card" id="sc_${sc.id}" onclick="pickScenario('${sc.id}')">
+              <div class="sc-emoji">${sc.icon}</div>
+              <div class="sc-name">${sc.name}, ${sc.age}</div>
+              <div class="sc-proc">${sc.procedure}</div>
+              <div class="sc-tags">
+                <span class="sc-badge">${sc.type}</span>
+                <span class="sc-badge">${sc.insurance.split(' ')[0]}</span>
+                ${sc.urgency.includes('URGENT') ? '<span class="sc-badge" style="background:rgba(226,75,74,0.15);color:#f09595;">Urgent</span>' : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div style="text-align:center;font-size:12px;color:rgba(255,255,255,0.25);">Select a scenario, then press <strong style="color:rgba(255,255,255,0.4);">Next</strong> or <strong style="color:rgba(255,255,255,0.4);">Space</strong> to advance</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── INTRO ── */
+function buildIntroSlide() {
+  const s = G.scenario;
+  return `
+    <div class="slide-tag tag-patient">🧑 Patient lane — Stage 1 of 7</div>
+    <div class="slide-headline">New case: <span>${s.name}</span></div>
+    <div class="slide-subtitle">${s.procedure} &nbsp;·&nbsp; ${s.insurance}</div>
+    <div class="info-grid cols-2">
+      <div class="info-card highlight">
+        <div class="card-label">Patient</div>
+        <div class="card-value">${s.name}, age ${s.age}</div>
+        <div class="card-sub">${s.icd10}</div>
+      </div>
+      <div class="info-card">
+        <div class="card-label">Insurance</div>
+        <div class="card-value">${s.insurance}</div>
+        <div class="card-sub">${s.urgency}</div>
+      </div>
+      <div class="info-card">
+        <div class="card-label">Procedure</div>
+        <div class="card-value">${s.procedure}</div>
+        <div class="card-sub">${s.cpt}</div>
+      </div>
+      <div class="info-card ${s.urgency.includes('URGENT') ? 'danger-card' : 'success-card'}">
+        <div class="card-label">Urgency</div>
+        <div class="card-value">${s.urgency}</div>
+        <div class="card-sub">Determines review window</div>
+      </div>
+    </div>
+    <div class="info-card" style="margin-top:4px;">
+      <div class="card-label">Clinical summary</div>
+      <div class="card-value" style="font-weight:400;font-size:13px;line-height:1.6;color:rgba(255,255,255,0.7);">${s.diagnosis}</div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📋</div>
+      <div class="edu-body">
+        <div class="edu-title">First step: insurance eligibility</div>
+        <div class="edu-text">Before any PA work begins, the front desk verifies the patient has active coverage and confirms that a Prior Authorization is required for this specific procedure.</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── CHECK-IN ── */
+function buildCheckinSlide() {
+  const s = G.scenario;
+  return `
+    <div class="slide-tag tag-patient">🧑 Patient lane — Stage 2 of 7</div>
+    <div class="slide-headline">Clinical <span>check-in</span></div>
+    <div class="slide-subtitle">Verifying insurance eligibility and flagging PA requirements for ${s.name}.</div>
+    <div class="info-grid cols-3">
+      <div class="info-card success-card">
+        <div class="card-icon">✅</div>
+        <div class="card-label">Eligibility</div>
+        <div class="card-value">Active coverage</div>
+        <div class="card-sub">Confirmed via EDI 270/271</div>
+      </div>
+      <div class="info-card warn-card">
+        <div class="card-icon">⚠️</div>
+        <div class="card-label">PA Required</div>
+        <div class="card-value">Yes — mandatory</div>
+        <div class="card-sub">For ${s.cpt}</div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">📅</div>
+        <div class="card-label">Review Window</div>
+        <div class="card-value">${s.urgency.includes('URGENT') ? '24–72 hrs' : '14 business days'}</div>
+        <div class="card-sub">${s.urgency.includes('URGENT') ? 'Expedited track' : 'Standard non-urgent'}</div>
+      </div>
+    </div>
+    <div class="flow-row" style="margin:4px 0;">
+      <div class="flow-node done-node">✓ Eligibility</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active-node">⚡ PA Required</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Necessity eval</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Docs</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Submit</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Decision</div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📚</div>
+      <div class="edu-body">
+        <div class="edu-title">Did you know?</div>
+        <div class="edu-text">${s.eduCheckin}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── NECESSITY ── */
+function buildNecessitySlide() {
+  const s = G.scenario;
+  G.necessityScore = s.necessityBase;
+  const criteria = [
+    { label:'Confirmed diagnosis', pts:8, text:`${s.icd10}` },
+    { label:'Appropriate indication', pts:12, text:'Procedure matches diagnosis per clinical guidelines' },
+    { label:'Severity documented', pts:15, text:'Disease severity justifies the requested intervention' },
+    { label:'Alternatives considered', pts:12, text:'Less-intensive options have been reviewed and documented' },
+    { label:'Guideline compliance', pts:13, text:'Request aligns with evidence-based clinical guidelines' },
+  ];
+
+  return `
+    <div class="slide-tag tag-provider">🏥 Provider lane — Stage 3 of 7</div>
+    <div class="slide-headline">Medical <span>necessity</span></div>
+    <div class="slide-subtitle">Click each criterion to mark it met. Stronger documentation = better approval odds.</div>
+    <div class="meter-wrap">
+      <div class="meter-header">
+        <div class="meter-title">Necessity strength</div>
+        <div class="meter-value" id="meterVal">${G.necessityScore}%</div>
+      </div>
+      <div class="meter-bar-bg">
+        <div class="meter-bar-fill" id="meterFill" style="width:${G.necessityScore}%;background:${meterColor(G.necessityScore)};"></div>
+      </div>
+      <div class="meter-labels"><span>Weak</span><span>60% pend risk</span><span>80%+ strong</span></div>
+    </div>
+    <div class="check-list" id="necessityCL">
+      ${criteria.map((c,i) => `
+        <div class="check-item" id="nc_${i}" onclick="toggleNecessity(${i},${c.pts})">
+          <div class="check-bubble" id="nb_${i}"></div>
+          <div class="check-text"><strong>${c.label}</strong> (+${c.pts}%) — ${c.text}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📚</div>
+      <div class="edu-body">
+        <div class="edu-title">What payers look for</div>
+        <div class="edu-text">${s.eduNecessity}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── DOCS ── */
+function buildDocsSlide() {
+  const s = G.scenario;
+  G.docsChecked = [];
+  return `
+    <div class="slide-tag tag-provider">🏥 Provider lane — Stage 4 of 7</div>
+    <div class="slide-headline">Document <span>collection</span></div>
+    <div class="slide-subtitle">Click each document to mark it collected. Incomplete submissions often trigger a pend.</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div style="font-size:13px;color:rgba(255,255,255,0.5);">${s.docs.length} documents required</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.7);font-weight:600;" id="docCount">0 / ${s.docs.length}</div>
+    </div>
+    <div class="meter-bar-bg" style="margin-bottom:12px;">
+      <div class="meter-bar-fill" id="docFill" style="width:0%;background:var(--blue-400);"></div>
+    </div>
+    <div class="check-list" id="docsCL">
+      ${s.docs.map((d,i) => `
+        <div class="check-item" id="dc_${i}" onclick="toggleDoc(${i})">
+          <div class="check-bubble" id="db_${i}"></div>
+          <div class="check-text"><strong>${d}</strong></div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📚</div>
+      <div class="edu-body">
+        <div class="edu-title">Documentation is everything</div>
+        <div class="edu-text">${s.eduDocs}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── SUBMIT ── */
+function buildSubmitSlide() {
+  const s = G.scenario;
+  const docsOk = G.docsChecked.length === s.docs.length;
+  const necessityOk = G.necessityScore >= 80;
+  return `
+    <div class="slide-tag tag-provider">🏥 Provider lane — Stage 5 of 7</div>
+    <div class="slide-headline">PA <span>submission</span></div>
+    <div class="slide-subtitle">Sending the completed PA request to ${s.insurance}. The review clock starts upon receipt.</div>
+    <div class="info-grid cols-2">
+      <div class="info-card ${necessityOk ? 'success-card' : 'warn-card'}">
+        <div class="card-icon">${necessityOk ? '✅' : '⚠️'}</div>
+        <div class="card-label">Necessity score</div>
+        <div class="card-value">${G.necessityScore}%</div>
+        <div class="card-sub">${necessityOk ? 'Strong — likely to meet criteria' : 'Below 80% — pend risk elevated'}</div>
+      </div>
+      <div class="info-card ${docsOk ? 'success-card' : 'warn-card'}">
+        <div class="card-icon">${docsOk ? '✅' : '⚠️'}</div>
+        <div class="card-label">Documentation</div>
+        <div class="card-value">${G.docsChecked.length} / ${s.docs.length}</div>
+        <div class="card-sub">${docsOk ? 'Complete package' : 'Incomplete — may trigger pend'}</div>
+      </div>
+      <div class="info-card highlight">
+        <div class="card-label">Submitted to</div>
+        <div class="card-value">${s.insurance}</div>
+        <div class="card-sub">Day ${G.days}</div>
+      </div>
+      <div class="info-card">
+        <div class="card-label">Decision deadline</div>
+        <div class="card-value">${s.urgency.includes('URGENT') ? '72 hours' : '14 business days'}</div>
+        <div class="card-sub">CMS regulatory requirement</div>
+      </div>
+    </div>
+    <div class="flow-row">
+      <div class="flow-node done-node">✓ Intake</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node done-node">✓ Check-in</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node done-node">✓ Necessity</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node done-node">✓ Docs</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node active-node">⚡ Submitted</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Review</div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📚</div>
+      <div class="edu-body">
+        <div class="edu-title">Submission process</div>
+        <div class="edu-text">${s.eduSubmit}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── REVIEW ── */
+function buildReviewSlide() {
+  const s = G.scenario;
+  addDays(s.urgency.includes('URGENT') ? 1 : 5);
+  return `
+    <div class="slide-tag tag-payer">📋 Payer lane — Stage 6 of 7</div>
+    <div class="slide-headline">Payer <span>review</span></div>
+    <div class="slide-subtitle">${s.insurance} utilization management team is evaluating the submission.</div>
+    <div class="info-grid cols-4">
+      <div class="info-card">
+        <div class="card-icon">📩</div>
+        <div class="card-label">Day 0</div>
+        <div class="card-value" style="font-size:12px;">PA received</div>
+        <div class="card-sub">Auto-acknowledgment sent</div>
+      </div>
+      <div class="info-card highlight">
+        <div class="card-icon">👩‍⚕️</div>
+        <div class="card-label">Day 1–2</div>
+        <div class="card-value" style="font-size:12px;">UM nurse review</div>
+        <div class="card-sub">Initial criteria check</div>
+      </div>
+      <div class="info-card ${G.docsChecked.length < s.docs.length ? 'warn-card' : ''}">
+        <div class="card-icon">${G.docsChecked.length < s.docs.length ? '⚠️' : '📋'}</div>
+        <div class="card-label">Day 2–3</div>
+        <div class="card-value" style="font-size:12px;">${G.docsChecked.length < s.docs.length ? 'Pend possible' : 'Clinical review'}</div>
+        <div class="card-sub">${G.docsChecked.length < s.docs.length ? 'Docs incomplete' : 'Guideline comparison'}</div>
+      </div>
+      <div class="info-card purple-card">
+        <div class="card-icon">🩺</div>
+        <div class="card-label">Day ${s.urgency.includes('URGENT') ? '1' : '5–14'}</div>
+        <div class="card-value" style="font-size:12px;">MD decision</div>
+        <div class="card-sub">Final determination</div>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num">${G.days}</div>
+        <div class="stat-lbl">Days elapsed</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" style="color:${G.score>=70?'#7fe0c0':G.score>=40?'#fac775':'#f09595'}">${G.score}</div>
+        <div class="stat-lbl">Efficiency score</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">${G.docsChecked.length}/${s.docs.length}</div>
+        <div class="stat-lbl">Docs submitted</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">${G.necessityScore}%</div>
+        <div class="stat-lbl">Necessity strength</div>
+      </div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📚</div>
+      <div class="edu-body">
+        <div class="edu-title">How payer review works</div>
+        <div class="edu-text">${s.eduReview}</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── DECISION ── */
+function buildDecisionSlide() {
+  return `
+    <div class="slide-tag tag-payer">📋 Payer lane — Stage 7 of 7</div>
+    <div class="slide-headline">Payer <span>decision</span></div>
+    <div class="slide-subtitle">Select the decision outcome. Each leads to a different path — just like in real-world PA.</div>
+    <div class="outcome-grid" id="outcomeGrid">
+      <div class="outcome-btn approve-btn" onclick="pickOutcome('approved',this)">
+        <div class="ob-icon">✅</div>
+        <div class="ob-title">Approved</div>
+        <div class="ob-desc">PA granted. Auth number issued. Proceed with treatment.</div>
+      </div>
+      <div class="outcome-btn pend-btn" onclick="pickOutcome('pended',this)">
+        <div class="ob-icon">⏸️</div>
+        <div class="ob-title">Pended</div>
+        <div class="ob-desc">More information needed. Provider has 14 days to respond.</div>
+      </div>
+      <div class="outcome-btn deny-btn" onclick="pickOutcome('denied',this)">
+        <div class="ob-icon">❌</div>
+        <div class="ob-title">Denied</div>
+        <div class="ob-desc">PA not approved. May appeal or request peer-to-peer review.</div>
+      </div>
+      <div class="outcome-btn peer-btn" onclick="pickOutcome('peer',this)">
+        <div class="ob-icon">🤝</div>
+        <div class="ob-title">Peer-to-peer</div>
+        <div class="ob-desc">Physician speaks directly with payer medical director.</div>
+      </div>
+    </div>
+    <div class="edu-banner" style="margin-top:4px;">
+      <div class="edu-icon">📊</div>
+      <div class="edu-body">
+        <div class="edu-title">Industry statistics</div>
+        <div class="edu-text">~35% of PA requests are initially denied. Of those, 40% are overturned on first appeal, and another 20% via peer-to-peer review. Understanding each path helps providers respond strategically.</div>
+      </div>
+    </div>
+  `;
+}
+
+/* ── OUTCOME SLIDES ── */
+function buildApprovalSlide() {
+  const authNum = 'PA-' + Math.random().toString(36).substr(2,8).toUpperCase();
+  addTimeline('PA Approved', `Auth #${authNum} issued`, 'ok');
+  return `
+    <div class="slide-tag tag-outcome">✅ Outcome — Approved</div>
+    <div class="slide-headline"><span>Authorization</span> granted!</div>
+    <div class="slide-subtitle">Authorization #${authNum} — valid for 90 days from today.</div>
+    <div class="info-grid cols-2">
+      <div class="info-card success-card">
+        <div class="card-icon">🎉</div>
+        <div class="card-label">Status</div>
+        <div class="card-value">APPROVED</div>
+        <div class="card-sub">Auth #${authNum}</div>
+      </div>
+      <div class="info-card success-card">
+        <div class="card-icon">📅</div>
+        <div class="card-label">Valid until</div>
+        <div class="card-value">90 days</div>
+        <div class="card-sub">Schedule within window</div>
+      </div>
+    </div>
+    <div class="check-list">
+      <div class="check-item checked"><div class="check-bubble">✓</div><div class="check-text"><strong>Notify patient</strong> of approval and next steps</div></div>
+      <div class="check-item checked"><div class="check-bubble">✓</div><div class="check-text"><strong>Schedule procedure</strong> within the 90-day authorization window</div></div>
+      <div class="check-item checked"><div class="check-bubble">✓</div><div class="check-text"><strong>Include auth #</strong> on claim form (Box 23) when billing</div></div>
+      <div class="check-item checked"><div class="check-bubble">✓</div><div class="check-text"><strong>Document in EHR</strong> — approved PA does not guarantee payment; claim still reviewed</div></div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">💡</div>
+      <div class="edu-body">
+        <div class="edu-title">Important: PA ≠ guaranteed payment</div>
+        <div class="edu-text">An approved PA authorizes the service — it does not guarantee the final claim will be paid. The claim undergoes a separate clinical review after service is rendered. Ensure all coding is accurate.</div>
+      </div>
+    </div>
+  `;
+}
+
+function buildDenialSlide() {
+  const s = G.scenario;
+  addTimeline('PA Denied', s.denialReason, 'er');
+  return `
+    <div class="slide-tag tag-danger">❌ Outcome — Denied</div>
+    <div class="slide-headline">Authorization <span style="color:#f09595;">denied</span></div>
+    <div class="slide-subtitle">The payer has not approved this request. You have options — denials are not final.</div>
+    <div class="info-card danger-card" style="margin-bottom:8px;">
+      <div class="card-label">Denial reason</div>
+      <div class="card-value">${s.denialReason}</div>
+    </div>
+    <div class="info-card" style="margin-bottom:8px;">
+      <div class="card-label">Appeal strategy</div>
+      <div class="card-value" style="font-weight:400;font-size:13px;color:rgba(255,255,255,0.7);">${s.appealNote}</div>
+    </div>
+    <div class="outcome-grid">
+      <div class="outcome-btn approve-btn" onclick="goToAppeal()">
+        <div class="ob-icon">📝</div>
+        <div class="ob-title">File an appeal</div>
+        <div class="ob-desc">Submit new evidence to payer medical director. ~40% success rate.</div>
+      </div>
+      <div class="outcome-btn peer-btn" onclick="goToPeer()">
+        <div class="ob-icon">🤝</div>
+        <div class="ob-title">Request peer-to-peer</div>
+        <div class="ob-desc">Physician call with medical director. ~65% overturn rate.</div>
+      </div>
+    </div>
+    <div class="edu-banner" style="margin-top:8px;">
+      <div class="edu-icon">⚖️</div>
+      <div class="edu-body">
+        <div class="edu-title">Your legal rights</div>
+        <div class="edu-text">Federal law (ACA) gives patients the right to a full internal appeal and an external independent review. The payer must provide specific denial reasons in writing. Expedited review is available for urgent cases within 72 hours.</div>
+      </div>
+    </div>
+  `;
+}
+
+function buildPendSlide() {
+  const s = G.scenario;
+  const missing = s.docs.filter((_,i) => !G.docsChecked.includes(i));
+  addTimeline('PA Pended', 'Additional information requested by payer', 'wn');
+  addDays(5);
+  return `
+    <div class="slide-tag tag-warning">⏸️ Outcome — Pended</div>
+    <div class="slide-headline">Request <span style="color:#fac775;">pended</span></div>
+    <div class="slide-subtitle">The payer needs more information before deciding. Respond within 14 days to avoid automatic denial.</div>
+    <div class="info-card warn-card" style="margin-bottom:4px;">
+      <div class="card-label">Status</div>
+      <div class="card-value">Pending additional info — not a denial</div>
+      <div class="card-sub">The review clock is paused. You have 14 calendar days to respond.</div>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);margin:8px 0 6px;">Missing or insufficient items:</div>
+    <div class="check-list">
+      ${missing.length > 0
+        ? missing.map(d => `<div class="check-item"><div class="check-bubble"></div><div class="check-text">${d}</div></div>`).join('')
+        : `<div class="check-item warn-card"><div class="check-bubble">⚠️</div><div class="check-text">General clinical clarification requested by payer's UM nurse</div></div>`
+      }
+    </div>
+    <div class="stat-row" style="margin-top:8px;">
+      <div class="stat-box"><div class="stat-num">${G.days}</div><div class="stat-lbl">Days so far</div></div>
+      <div class="stat-box"><div class="stat-num">+5</div><div class="stat-lbl">Days added by pend</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:#fac775;">${G.score}</div><div class="stat-lbl">Efficiency score</div></div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📚</div>
+      <div class="edu-body">
+        <div class="edu-title">About pend requests</div>
+        <div class="edu-text">A pend (also called "Request for Information") is not a denial — it pauses the clock. Prompt response is critical. Most pends resolve within 3–5 days when documentation is ready. Providers should have a dedicated UM coordinator track pends proactively.</div>
+      </div>
+    </div>
+  `;
+}
+
+function buildPendResolvedSlide() {
+  addTimeline('Pend Resolved', 'Additional docs submitted — resubmission approved', 'ok');
+  G.docsChecked = G.scenario.docs.map((_,i) => i);
+  addDays(3);
+  G.score = Math.max(0, G.score - 10);
+  return `
+    <div class="slide-tag tag-outcome">✅ Pend Resolved — Approved</div>
+    <div class="slide-headline">Pend resolved — <span>approved!</span></div>
+    <div class="slide-subtitle">Additional documentation was submitted and the payer has now approved the request.</div>
+    <div class="info-card success-card">
+      <div class="card-icon">✅</div>
+      <div class="card-label">Final outcome</div>
+      <div class="card-value">APPROVED after pend response</div>
+      <div class="card-sub">Total process: ${G.days} days (longer than optimal)</div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">⏱️</div>
+      <div class="edu-body">
+        <div class="edu-title">The cost of pends</div>
+        <div class="edu-text">Every pend adds 5–10 days to the PA process. Proactive, complete documentation at submission eliminates most pends. Dedicated PA coordinators who know each payer's specific requirements dramatically reduce pend rates and improve efficiency scores.</div>
+      </div>
+    </div>
+  `;
+}
+
+function buildAppealSlide() {
+  const s = G.scenario;
+  addTimeline('Appeal Filed', 'Internal appeal to payer medical director', 'wn');
+  const success = Math.random() < 0.60;
+  return `
+    <div class="slide-tag tag-warning">📝 Appeal — Internal Review</div>
+    <div class="slide-headline">Filing a formal <span>appeal</span></div>
+    <div class="slide-subtitle">Submitting new clinical evidence to the payer's medical director for a second review.</div>
+    <div class="info-card purple-card">
+      <div class="card-label">Appeal letter key points</div>
+      <div class="card-value" style="font-weight:400;font-size:13px;line-height:1.6;color:rgba(255,255,255,0.7);">${s.appealNote}</div>
+    </div>
+    <div class="info-grid cols-3">
+      <div class="info-card">
+        <div class="card-icon">📅</div>
+        <div class="card-label">Deadline</div>
+        <div class="card-value">60 days</div>
+        <div class="card-sub">From denial date</div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">⏱️</div>
+        <div class="card-label">Decision time</div>
+        <div class="card-value">30 days</div>
+        <div class="card-sub">7 days if urgent</div>
+      </div>
+      <div class="info-card ${success ? 'success-card' : 'danger-card'}">
+        <div class="card-icon">${success ? '✅' : '❌'}</div>
+        <div class="card-label">Appeal result</div>
+        <div class="card-value">${success ? 'Overturned!' : 'Upheld'}</div>
+        <div class="card-sub">${success ? '~40% of appeals succeed' : 'Escalate to P2P'}</div>
+      </div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">📚</div>
+      <div class="edu-body">
+        <div class="edu-title">External independent review</div>
+        <div class="edu-text">If the internal appeal fails, the patient has the right to an External Independent Review Organization (IRO). The IRO's decision is binding on the insurer. This process adds 45–60 days but can be expedited for urgent cases.</div>
+      </div>
+    </div>
+    ${success ? `<div style="display:none" id="appealSuccess">true</div>` : ''}
+  `;
+}
+
+function buildPeerSlide() {
+  const s = G.scenario;
+  addTimeline('Peer-to-Peer Call', 'Physician spoke with payer medical director', 'pr');
+  const success = Math.random() < 0.65;
+  return `
+    <div class="slide-tag tag-payer">🤝 Peer-to-Peer Review</div>
+    <div class="slide-headline">Physician to physician <span>review</span></div>
+    <div class="slide-subtitle">The ordering physician speaks directly with the payer's medical director. Most effective reversal tool.</div>
+    <div class="info-card teal-card">
+      <div class="card-label">Talking points for the physician</div>
+      <div class="card-value" style="font-weight:400;font-size:13px;line-height:1.6;color:rgba(255,255,255,0.7);">${s.peerNote}</div>
+    </div>
+    <div class="info-grid cols-3">
+      <div class="info-card">
+        <div class="card-icon">⏱️</div>
+        <div class="card-label">Call length</div>
+        <div class="card-value">10–15 min</div>
+        <div class="card-sub">Request within 24 hrs</div>
+      </div>
+      <div class="info-card">
+        <div class="card-icon">📊</div>
+        <div class="card-label">Success rate</div>
+        <div class="card-value">~65%</div>
+        <div class="card-sub">Industry average</div>
+      </div>
+      <div class="info-card ${success ? 'success-card' : 'danger-card'}">
+        <div class="card-icon">${success ? '✅' : '❌'}</div>
+        <div class="card-label">This outcome</div>
+        <div class="card-value">${success ? 'Overturned!' : 'Upheld'}</div>
+        <div class="card-sub">${success ? 'Approved post-P2P' : 'External review next'}</div>
+      </div>
+    </div>
+    <div class="edu-banner">
+      <div class="edu-icon">💡</div>
+      <div class="edu-body">
+        <div class="edu-title">P2P best practices</div>
+        <div class="edu-text">Have the chart open during the call. Be specific about why alternatives failed. Cite guidelines by name (e.g., AAOS, AHA, NCCN). Ask for the decision in writing within 24 hours. If the payer's MD is unavailable, escalate to their supervisor.</div>
+      </div>
+    </div>
+    ${success ? `<div style="display:none" id="peerSuccess">true</div>` : ''}
+  `;
+}
+
+function buildSummarySlide() {
+  const s = G.scenario;
+  const approved = G.outcome === 'approved';
+  const icon = approved ? '🎉' : G.outcome === 'denied' ? '❌' : '📋';
+  const scoreColor = G.score >= 70 ? '#7fe0c0' : G.score >= 40 ? '#fac775' : '#f09595';
+
+  return `
+    <div style="display:flex;flex-direction:column;gap:16px;width:100%;">
+      <div style="text-align:center;padding-bottom:4px;">
+        <div style="font-size:44px;margin-bottom:8px;">${icon}</div>
+        <div style="font-size:26px;font-weight:800;color:#fff;letter-spacing:-0.4px;margin-bottom:6px;">Case complete</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.45);">${s.name} — ${s.procedure}</div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><div class="stat-num" style="color:${scoreColor};">${G.score}</div><div class="stat-lbl">Efficiency score</div></div>
+        <div class="stat-box"><div class="stat-num">${G.days}</div><div class="stat-lbl">Total days</div></div>
+        <div class="stat-box"><div class="stat-num">${G.docsChecked.length}/${s.docs.length}</div><div class="stat-lbl">Docs collected</div></div>
+        <div class="stat-box"><div class="stat-num">${G.necessityScore}%</div><div class="stat-lbl">Necessity score</div></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;">
+        <div style="padding:12px 16px;background:rgba(55,138,221,0.1);font-size:12px;font-weight:700;color:var(--blue-200);text-transform:uppercase;letter-spacing:0.5px;">Case timeline</div>
+        <div class="timeline" style="padding:4px 16px;">
+          ${G.timeline.map((t,i) => `
+            <div class="tl-item">
+              <div class="tl-dot ${t.type}">${i+1}</div>
+              <div class="tl-body"><div class="tl-step">${t.step}</div><div class="tl-detail">${t.detail}</div></div>
+              <div class="tl-day">Day ${t.day}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="edu-banner">
+        <div class="edu-icon">🎓</div>
+        <div class="edu-body">
+          <div class="edu-title">Key takeaways</div>
+          <div class="edu-text">PA workflows span 3 parties across multiple days. Complete documentation and strong medical necessity documentation are the two biggest levers for approval. Denials are not final — appeal and P2P rates are surprisingly high. Press <strong style="color:#fff;">Restart</strong> to try another scenario.</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   HELPERS
+   ========================================================= */
+function meterColor(v) {
+  return v >= 80 ? 'var(--green-400)' : v >= 60 ? 'var(--amber-400)' : 'var(--red-400)';
+}
+
+function addDays(n) {
+  G.days += n;
+  G.score = Math.max(0, G.score - n * 3);
+}
+
+function addTimeline(step, detail, type) {
+  G.timeline.push({ step, detail, day: G.days, type });
+}
+
+/* =========================================================
+   SLIDE RENDER ENGINE
+   ========================================================= */
+function renderSlide(index, direction) {
+  const stage = document.getElementById('stage');
+  const def = G.slides[index];
+  if (!def) return;
+
+  // Exit current active slide
+  const current = stage.querySelector('.slide.active');
+  if (current) {
+    current.classList.remove('active');
+    current.classList.add('exit-left');
+    setTimeout(() => current.remove(), 400);
+  }
+
+  // Build new slide
+  const el = document.createElement('div');
+  el.className = 'slide';
+  el.id = 'slide_' + index;
+
+  const isSpecial = ['pick','summary'].includes(def.id);
+
+  el.innerHTML = `
+    <div class="slide-topbar">
+      <div class="slide-logo">
+        <div class="slide-logo-dot"></div>
+        PA Workflow Simulator
+      </div>
+      <div class="slide-counter">${G.scenario ? def.title : 'Scenario selection'} &nbsp;·&nbsp; ${index + 1} / ${G.slides.length}</div>
+    </div>
+    <div class="slide-progress-bar">
+      <div class="slide-progress-fill" style="width:${Math.round((index / Math.max(G.slides.length - 1, 1)) * 100)}%"></div>
+    </div>
+    <div class="slide-body">
+      ${!isSpecial && G.scenario ? buildLanePanel(def.lane) : ''}
+      <div class="slide-content">${def.html}</div>
+    </div>
+  `;
+
+  // Direction: entering from right (default) or left
+  if (direction === 'back') {
+    el.style.transform = 'translateX(-60px)';
+  }
+
+  stage.appendChild(el);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      el.style.transform = '';
+      el.classList.add('active');
+    });
+  });
+
+  updateNav(index);
+  G.slideIndex = index;
+}
+
+function buildLanePanel(activeLane) {
+  const stages = [
+    { lane:'patient',  label:'Patient intake',        id:'intro' },
+    { lane:'patient',  label:'Clinical check-in',     id:'checkin' },
+    { lane:'provider', label:'Medical necessity',     id:'necessity' },
+    { lane:'provider', label:'Document collection',   id:'docs' },
+    { lane:'provider', label:'PA submission',         id:'submit' },
+    { lane:'payer',    label:'Payer review',          id:'review' },
+    { lane:'payer',    label:'Decision',              id:'decision' },
+  ];
+  const currentDef = G.slides[G.slideIndex] || {};
+
+  return `
+    <div class="slide-lane">
+      ${LANES.map(lane => {
+        const laneStages = stages.filter(s => s.lane === lane.id);
+        const isActive = activeLane === lane.id;
+        const isDone = activeLane === 'payer' && lane.id === 'patient'
+                    || activeLane === 'payer' && lane.id === 'provider'
+                    || activeLane === 'provider' && lane.id === 'patient';
+
+        return `
+          <div class="lane-pill ${isActive ? 'active-lane' : isDone ? 'done-lane' : ''}">
+            <div class="lane-icon-box ${lane.cls}">${lane.icon}</div>
+            ${lane.label}
+          </div>
+          ${isActive || isDone ? `
+            <div class="lane-stages">
+              ${laneStages.map(st => {
+                const stIdx = G.slides.findIndex(s => s.id === st.id);
+                const isCurrent = G.slides[G.slideIndex]?.id === st.id;
+                const isPast = stIdx < G.slideIndex;
+                return `
+                  <div class="lane-stage-dot ${isCurrent ? 'current' : isPast ? 'done' : ''}">
+                    <div class="dot-indicator"></div>
+                    ${st.label}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          ` : ''}
+          ${lane.id !== 'payer' ? '<div class="divider-lane"></div>' : ''}
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+function updateNav(index) {
+  const total = G.slides.length;
+  document.getElementById('btnBack').disabled = index === 0;
+  document.getElementById('btnNext').disabled = index === total - 1;
+  document.getElementById('btnRestart').style.opacity = G.scenario ? '1' : '0.4';
+
+  // Dots
+  const dots = document.getElementById('navDots');
+  dots.innerHTML = '';
+  const max = Math.min(total, 12);
+  const start = Math.max(0, Math.min(index - 5, total - max));
+  for (let i = start; i < start + max; i++) {
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i === index ? ' active' : i < index ? ' done' : '');
+    d.onclick = () => navigateTo(i);
+    dots.appendChild(d);
+  }
+
+  const nextBtn = document.getElementById('btnNext');
+  const def = G.slides[index];
+  nextBtn.textContent = def?.id === 'decision' ? 'Pick outcome first' : index === total - 2 ? 'View summary →' : 'Next →';
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+function navigateTo(index, direction) {
+  if (index < 0 || index >= G.slides.length) return;
+  G.history.push(G.slideIndex);
+  renderSlide(index, direction);
+}
+
+function goNext() {
+  const def = G.slides[G.slideIndex];
+
+  // Decision slide — require outcome pick
+  if (def?.id === 'decision') {
+    if (!G.outcome) {
+        flashNav();
+        return;
+    }
+
+    addOutcomeSlides();
+    //renderNav();
+    navigateTo(G.slideIndex + 1);
+    return;
+  }
+
+  // Appeal / Peer — check sub-result
+  if (def?.id === 'appeal') {
+    const success = !!document.getElementById('appealSuccess');
+    if (success) {
+      G.outcome = 'approved';
+      G.score = Math.min(100, G.score + 5);
+      addTimeline('Appeal Approved', 'Denial overturned on internal appeal', 'ok');
+      insertSlide(G.slideIndex + 1, { id:'approved', lane:'payer', title:'Approved', html: buildApprovalSlide() });
+      insertSlide(G.slideIndex + 2, { id:'summary', lane:'none', title:'Summary', html: buildSummarySlide() });
+    } else {
+      insertSlide(G.slideIndex + 1, { id:'summary', lane:'none', title:'Summary', html: buildSummarySlide() });
+    }
+    navigateTo(G.slideIndex + 1);
+    return;
+  }
+
+  if (def?.id === 'peer') {
+    const success = !!document.getElementById('peerSuccess');
+    if (success) {
+      G.outcome = 'approved';
+      G.score = Math.min(100, G.score + 8);
+      addTimeline('P2P — Approved', 'Denial overturned via peer-to-peer review', 'ok');
+      insertSlide(G.slideIndex + 1, { id:'approved', lane:'payer', title:'Approved', html: buildApprovalSlide() });
+      insertSlide(G.slideIndex + 2, { id:'summary', lane:'none', title:'Summary', html: buildSummarySlide() });
+    } else {
+      G.outcome = 'denied';
+      addTimeline('P2P Unsuccessful', 'Denial upheld — external review option remains', 'er');
+      insertSlide(G.slideIndex + 1, { id:'summary', lane:'none', title:'Summary', html: buildSummarySlide() });
+    }
+    navigateTo(G.slideIndex + 1);
+    return;
+  }
+
+  // Pend slide → go to pend resolved
+  if (def?.id === 'pended') {
+    insertSlide(G.slideIndex + 1, { id:'pend_resolved', lane:'payer', title:'Pend resolved', html: buildPendResolvedSlide() });
+    insertSlide(G.slideIndex + 2, { id:'summary', lane:'none', title:'Summary', html: buildSummarySlide() });
+    navigateTo(G.slideIndex + 1);
+    return;
+  }
+
+  // Pick slide requires scenario
+  if (def?.id === 'pick' && !G.scenario) { flashNav(); return; }
+
+  if (G.slideIndex < G.slides.length - 1) {
+    navigateTo(G.slideIndex + 1);
+  }
+}
+
+function goBack() {
+  if (G.slideIndex > 0) navigateTo(G.slideIndex - 1, 'back');
+}
+
+function flashNav() {
+  const btn = document.getElementById('btnNext');
+  btn.style.background = '#a32d2d';
+  btn.style.borderColor = '#a32d2d';
+  setTimeout(() => { btn.style.background = ''; btn.style.borderColor = ''; }, 600);
+}
+
+function insertSlide(at, def) {
+  G.slides.splice(at, 0, def);
+}
+
+/* =========================================================
+   OUTCOME ROUTING
+   ========================================================= */
+function addOutcomeSlides() {
+  const after = G.slideIndex + 1;
+  // Remove any existing outcome slides
+  while (G.slides.length > after) G.slides.pop();
+
+  if (G.outcome === 'approved') {
+    G.score = Math.min(100, G.score + 10);
+    addTimeline('PA Approved', `Approved by ${G.scenario.insurance}`, 'ok');
+    G.slides.push({ id:'approved', lane:'payer', title:'Approved', html: buildApprovalSlide() });
+    setTimeout(() => celebrate(), 300);
+  } else if (G.outcome === 'denied') {
+    G.score = Math.max(0, G.score - 20);
+    G.slides.push({ id:'denied', lane:'payer', title:'Denied', html: buildDenialSlide() });
+  } else if (G.outcome === 'pended') {
+    G.score = Math.max(0, G.score - 10);
+    G.slides.push({ id:'pended', lane:'payer', title:'Pended', html: buildPendSlide() });
+  } else if (G.outcome === 'peer') {
+    G.slides.push({ id:'peer', lane:'payer', title:'Peer-to-peer', html: buildPeerSlide() });
+  }
+
+  if (!['denied','pended','peer'].includes(G.outcome)) {
+    G.slides.push({ id:'summary', lane:'none', title:'Summary', html: buildSummarySlide() });
+  }
+}
+
+window.pickOutcome = function(o, el) {
+  G.outcome = o;
+  document.querySelectorAll('.outcome-btn').forEach(b => b.classList.remove('picked'));
+  el.classList.add('picked');
+  document.getElementById('btnNext').textContent = 'Continue →';
+  setTimeout(()=>goNext(),250);
+  document.getElementById('btnNext').style.background = 'var(--blue-600)';
+};
+
+window.goToAppeal = function() {
+  insertSlide(G.slideIndex + 1, { id:'appeal', lane:'payer', title:'Appeal', html: buildAppealSlide() });
+  navigateTo(G.slideIndex + 1);
+};
+
+window.goToPeer = function() {
+  insertSlide(G.slideIndex + 1, { id:'peer', lane:'payer', title:'Peer-to-peer', html: buildPeerSlide() });
+  navigateTo(G.slideIndex + 1);
+};
+
+/* =========================================================
+   SCENARIO PICK
+   ========================================================= */
+window.pickScenario = function(id) {
+  G.scenario = SCENARIOS.find(s => s.id === id);
+  document.querySelectorAll('.sc-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('sc_' + id)?.classList.add('selected');
+  document.getElementById('btnNext').textContent = 'Start case →';
+
+  G.days = 0; G.score = 100; G.timeline = []; G.docsChecked = []; G.outcome = null;
+  addTimeline('Case initiated', `${G.scenario.name}: ${G.scenario.procedure}`, 'p');
+  buildSlides();
+  updateNav(G.slideIndex);
+};
+
+/* =========================================================
+   CHECKLIST INTERACTIONS
+   ========================================================= */
+window.toggleNecessity = function(i, pts) {
+  const item = document.getElementById('nc_' + i);
+  const bubble = document.getElementById('nb_' + i);
+  if (!item) return;
+  const checked = item.classList.toggle('checked');
+  bubble.textContent = checked ? '✓' : '';
+  G.necessityScore = Math.max(G.scenario.necessityBase,
+    Math.min(100, checked ? G.necessityScore + pts : G.necessityScore - pts));
+  const fill = document.getElementById('meterFill');
+  const val = document.getElementById('meterVal');
+  if (fill) { fill.style.width = G.necessityScore + '%'; fill.style.background = meterColor(G.necessityScore); }
+  if (val) val.textContent = G.necessityScore + '%';
+};
+
+window.toggleDoc = function(i) {
+  const item = document.getElementById('dc_' + i);
+  const bubble = document.getElementById('db_' + i);
+  if (!item) return;
+  const checked = item.classList.toggle('checked');
+  bubble.textContent = checked ? '✓' : '';
+  if (checked && !G.docsChecked.includes(i)) G.docsChecked.push(i);
+  else G.docsChecked = G.docsChecked.filter(x => x !== i);
+
+  const s = G.scenario;
+  const fill = document.getElementById('docFill');
+  const cnt = document.getElementById('docCount');
+  if (fill) fill.style.width = Math.round(G.docsChecked.length / s.docs.length * 100) + '%';
+  if (cnt) cnt.textContent = G.docsChecked.length + ' / ' + s.docs.length;
+};
+
+/* =========================================================
+   CELEBRATION
+   ========================================================= */
+function celebrate() {
+  const wrap = document.getElementById('confettiWrap');
+  wrap.innerHTML = '';
+  const colors = ['#378add','#1d9e75','#7f77dd','#fac775','#5dcaa5','#85b7eb','#c0dd97','#ef9f27'];
+  for (let i = 0; i < 90; i++) {
+    const p = document.createElement('div');
+    p.className = 'cp';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.width = (Math.random() * 9 + 5) + 'px';
+    p.style.height = (Math.random() * 9 + 5) + 'px';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    p.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+    p.style.animationDelay = (Math.random() * 0.9) + 's';
+    p.style.opacity = '1';
+    wrap.appendChild(p);
+  }
+  setTimeout(() => { wrap.innerHTML = ''; }, 4000);
+}
+
+/* =========================================================
+   RESTART
+   ========================================================= */
+window.restart = function() {
+  G = { scenario:null, slideIndex:0, slides:[], days:0, score:100,
+        docsChecked:[], necessityScore:0, outcome:null, timeline:[], history:[] };
+  buildSlides();
+  document.getElementById('stage').innerHTML = '';
+  G.slides = [{ id:'pick', lane:'none', title:'Select patient', html: buildPickSlide() }];
+  renderSlide(0);
+};
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); goNext(); }
+  if (e.key === 'ArrowLeft') goBack();
+});
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+(function init() {
+  buildSlides();
+  renderSlide(0);
+})();
+</script>
+</body>
+</html>
