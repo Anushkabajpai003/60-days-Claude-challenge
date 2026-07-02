@@ -25,7 +25,6 @@ Add screenshots of the following screens:
 
 Example:
 
-```md
 ![Welcome Screen](<Screenshot 2026-07-02 170141.png>)
 
 ![Audience Analysis](<Screenshot 2026-07-02 171411.png>)
@@ -33,7 +32,7 @@ Example:
 ![Platform Strategy](<Screenshot 2026-07-02 171513.png>)
 
 ![Growth Report](<Screenshot 2026-07-02 171934.png>)
-```
+
 
 ---
 
