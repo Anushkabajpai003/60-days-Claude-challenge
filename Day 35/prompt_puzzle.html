@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧩 Prompt Puzzle — Master AI Prompting Through Play</title>
+<style>
+:root{
+  --bg:#0d1117;
+  --bg2:#151b23;
+  --panel:#1a2029;
+  --panel-hi:#212836;
+  --line:#2a3140;
+  --text:#d9e2ec;
+  --text-dim:#8b96a5;
+  --accent:#5eead4;
+  --accent-dim:#2dd4bf;
+  --violet:#a78bfa;
+  --amber:#fbbf24;
+  --red:#f87171;
+  --mono:'JetBrains Mono','Fira Code',Consolas,monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(94,234,212,0.06), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(167,139,250,0.06), transparent 40%),
+    var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+::selection{background:var(--accent-dim);color:#04121a;}
+::-webkit-scrollbar{width:10px;}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+.app{max-width:1100px;margin:0 auto;padding:28px 20px 80px;}
+
+/* ---------- Header ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:12px;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-badge{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--violet));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 6px 20px -4px rgba(94,234,212,0.4);
+}
+.brand h1{font-size:19px;margin:0;font-weight:700;letter-spacing:-0.01em;}
+.brand p{margin:0;font-size:12px;color:var(--text-dim);font-family:var(--mono);}
+.hud{display:flex;gap:10px;flex-wrap:wrap;}
+.hud-chip{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:8px 14px;font-family:var(--mono);font-size:12px;color:var(--text-dim);
+  display:flex;align-items:center;gap:6px;transition:transform .2s;
+}
+.hud-chip b{color:var(--accent);font-size:14px;}
+.hud-chip.pulse{animation:pulse .5s ease;}
+@keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.08);border-color:var(--accent);}100%{transform:scale(1);}}
+
+/* ---------- Screens ---------- */
+.screen{display:none;animation:fadeIn .4s ease;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---------- Setup ---------- */
+.setup-card{
+  background:var(--panel);border:1px solid var(--line);border-radius:18px;
+  padding:36px;text-align:center;
+}
+.setup-card h2{font-size:26px;margin:0 0 8px;}
+.setup-card .sub{color:var(--text-dim);margin-bottom:28px;font-size:14px;}
+.domain-tag{
+  display:inline-flex;align-items:center;gap:8px;background:var(--panel-hi);
+  border:1px solid var(--accent-dim);color:var(--accent);border-radius:999px;
+  padding:8px 18px;font-family:var(--mono);font-size:13px;margin-bottom:24px;
+}
+.btn{
+  border:none;cursor:pointer;font-family:var(--sans);font-weight:600;
+  border-radius:10px;padding:13px 26px;font-size:14px;transition:all .18s;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dim));color:#042620;box-shadow:0 4px 18px -4px rgba(94,234,212,0.5);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px -4px rgba(94,234,212,0.6);}
+.btn-ghost{background:var(--panel-hi);color:var(--text);border:1px solid var(--line);}
+.btn-ghost:hover{border-color:var(--accent-dim);color:var(--accent);}
+.btn:active{transform:scale(0.97);}
+.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+/* ---------- Progress ---------- */
+.progress-wrap{display:flex;align-items:center;gap:10px;margin-bottom:22px;}
+.progress-track{flex:1;height:8px;background:var(--panel);border-radius:6px;overflow:hidden;border:1px solid var(--line);}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent-dim),var(--violet));border-radius:6px;transition:width .5s cubic-bezier(.22,1,.36,1);}
+.progress-label{font-family:var(--mono);font-size:12px;color:var(--text-dim);white-space:nowrap;}
+
+/* ---------- Scenario Card ---------- */
+.scenario-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;margin-bottom:20px;}
+.scenario-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+.type-badge{
+  font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+  padding:5px 11px;border-radius:7px;font-weight:700;
+}
+.type-build{background:rgba(94,234,212,.14);color:var(--accent);}
+.type-clean{background:rgba(251,191,36,.14);color:var(--amber);}
+.type-choose{background:rgba(167,139,250,.14);color:var(--violet);}
+.scenario-title{font-size:19px;font-weight:700;margin:4px 0 6px;}
+.desired-output{
+  background:var(--bg2);border-left:3px solid var(--accent-dim);border-radius:8px;
+  padding:14px 16px;font-size:13.5px;color:var(--text-dim);line-height:1.55;
+}
+.desired-output b{color:var(--text);}
+
+/* ---------- Build the Prompt ---------- */
+.build-zone{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px;}
+@media(max-width:720px){.build-zone{grid-template-columns:1fr;}}
+.zone-title{font-family:var(--mono);font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.dropzone{
+  min-height:180px;background:var(--bg2);border:2px dashed var(--line);border-radius:12px;
+  padding:12px;display:flex;flex-direction:column;gap:8px;transition:all .2s;
+}
+.dropzone.dragover{border-color:var(--accent);background:rgba(94,234,212,0.06);}
+.bank{
+  min-height:180px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;
+  padding:12px;display:flex;flex-direction:column;gap:8px;
+}
+.block{
+  background:var(--panel-hi);border:1px solid var(--line);border-radius:9px;padding:11px 13px;
+  font-size:13px;cursor:grab;user-select:none;transition:all .15s;line-height:1.4;
+  position:relative;
+}
+.block:hover{border-color:var(--accent-dim);transform:translateX(2px);}
+.block.dragging{opacity:0.4;}
+.block.correct-flash{animation:goodFlash .6s ease;}
+.block.wrong-flash{animation:badFlash .5s ease;}
+@keyframes goodFlash{0%{background:rgba(94,234,212,0.35);}100%{background:var(--panel-hi);}}
+@keyframes badFlash{0%,100%{background:var(--panel-hi);}30%{background:rgba(248,113,113,0.35);transform:translateX(-4px);}60%{transform:translateX(4px);}}
+.block .rm{position:absolute;top:6px;right:8px;color:var(--text-dim);cursor:pointer;font-size:12px;opacity:0;transition:opacity .15s;}
+.block:hover .rm{opacity:1;}
+.empty-hint{color:var(--text-dim);font-size:12px;font-style:italic;text-align:center;margin:auto 0;}
+
+/* ---------- Clean the Prompt ---------- */
+.messy-prompt{
+  background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;
+  font-family:var(--mono);font-size:13.5px;line-height:2;margin-top:16px;
+}
+.tok{display:inline-block;padding:3px 8px;margin:2px;border-radius:6px;cursor:pointer;transition:all .15s;border:1px solid transparent;}
+.tok.keep{background:rgba(94,234,212,0.1);}
+.tok.remove-candidate{background:rgba(248,113,113,0.12);}
+.tok.selected-remove{background:rgba(248,113,113,0.35);text-decoration:line-through;border-color:var(--red);}
+.tok:hover{border-color:var(--text-dim);}
+
+/* ---------- Choose Best ---------- */
+.choice-grid{display:grid;gap:14px;margin-top:16px;}
+.choice-card{
+  background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;
+  transition:all .18s;position:relative;
+}
+.choice-card:hover{border-color:var(--accent-dim);transform:translateY(-2px);}
+.choice-card.selected{border-color:var(--accent);background:rgba(94,234,212,0.06);}
+.choice-card.right-answer{border-color:var(--accent);}
+.choice-card.wrong-answer{border-color:var(--red);}
+.choice-label{font-family:var(--mono);font-size:11px;color:var(--violet);text-transform:uppercase;margin-bottom:6px;letter-spacing:.05em;}
+.choice-text{font-size:13.5px;line-height:1.55;color:var(--text);}
+
+/* ---------- Actions row ---------- */
+.action-row{display:flex;justify-content:space-between;align-items:center;margin-top:20px;flex-wrap:wrap;gap:12px;}
+.action-left{display:flex;gap:10px;flex-wrap:wrap;}
+
+/* ---------- Feedback panel ---------- */
+.feedback-panel{
+  margin-top:16px;border-radius:14px;padding:20px;border:1px solid var(--line);background:var(--bg2);
+  display:none;
+}
+.feedback-panel.show{display:block;animation:fadeIn .35s ease;}
+.fb-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;}
+@media(max-width:640px){.fb-row{grid-template-columns:1fr;}}
+.fb-block{background:var(--panel);border-radius:10px;padding:14px;}
+.fb-block h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--text-dim);font-family:var(--mono);}
+.fb-block p{margin:0;font-size:13px;line-height:1.55;}
+.fb-weak{border-left:3px solid var(--red);}
+.fb-opt{border-left:3px solid var(--accent);}
+.principle-box{
+  background:linear-gradient(135deg,rgba(167,139,250,0.1),rgba(94,234,212,0.06));
+  border:1px solid var(--violet);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.6;
+}
+.principle-box b{color:var(--violet);}
+
+/* ---------- Notifications ---------- */
+#notif-stack{position:fixed;top:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:10px;}
+.notif{
+  background:var(--panel-hi);border:1px solid var(--accent-dim);border-radius:10px;
+  padding:12px 18px;font-size:13px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  animation:notifIn .35s cubic-bezier(.22,1,.36,1), notifOut .35s ease 2.3s forwards;
+  display:flex;align-items:center;gap:8px;
+}
+.notif.bad{border-color:var(--red);}
+.notif.gold{border-color:var(--amber);}
+@keyframes notifIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+@keyframes notifOut{to{opacity:0;transform:translateX(40px);}}
+
+/* ---------- Score pop ---------- */
+.score-pop{
+  position:fixed;font-family:var(--mono);font-weight:700;font-size:20px;color:var(--accent);
+  pointer-events:none;z-index:1000;animation:popUp 1s ease forwards;
+}
+@keyframes popUp{0%{opacity:0;transform:translateY(0) scale(0.8);}20%{opacity:1;transform:translateY(-10px) scale(1.1);}100%{opacity:0;transform:translateY(-60px) scale(1);}}
+
+/* ---------- Report ---------- */
+.report-card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:36px;}
+.report-hero{text-align:center;margin-bottom:30px;}
+.rank-badge{
+  display:inline-block;font-size:52px;margin-bottom:6px;
+  filter:drop-shadow(0 0 24px rgba(94,234,212,0.5));
+}
+.score-big{font-family:var(--mono);font-size:56px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;}
+.rating-text{font-size:16px;color:var(--text-dim);margin-top:4px;}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0;}
+@media(max-width:640px){.stat-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-box{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;}
+.stat-box .val{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);}
+.stat-box .lbl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+.dna-wrap{margin:26px 0;}
+.dna-title{font-family:var(--mono);font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.dna-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;border:1px solid var(--line);}
+.dna-seg{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;font-weight:700;color:#04121a;transition:width .6s ease;}
+.dna-legend{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);}
+.dna-legend span{display:inline-flex;align-items:center;gap:5px;}
+.dna-dot{width:9px;height:9px;border-radius:3px;display:inline-block;}
+.milestone{
+  background:var(--bg2);border:1px dashed var(--accent-dim);border-radius:12px;padding:16px;margin:20px 0;font-size:13.5px;line-height:1.6;
+}
+.final-prompt{
+  background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:16px;font-family:var(--mono);
+  font-size:12.5px;line-height:1.7;color:var(--accent-dim);white-space:pre-wrap;margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<div id="notif-stack"></div>
+
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">🧩</div>
+      <div>
+        <h1>Prompt Puzzle</h1>
+        <p>Master AI Prompting Through Play</p>
+      </div>
+    </div>
+    <div class="hud" id="hud"></div>
+  </div>
+
+  <!-- SETUP SCREEN -->
+  <div class="screen active" id="screen-setup">
+    <div class="setup-card">
+      <div class="domain-tag">💻 Software / Coding &nbsp;•&nbsp; Intermediate</div>
+      <h2>Ready to sharpen your prompting instincts?</h2>
+      <p class="sub">8 scenarios. 3 challenge types. Real prompt engineering principles disguised as a game.</p>
+      <button class="btn btn-primary" onclick="startGame()">▶ Start Challenge</button>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div class="screen" id="screen-game">
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">0 / 0</div>
+    </div>
+    <div id="scenario-container"></div>
+  </div>
+
+  <!-- REPORT SCREEN -->
+  <div class="screen" id="screen-report"></div>
+</div>
+
+<script>
+/* ================= SCENARIO DATA (Software / Coding — Intermediate) ================= */
+const SCENARIOS = [
+{
+  id:1,
+  type:"build",
+  title:"Refactor a messy function",
+  desiredOutput:"A clean, refactored version of a JavaScript function with explanation of changes, following modern best practices, without changing its behavior.",
+  correctBlocks:[
+    "Act as a senior JavaScript engineer performing a code review.",
+    "Here is the function: [paste code]. Refactor it for readability and modern ES6+ syntax.",
+    "Do not change the function's external behavior or output.",
+    "After the code, list the 3 key changes you made and why."
+  ],
+  distractorBlocks:[
+    "Make the code as short as possible, even if unreadable.",
+    "Rewrite the entire application from scratch.",
+    "Ignore any edge cases the original code handled."
+  ],
+  weakPrompt:"Fix this code.",
+  optimizedPrompt:"Act as a senior JavaScript engineer performing a code review. Here is the function: [paste code]. Refactor it for readability and modern ES6+ syntax. Do not change the function's external behavior or output. After the code, list the 3 key changes you made and why.",
+  overEngineeredPrompt:"You are the world's greatest 10x rockstar ninja engineer with 50 years of experience across every language ever invented. Analyze this code across 25 dimensions including but not limited to security, performance, scalability, maintainability, testability, readability, style, naming, architecture, design patterns, SOLID principles, DRY, KISS, YAGNI, and cosmic code harmony, then rewrite it seven different ways for seven different paradigms and rank them.",
+  weakOutput:"Here's a slightly cleaned up version of your code with a few tweaks. [vague, inconsistent, may alter behavior]",
+  optimizedOutput:"Refactored function using const/let, arrow functions, and destructuring. Behavior preserved and verified against original logic. Key changes: (1) replaced var with const, (2) extracted repeated logic into a helper, (3) added early return for clarity.",
+  principle:"Role + Task + Constraint + Output Format. Giving the model a role anchors its expertise, a clear task defines scope, an explicit constraint (preserve behavior) prevents unwanted side effects, and a requested output format (explanation of changes) makes the response verifiable."
+},
+{
+  id:2,
+  type:"clean",
+  title:"Debugging a null pointer error",
+  desiredOutput:"A focused explanation of why a null reference error occurs and a minimal fix, without unrelated commentary.",
+  messyPrompt:"Hey so like I'm getting this really annoying error can you PLEASE help me??? btw I love your responses they're always so amazing and smart, anyway here's my code [paste code] it says 'cannot read property of undefined' and also can you tell me the entire history of JavaScript and maybe suggest a completely different framework I should use instead and also what's your favorite color, just fix the null error please and explain briefly why it happens.",
+  removeTokens:["Hey so like","really annoying","PLEASE","???","btw I love your responses they're always so amazing and smart, anyway","also can you tell me the entire history of JavaScript","and maybe suggest a completely different framework I should use instead","and also what's your favorite color",],
+  keepTokens:["here's my code [paste code]","it says 'cannot read property of undefined'","just fix the null error please and explain briefly why it happens."],
+  weakPrompt:"Hey so like I'm getting this really annoying error can you PLEASE help me??? ...fix the null error please and explain briefly why it happens.",
+  optimizedPrompt:"Here's my code: [paste code]. It throws 'cannot read property of undefined'. Fix the null reference error and briefly explain why it happens.",
+  overEngineeredPrompt:"As a distinguished principal engineer with deep expertise in JavaScript runtime internals, V8 engine optimization, memory management, and error taxonomy, please conduct an exhaustive root-cause analysis of this null pointer exception including a full historical survey of null-handling paradigms across programming languages, a comparative analysis of optional chaining implementations in five languages, and a philosophical discussion of the billion-dollar mistake.",
+  weakOutput:"That's a common error! JavaScript has a long history... [rambling, buried fix, ignores tone noise inconsistently]",
+  optimizedOutput:"The error occurs because you're accessing a property on a variable that is undefined at that point in execution. Fix: add an optional chaining check `obj?.property` or a guard clause before access. This ensures the code only proceeds when the object exists.",
+  principle:"Signal-to-noise ratio. Politeness and personality are fine, but flattery, tangents, and irrelevant questions dilute the prompt's focus and can cause the model to respond to the noise instead of the task. Strip prompts down to context + problem + explicit ask."
+},
+{
+  id:3,
+  type:"choose",
+  title:"Writing unit tests for an API endpoint",
+  desiredOutput:"A complete, well-structured set of unit tests for a REST API endpoint using a specified testing framework, covering both success and failure cases.",
+  choices:[
+    {label:"Option A",text:"Write tests for my API.",isBest:false,why:"Too vague — no framework, no endpoint details, no coverage expectations."},
+    {label:"Option B",text:"Using Jest and Supertest, write unit tests for the POST /users endpoint shown below. Cover: (1) successful creation with valid data, (2) validation error with missing fields, (3) duplicate email conflict. Use descriptive test names and mock the database layer. [paste endpoint code]",isBest:true,why:"Specifies framework, exact endpoint, concrete test cases, and mocking strategy — fully actionable."},
+    {label:"Option C",text:"You are a testing god. Write the most comprehensive test suite ever created covering every possible edge case in the universe, using every testing framework available, with 100% mutation coverage and formal proofs of correctness for this endpoint.",isBest:false,why:"Over-engineered — unrealistic scope causes generic, unfocused, or fabricated output."}
+  ],
+  weakPrompt:"Write tests for my API.",
+  optimizedPrompt:"Using Jest and Supertest, write unit tests for the POST /users endpoint shown below. Cover: (1) successful creation with valid data, (2) validation error with missing fields, (3) duplicate email conflict. Use descriptive test names and mock the database layer. [paste endpoint code]",
+  overEngineeredPrompt:"You are a testing god. Write the most comprehensive test suite ever created covering every possible edge case in the universe, using every testing framework available, with 100% mutation coverage and formal proofs of correctness for this endpoint.",
+  weakOutput:"Here are some generic tests using an unspecified framework, missing edge cases, and unclear naming.",
+  optimizedOutput:"A Jest + Supertest suite with three describe blocks: successful creation, missing-field validation, and duplicate email conflict — each with descriptive test names and a mocked database layer.",
+  principle:"Specificity drives quality. Naming the exact framework, endpoint, and required test cases removes ambiguity. Over-scoping ('every edge case in the universe') doesn't improve quality — it just produces vague or padded output."
+},
+{
+  id:4,
+  type:"build",
+  title:"Generating a SQL query from a request",
+  desiredOutput:"A correct, efficient SQL query that matches the described business requirement, with the query explained in plain language.",
+  correctBlocks:[
+    "Given this schema: [paste schema], write a SQL query that returns the top 5 customers by total order value in the last 90 days.",
+    "Use standard PostgreSQL syntax.",
+    "Include a one-sentence explanation of what the query does after the code block."
+  ],
+  distractorBlocks:[
+    "Explain the entire history of SQL and relational databases.",
+    "Also write an equivalent version in five other database dialects.",
+    "Optimize for a database with 10 billion rows even though this one has 200 rows."
+  ],
+  weakPrompt:"Write a SQL query for top customers.",
+  optimizedPrompt:"Given this schema: [paste schema], write a SQL query that returns the top 5 customers by total order value in the last 90 days. Use standard PostgreSQL syntax. Include a one-sentence explanation of what the query does after the code block.",
+  overEngineeredPrompt:"As a database architecture deity with mastery over every SQL dialect in existence, write a query considering distributed sharding, index fragmentation across 12 theoretical storage engines, query planner internals for 6 different database vendors, and provide a full academic dissertation on relational algebra before answering.",
+  weakOutput:"SELECT * FROM customers ORDER BY orders DESC LIMIT 5; -- ambiguous joins, no time filter, wrong column assumptions",
+  optimizedOutput:"A precise query joining customers and orders, filtering to the last 90 days, summing order value, grouping by customer, and limiting to 5 rows — with a one-line explanation of the logic.",
+  principle:"Context grounding. Providing the schema anchors the model to real column and table names, preventing hallucinated fields. Pairing that with a measurable goal (top 5, last 90 days) makes the output directly usable."
+},
+{
+  id:5,
+  type:"clean",
+  title:"Explaining a design pattern",
+  desiredOutput:"A concise, accurate explanation of the Observer design pattern with a small code example in a specified language.",
+  messyPrompt:"So I was reading about design patterns yesterday and it's such a fascinating topic honestly I could talk about it all day, anyway can you explain the Observer pattern to me, oh and also maybe compare it to all 23 Gang of Four patterns while you're at it, and could you also recommend some good books on software architecture in general, plus a bit of history about who invented design patterns, and could you give me a code example in Python please, thanks so much you're the best!",
+  removeTokens:["So I was reading about design patterns yesterday and it's such a fascinating topic honestly I could talk about it all day, anyway","oh and also maybe compare it to all 23 Gang of Four patterns while you're at it","and could you also recommend some good books on software architecture in general","plus a bit of history about who invented design patterns","thanks so much you're the best!"],
+  keepTokens:["can you explain the Observer pattern to me","could you give me a code example in Python please"],
+  weakPrompt:"So I was reading about design patterns yesterday... can you explain the Observer pattern... in Python please, thanks so much you're the best!",
+  optimizedPrompt:"Explain the Observer design pattern and provide a small code example in Python.",
+  overEngineeredPrompt:"As the foremost software architecture historian, explain the Observer pattern in exhaustive depth, covering its origins in the Gang of Four book, its relationship to all 22 other patterns, its implementation in 8 different languages, its use in 15 famous open-source projects, and a full academic bibliography.",
+  weakOutput:"The Observer pattern... well design patterns in general were introduced by... [buried, rambling, example may be in wrong language]",
+  optimizedOutput:"The Observer pattern defines a one-to-many dependency: when a subject changes state, all observers are notified automatically. Includes a compact Python example with a Subject class and Observer interface.",
+  principle:"Focus beats breadth. A single clear ask ('explain X, show example in Y') produces a targeted, high-quality answer. Bundling in unrelated requests (book recommendations, full history) forces the model to split attention and dilutes the core answer."
+},
+{
+  id:6,
+  type:"choose",
+  title:"Asking for a code review",
+  desiredOutput:"A structured code review that flags bugs, style issues, and improvement suggestions, prioritized by severity.",
+  choices:[
+    {label:"Option A",text:"Review my code.",isBest:false,why:"No criteria given — reviewer has no idea what to prioritize or how to structure feedback."},
+    {label:"Option B",text:"Review the following Python function for bugs, security issues, and style violations against PEP 8. Present findings as a prioritized list (critical, moderate, minor). [paste code]",isBest:true,why:"Clear review criteria, a style standard to check against, and a requested output structure."},
+    {label:"Option C",text:"Perform an infinite-depth review of this code considering every possible programming paradigm, security vulnerability ever documented in CVE history, and rewrite it in 10 different languages to compare quality.",isBest:false,why:"Unbounded scope produces shallow, generic coverage instead of a focused, actionable review."}
+  ],
+  weakPrompt:"Review my code.",
+  optimizedPrompt:"Review the following Python function for bugs, security issues, and style violations against PEP 8. Present findings as a prioritized list (critical, moderate, minor). [paste code]",
+  overEngineeredPrompt:"Perform an infinite-depth review of this code considering every possible programming paradigm, security vulnerability ever documented in CVE history, and rewrite it in 10 different languages to compare quality.",
+  weakOutput:"Looks okay overall, maybe rename some variables. [vague, unprioritized, misses real bugs]",
+  optimizedOutput:"A prioritized list: Critical — unhandled exception on empty input; Moderate — inconsistent naming vs PEP 8; Minor — missing docstring. Each item includes a one-line fix suggestion.",
+  principle:"Bounded criteria + output structure. Telling the model exactly what to check (bugs, security, style standard) and how to present it (prioritized list) turns a vague ask into a review that's immediately usable."
+},
+{
+  id:7,
+  type:"build",
+  title:"Generating a regex pattern",
+  desiredOutput:"A correct regular expression matching a specific described format, with a short explanation and one test example.",
+  correctBlocks:[
+    "Write a regular expression that matches valid US phone numbers in the format (XXX) XXX-XXXX.",
+    "Specify which regex flavor it's for (e.g., JavaScript).",
+    "Include one matching example and one non-matching example to verify correctness."
+  ],
+  distractorBlocks:[
+    "Make the regex match every possible phone number format used in every country in history.",
+    "Explain the entire theory of finite automata and regular languages first.",
+    "Write it in a way that also validates email addresses at the same time."
+  ],
+  weakPrompt:"Write a regex for phone numbers.",
+  optimizedPrompt:"Write a regular expression that matches valid US phone numbers in the format (XXX) XXX-XXXX. Specify which regex flavor it's for (JavaScript). Include one matching example and one non-matching example to verify correctness.",
+  overEngineeredPrompt:"As a formal languages theorist, derive a regex from first principles covering every international phone number format across all countries and historical numbering plans, prove its correctness using automata theory, and provide a 50-page explanation.",
+  weakOutput:"/\\d+/ — matches basically any number, not the specific format, no examples given.",
+  optimizedOutput:"/^\\(\\d{3}\\) \\d{3}-\\d{4}$/ for JavaScript. Matches: '(415) 555-2671'. Does not match: '415-555-2671' (missing parentheses).",
+  principle:"Precision through format + validation examples. Specifying the exact format and regex flavor removes ambiguity, and requesting matching/non-matching examples forces the model to self-verify its own answer."
+},
+{
+  id:8,
+  type:"clean",
+  title:"Requesting an API integration snippet",
+  desiredOutput:"A minimal, working code snippet showing how to call a specific third-party API with authentication, error handling, and a stated language.",
+  messyPrompt:"Okay so I need to like integrate an API into my app, it's a weather API, and I've never really done API stuff before so sorry if this is a dumb question, could you also explain what an API even is from scratch, and what REST means, and the history of HTTP, and maybe show me how to build my own API server too while you're at it, oh and I'm using Python by the way, and can you add authentication with an API key and handle errors please, sorry again for the long message!",
+  removeTokens:["Okay so I need to like","sorry if this is a dumb question","could you also explain what an API even is from scratch, and what REST means, and the history of HTTP","and maybe show me how to build my own API server too while you're at it","sorry again for the long message!"],
+  keepTokens:["integrate an API into my app, it's a weather API","I'm using Python by the way","can you add authentication with an API key and handle errors please"],
+  weakPrompt:"Okay so I need to like integrate an API into my app... explain what an API even is... sorry again for the long message!",
+  optimizedPrompt:"Show me how to integrate a weather API into my Python app, including authentication with an API key and error handling.",
+  overEngineeredPrompt:"As the creator of the HTTP protocol itself, explain the entire history of networked computing, build a full custom API server from scratch, then integrate a weather API with quantum-resistant encryption and formal verification of every network call.",
+  weakOutput:"APIs are ways for programs to talk to each other... [long tangent, snippet buried at the end, may skip error handling]",
+  optimizedOutput:"A minimal Python snippet using `requests`, reading the API key from an environment variable, making the call in a try/except block, and printing the parsed JSON response.",
+  principle:"Cut apologies and scope creep. Self-deprecating filler ('sorry if this is dumb') and requests for unrelated background ('explain HTTP history') add no signal. State the goal, the language, and the specific requirements (auth, error handling) directly."
+}
+];
+
+/* ================= STATE ================= */
+let state = {
+  scenarios:[],
+  currentIndex:0,
+  score:0,
+  moves:0,
+  wrongPlacements:0,
+  hintsUsed:0,
+  correctCount:0,
+  startTime:0,
+  scenarioStart:0,
+  optimizationBonus:0,
+  results:[] // per scenario: {type, correct, timeSpent}
+};
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ================= NOTIFICATIONS ================= */
+function notify(msg, kind){
+  const stack = document.getElementById('notif-stack');
+  const el = document.createElement('div');
+  el.className = 'notif' + (kind ? ' '+kind : '');
+  el.textContent = msg;
+  stack.appendChild(el);
+  setTimeout(()=>el.remove(), 2700);
+}
+function scorePop(text, x, y){
+  const el = document.createElement('div');
+  el.className='score-pop';
+  el.textContent=text;
+  el.style.left=x+'px';
+  el.style.top=y+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),1000);
+}
+
+/* ================= HUD ================= */
+function renderHUD(){
+  const elapsed = state.startTime ? Math.floor((Date.now()-state.startTime)/1000) : 0;
+  const mm = String(Math.floor(elapsed/60)).padStart(2,'0');
+  const ss = String(elapsed%60).padStart(2,'0');
+  document.getElementById('hud').innerHTML = `
+    <div class="hud-chip">⏱ <b>${mm}:${ss}</b></div>
+    <div class="hud-chip">🎯 <b>${state.score}</b> pts</div>
+    <div class="hud-chip">🧠 <b>${state.moves}</b> moves</div>
+    <div class="hud-chip">❌ <b>${state.wrongPlacements}</b> wrong</div>
+    <div class="hud-chip">💡 <b>${state.hintsUsed}</b> hints</div>
+  `;
+}
+let hudInterval;
+
+/* ================= START ================= */
+function startGame(){
+  state.scenarios = shuffle(SCENARIOS).slice(0,8);
+  state.currentIndex = 0;
+  state.score = 0;
+  state.moves = 0;
+  state.wrongPlacements = 0;
+  state.hintsUsed = 0;
+  state.correctCount = 0;
+  state.results = [];
+  state.startTime = Date.now();
+  document.getElementById('screen-setup').classList.remove('active');
+  document.getElementById('screen-game').classList.add('active');
+  hudInterval = setInterval(renderHUD, 1000);
+  renderHUD();
+  renderScenario();
+}
+
+/* ================= PROGRESS ================= */
+function updateProgress(){
+  const total = state.scenarios.length;
+  const cur = state.currentIndex;
+  document.getElementById('progress-fill').style.width = (cur/total*100)+'%';
+  document.getElementById('progress-label').textContent = `${cur} / ${total}`;
+}
+
+/* ================= RENDER SCENARIO ROUTER ================= */
+function renderScenario(){
+  updateProgress();
+  const container = document.getElementById('scenario-container');
+  const s = state.scenarios[state.currentIndex];
+  if(!s){ return showReport(); }
+  state.scenarioStart = Date.now();
+  container.innerHTML = '';
+  if(s.type==='build') renderBuild(s, container);
+  else if(s.type==='clean') renderClean(s, container);
+  else if(s.type==='choose') renderChoose(s, container);
+}
+
+function typeBadge(type){
+  if(type==='build') return `<span class="type-badge type-build">🧱 Build the Prompt</span>`;
+  if(type==='clean') return `<span class="type-badge type-clean">🧹 Clean the Prompt</span>`;
+  return `<span class="type-badge type-choose">⚖️ Choose the Best Prompt</span>`;
+}
+
+function scenarioHeader(s){
+  return `
+    <div class="scenario-head">
+      <div>
+        ${typeBadge(s.type)}
+        <div class="scenario-title">${s.title}</div>
+      </div>
+      <button class="btn btn-ghost" onclick="useHint()">💡 Hint</button>
+    </div>
+    <div class="desired-output"><b>Desired Output:</b> ${s.desiredOutput}</div>
+  `;
+}
+
+/* ================= HINT ================= */
+function useHint(){
+  state.hintsUsed++;
+  renderHUD();
+  notify('💡 Hint used — a small penalty applied to your Optimization Bonus.', 'gold');
+  const s = state.scenarios[state.currentIndex];
+  if(s.type==='build'){
+    const firstMissing = s.correctBlocks.find(b=>!getPlacedBlocks().includes(b));
+    if(firstMissing){
+      notify('Hint: try placing → "'+firstMissing.slice(0,50)+'..."');
+    }
+  } else if(s.type==='clean'){
+    notify('Hint: look for flattery, tangents, or apologies — that\'s usually noise.');
+  } else if(s.type==='choose'){
+    notify('Hint: the best prompt is specific but not excessive.');
+  }
+}
+
+/* ================= BUILD THE PROMPT ================= */
+let dragBlockData = null;
+
+function getPlacedBlocks(){
+  const zone = document.getElementById('dropzone');
+  if(!zone) return [];
+  return [...zone.querySelectorAll('.block')].map(b=>b.dataset.text);
+}
+
+function renderBuild(s, container){
+  const allBlocks = shuffle([...s.correctBlocks, ...s.distractorBlocks]);
+  container.innerHTML = `
+    <div class="scenario-card">
+      ${scenarioHeader(s)}
+      <div class="build-zone">
+        <div>
+          <div class="zone-title">📦 Block Bank (drag to build your prompt)</div>
+          <div class="bank" id="bank"></div>
+        </div>
+        <div>
+          <div class="zone-title">🧩 Your Prompt (drop blocks here in order)</div>
+          <div class="dropzone" id="dropzone"><div class="empty-hint">Drag blocks here…</div></div>
+        </div>
+      </div>
+      <div class="action-row">
+        <div class="action-left">
+          <button class="btn btn-ghost" onclick="resetBuild()">↺ Reset</button>
+        </div>
+        <button class="btn btn-primary" id="submit-build" onclick="submitBuild()">Submit Prompt →</button>
+      </div>
+      <div class="feedback-panel" id="feedback"></div>
+    </div>
+  `;
+  const bank = document.getElementById('bank');
+  allBlocks.forEach(text=>{
+    const el = createBlockEl(text, true);
+    bank.appendChild(el);
+  });
+  setupDropzone();
+}
+
+function createBlockEl(text, removable){
+  const el = document.createElement('div');
+  el.className = 'block';
+  el.draggable = true;
+  el.dataset.text = text;
+  el.innerHTML = text + (removable? '<span class="rm" onclick="event.stopPropagation();returnToBank(this)">✕ remove</span>':'');
+  el.addEventListener('dragstart', e=>{
+    dragBlockData = text;
+    el.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+  });
+  el.addEventListener('dragend', ()=> el.classList.remove('dragging'));
+  return el;
+}
+
+function returnToBank(rmEl){
+  const block = rmEl.closest('.block');
+  const bank = document.getElementById('bank');
+  block.querySelector('.rm')?.remove();
+  const newBlock = createBlockEl(block.dataset.text, true);
+  bank.appendChild(newBlock);
+  block.remove();
+  checkEmptyDropzone();
+}
+
+function checkEmptyDropzone(){
+  const zone = document.getElementById('dropzone');
+  if(zone && zone.children.length===0){
+    zone.innerHTML = '<div class="empty-hint">Drag blocks here…</div>';
+  }
+}
+
+function setupDropzone(){
+  const zone = document.getElementById('dropzone');
+  const bank = document.getElementById('bank');
+  [zone, bank].forEach(dz=>{
+    dz.addEventListener('dragover', e=>{
+      e.preventDefault();
+      dz.classList.add('dragover');
+    });
+    dz.addEventListener('dragleave', ()=> dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e=>{
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      const dragging = document.querySelector('.block.dragging');
+      if(!dragging) return;
+      const emptyHint = dz.querySelector('.empty-hint');
+      if(emptyHint) emptyHint.remove();
+      if(dz.id==='dropzone' && dragging.parentElement.id!=='dropzone'){
+        state.moves++;
+        renderHUD();
+      }
+      dz.appendChild(dragging);
+      if(dz.id==='bank'){
+        const rm = dragging.querySelector('.rm');
+        if(!rm){
+          const span=document.createElement('span');
+          span.className='rm';
+          span.textContent='✕ remove';
+          span.onclick=(ev)=>{ev.stopPropagation();returnToBank(span);};
+          dragging.appendChild(span);
+        }
+      }
+      checkEmptyDropzone();
+    });
+  });
+}
+
+function resetBuild(){
+  renderScenario();
+}
+
+function submitBuild(){
+  const s = state.scenarios[state.currentIndex];
+  const placed = getPlacedBlocks();
+  let correctCount=0, wrongCount=0;
+  const zoneBlocks = [...document.getElementById('dropzone').querySelectorAll('.block')];
+  zoneBlocks.forEach(b=>{
+    if(s.correctBlocks.includes(b.dataset.text)){
+      correctCount++;
+      b.classList.add('correct-flash');
+    } else {
+      wrongCount++;
+      b.classList.add('wrong-flash');
+    }
+  });
+  const missed = s.correctBlocks.filter(cb=>!placed.includes(cb)).length;
+  state.wrongPlacements += wrongCount;
+  const accuracyRatio = correctCount / s.correctBlocks.length;
+  const isPerfect = correctCount===s.correctBlocks.length && wrongCount===0 && missed===0;
+
+  let pts = Math.round(accuracyRatio*100) - wrongCount*15 - missed*10;
+  pts = Math.max(pts, 5);
+  if(isPerfect){ pts += 30; state.optimizationBonus += 30; notify('⭐ Perfect prompt! Optimization Bonus +30','gold'); }
+  pts = Math.max(pts - state.hintsUsed*5, 5);
+  state.score += pts;
+  state.correctCount += isPerfect?1:0;
+
+  const rect = document.getElementById('submit-build').getBoundingClientRect();
+  scorePop('+'+pts, rect.left, rect.top);
+  renderHUD();
+  notify(isPerfect? '✅ Excellent block selection!' : (wrongCount>0? '⚠️ Some distractor blocks slipped in.':'👍 Good, but a few pieces were missing.'), isPerfect?'':(wrongCount>0?'bad':''));
+
+  document.getElementById('submit-build').disabled = true;
+  showFeedback(s, pts);
+}
+
+/* ================= CLEAN THE PROMPT ================= */
+function renderClean(s, container){
+  container.innerHTML = `
+    <div class="scenario-card">
+      ${scenarioHeader(s)}
+      <div class="zone-title" style="margin-top:16px;">🧹 Click the noisy words/phrases to remove them</div>
+      <div class="messy-prompt" id="messy"></div>
+      <div class="action-row">
+        <div class="action-left">
+          <button class="btn btn-ghost" onclick="resetClean()">↺ Reset</button>
+        </div>
+        <button class="btn btn-primary" id="submit-clean" onclick="submitClean()">Submit Cleaned Prompt →</button>
+      </div>
+      <div class="feedback-panel" id="feedback"></div>
+    </div>
+  `;
+  const messyEl = document.getElementById('messy');
+  const allTokens = [...s.removeTokens.map(t=>({text:t,shouldRemove:true})), ...s.keepTokens.map(t=>({text:t,shouldRemove:false}))];
+  const ordered = orderTokensLikeOriginal(s.messyPrompt, allTokens);
+  ordered.forEach(tk=>{
+    const span = document.createElement('span');
+    span.className = 'tok';
+    span.textContent = tk.text;
+    span.dataset.remove = tk.shouldRemove;
+    span.dataset.selected = 'false';
+    span.onclick = ()=> toggleToken(span);
+    messyEl.appendChild(span);
+    messyEl.appendChild(document.createTextNode(' '));
+  });
+}
+
+function orderTokensLikeOriginal(original, tokens){
+  return tokens.slice().sort((a,b)=> original.indexOf(a.text) - original.indexOf(b.text));
+}
+
+function toggleToken(span){
+  const sel = span.dataset.selected === 'true';
+  span.dataset.selected = sel? 'false':'true';
+  span.classList.toggle('selected-remove', !sel);
+  state.moves++;
+  renderHUD();
+}
+
+function resetClean(){
+  renderScenario();
+}
+
+function submitClean(){
+  const s = state.scenarios[state.currentIndex];
+  const spans = [...document.getElementById('messy').querySelectorAll('.tok')];
+  let correct=0, wrong=0;
+  spans.forEach(sp=>{
+    const shouldRemove = sp.dataset.remove==='true';
+    const selected = sp.dataset.selected==='true';
+    if(shouldRemove===selected){
+      correct++;
+      sp.style.transition='all .3s';
+    } else {
+      wrong++;
+      sp.style.outline='2px solid var(--red)';
+    }
+  });
+  state.wrongPlacements += wrong;
+  const ratio = correct/spans.length;
+  const isPerfect = wrong===0;
+  let pts = Math.round(ratio*100) - wrong*12;
+  pts = Math.max(pts,5);
+  if(isPerfect){ pts+=25; state.optimizationBonus+=25; notify('⭐ Immaculate cleanup! Optimization Bonus +25','gold'); }
+  pts = Math.max(pts - state.hintsUsed*5, 5);
+  state.score += pts;
+  state.correctCount += isPerfect?1:0;
+
+  const rect = document.getElementById('submit-clean').getBoundingClientRect();
+  scorePop('+'+pts, rect.left, rect.top);
+  renderHUD();
+  notify(isPerfect? '✅ Signal-to-noise maximized!' : '⚠️ Some noise remains (or good text was cut).', isPerfect?'':'bad');
+
+  document.getElementById('submit-clean').disabled = true;
+  showFeedback(s, pts);
+}
+
+/* ================= CHOOSE THE BEST PROMPT ================= */
+function renderChoose(s, container){
+  container.innerHTML = `
+    <div class="scenario-card">
+      ${scenarioHeader(s)}
+      <div class="choice-grid" id="choice-grid"></div>
+      <div class="action-row">
+        <div></div>
+        <button class="btn btn-primary" id="submit-choose" onclick="submitChoose()" disabled>Confirm Choice →</button>
+      </div>
+      <div class="feedback-panel" id="feedback"></div>
+    </div>
+  `;
+  const grid = document.getElementById('choice-grid');
+  const shuffled = shuffle(s.choices);
+  shuffled.forEach((c,i)=>{
+    const card = document.createElement('div');
+    card.className = 'choice-card';
+    card.dataset.best = c.isBest;
+    card.dataset.why = c.why;
+    card.innerHTML = `<div class="choice-label">${c.label}</div><div class="choice-text">${c.text}</div>`;
+    card.onclick = ()=>{
+      grid.querySelectorAll('.choice-card').forEach(cc=>cc.classList.remove('selected'));
+      card.classList.add('selected');
+      document.getElementById('submit-choose').disabled = false;
+      state.moves++;
+      renderHUD();
+    };
+    grid.appendChild(card);
+  });
+}
+
+function submitChoose(){
+  const s = state.scenarios[state.currentIndex];
+  const grid = document.getElementById('choice-grid');
+  const selected = grid.querySelector('.choice-card.selected');
+  const cards = [...grid.querySelectorAll('.choice-card')];
+  const isCorrect = selected.dataset.best === 'true';
+
+  cards.forEach(c=>{
+    if(c.dataset.best==='true') c.classList.add('right-answer');
+    else if(c===selected) c.classList.add('wrong-answer');
+  });
+
+  let pts;
+  if(isCorrect){
+    pts = 100 - state.hintsUsed*10;
+    pts += 20; state.optimizationBonus += 20;
+    notify('✅ That\'s the optimal prompt!','');
+  } else {
+    pts = 20;
+    state.wrongPlacements += 1;
+    notify('⚠️ Not quite optimal — check the reasoning below.','bad');
+  }
+  pts = Math.max(pts,5);
+  state.score += pts;
+  state.correctCount += isCorrect?1:0;
+
+  const rect = document.getElementById('submit-choose').getBoundingClientRect();
+  scorePop('+'+pts, rect.left, rect.top);
+  renderHUD();
+
+  document.getElementById('submit-choose').disabled = true;
+  showFeedback(s, pts);
+}
+
+/* ================= FEEDBACK PANEL (shared) ================= */
+function showFeedback(s, pts){
+  const panel = document.getElementById('feedback');
+  panel.innerHTML = `
+    <div class="fb-row">
+      <div class="fb-block fb-weak">
+        <h4>⚠️ Weak Prompt</h4>
+        <p style="color:var(--text-dim);font-style:italic;">"${s.weakPrompt}"</p>
+        <p style="margin-top:8px;"><b>Weak AI Output:</b><br>${s.weakOutput}</p>
+      </div>
+      <div class="fb-block fb-opt">
+        <h4>✅ Optimized Prompt</h4>
+        <p style="color:var(--text-dim);font-style:italic;">"${s.optimizedPrompt}"</p>
+        <p style="margin-top:8px;"><b>Optimized AI Output:</b><br>${s.optimizedOutput}</p>
+      </div>
+    </div>
+    <div class="fb-block" style="border-left:3px solid var(--amber);margin-bottom:14px;">
+      <h4>🚧 Over-Engineered Prompt (also to avoid)</h4>
+      <p style="color:var(--text-dim);font-style:italic;">"${s.overEngineeredPrompt}"</p>
+    </div>
+    <div class="principle-box">💡 <b>Prompt Principle:</b> ${s.principle}</div>
+    <div class="action-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="nextScenario()">Continue →</button>
+    </div>
+  `;
+  panel.classList.add('show');
+}
+
+function nextScenario(){
+  state.currentIndex++;
+  renderScenario();
+}
+
+/* ================= REPORT ================= */
+function computeRank(scorePct){
+  if(scorePct>=90) return {emoji:'👑', rank:'Prompt Architect', rating:'Legendary'};
+  if(scorePct>=75) return {emoji:'🥇', rank:'Prompt Engineer', rating:'Excellent'};
+  if(scorePct>=60) return {emoji:'🥈', rank:'Prompt Practitioner', rating:'Solid'};
+  if(scorePct>=40) return {emoji:'🥉', rank:'Prompt Apprentice', rating:'Developing'};
+  return {emoji:'🌱', rank:'Prompt Novice', rating:'Just Getting Started'};
+}
+
+function showReport(){
+  clearInterval(hudInterval);
+  document.getElementById('screen-game').classList.remove('active');
+  const screen = document.getElementById('screen-report');
+  screen.classList.add('active');
+
+  const totalScenarios = state.scenarios.length;
+  const maxPossible = totalScenarios * 150; // rough ceiling incl bonuses
+  const scorePct = Math.min(100, Math.round((state.score/maxPossible)*100));
+  const {emoji, rank, rating} = computeRank(scorePct);
+  const elapsed = Math.floor((Date.now()-state.startTime)/1000);
+  const mm = String(Math.floor(elapsed/60)).padStart(2,'0');
+  const ss = String(elapsed%60).padStart(2,'0');
+
+  // Prompt DNA: composite of dimensions based on gameplay
+  const clarity = Math.max(10, 100 - state.wrongPlacements*8);
+  const specificity = Math.max(10, Math.round(scorePct*0.9 + (8-state.hintsUsed)*2));
+  const efficiency = Math.max(10, 100 - state.moves*2);
+  const restraint = Math.max(10, 100 - Math.round(state.optimizationBonus<100?20:0) - state.hintsUsed*5);
+  const dnaTotal = clarity+specificity+efficiency+restraint;
+  const dna = [
+    {label:'Clarity', val:clarity, color:'var(--accent)'},
+    {label:'Specificity', val:specificity, color:'var(--violet)'},
+    {label:'Efficiency', val:efficiency, color:'var(--amber)'},
+    {label:'Restraint', val:restraint, color:'#f472b6'}
+  ];
+
+  let feedback;
+  if(scorePct>=85) feedback = "You consistently identify the exact signal a prompt needs — role, task, constraints, and format — while cutting noise without hesitation. This is professional-grade prompting.";
+  else if(scorePct>=65) feedback = "You have a strong instinct for structured prompts, though a few distractor blocks or noisy phrases slipped through. Focus on spotting over-engineering as sharply as you spot vagueness.";
+  else if(scorePct>=40) feedback = "You're building the right habits — recognizing weak prompts is easier than constructing optimized ones. Keep practicing the Role + Task + Constraint + Format pattern.";
+  else feedback = "This is a great starting point. Revisit the Prompt Principle callouts in each scenario — they're the fastest path to leveling up your prompting instincts.";
+
+  const nextMilestone = scorePct>=90
+    ? "You've nearly mastered this domain. Try Advanced difficulty next to test edge-case prompting."
+    : `Reach ${Math.min(100, scorePct+15)}% accuracy next round by using fewer hints and double-checking distractor blocks before submitting.`;
+
+  const bestScenario = state.scenarios[0];
+  const finalOptimized = state.scenarios.map(s=>s.optimizedPrompt).slice(0,1)[0];
+
+  screen.innerHTML = `
+    <div class="report-card">
+      <div class="report-hero">
+        <div class="rank-badge">${emoji}</div>
+        <div class="score-big">${state.score}</div>
+        <div class="rating-text">${rating} — <b style="color:var(--accent);">${rank}</b></div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box"><div class="val">${scorePct}%</div><div class="lbl">Accuracy</div></div>
+        <div class="stat-box"><div class="val">${mm}:${ss}</div><div class="lbl">Time</div></div>
+        <div class="stat-box"><div class="val">${state.moves}</div><div class="lbl">Moves</div></div>
+        <div class="stat-box"><div class="val">${state.wrongPlacements}</div><div class="lbl">Wrong Placements</div></div>
+        <div class="stat-box"><div class="val">${state.hintsUsed}</div><div class="lbl">Hints Used</div></div>
+        <div class="stat-box"><div class="val">+${state.optimizationBonus}</div><div class="lbl">Optimization Bonus</div></div>
+      </div>
+
+      <div class="dna-wrap">
+        <div class="dna-title">🧬 Prompt DNA</div>
+        <div class="dna-bar">
+          ${dna.map(d=>`<div class="dna-seg" style="width:${(d.val/dnaTotal*100)}%;background:${d.color};">${d.label}</div>`).join('')}
+        </div>
+        <div class="dna-legend">
+          ${dna.map(d=>`<span><span class="dna-dot" style="background:${d.color};"></span>${d.label}: ${d.val}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="fb-block fb-opt" style="margin-bottom:16px;">
+        <h4>📋 Personalized Feedback</h4>
+        <p>${feedback}</p>
+      </div>
+
+      <div class="milestone">🎯 <b>Next Milestone:</b> ${nextMilestone}</div>
+
+      <div class="dna-title" style="margin-top:22px;">🏆 Sample Final Optimized Prompt</div>
+      <div class="final-prompt">${finalOptimized}</div>
+
+      <div class="action-row" style="margin-top:26px;">
+        <div></div>
+        <button class="btn btn-primary" onclick="replay()">🔄 Play Again — New Scenarios</button>
+      </div>
+    </div>
+  `;
+}
+
+function replay(){
+  document.getElementById('screen-report').classList.remove('active');
+  document.getElementById('screen-report').innerHTML='';
+  startGame();
+}
+</script>
+</body>
+</html>
