@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Typing Speed Studio — premium offline typing practice and analytics.">
+<title>Typing Speed Studio</title>
+<style>
+:root{--bg:#0a0d14;--panel:#111722;--panel2:#171f2d;--text:#eef4ff;--muted:#8390a6;--accent:#7c5cff;--accent2:#20d6b5;--bad:#ff5d73;--warn:#ffbd59;--line:#263044;--shadow:0 20px 60px #0007;--fs:28px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 15% 0,#251c55 0,transparent 28%),radial-gradient(circle at 90% 10%,#073b40 0,transparent 24%),var(--bg);color:var(--text);min-height:100vh}
+body.light{--bg:#f4f7fb;--panel:#fff;--panel2:#eef2f8;--text:#152033;--muted:#66748a;--line:#dce3ee;--shadow:0 18px 50px #34415a1c}
+button,select,input,textarea{font:inherit}.app{max-width:1280px;margin:auto;padding:22px}.topbar{display:flex;align-items:center;gap:16px;justify-content:space-between;margin-bottom:18px}.brand{display:flex;gap:12px;align-items:center}.logo{width:43px;height:43px;border-radius:14px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-weight:900;box-shadow:0 8px 30px #7c5cff55}.brand h1{font-size:18px;margin:0}.brand p{font-size:12px;color:var(--muted);margin:2px 0}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn,.chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:12px;padding:9px 12px;cursor:pointer;transition:.2s}.btn:hover,.chip:hover{transform:translateY(-1px);border-color:var(--accent)}.btn.primary{background:linear-gradient(135deg,var(--accent),#5a7cff);border:0}.shell{display:grid;grid-template-columns:240px 1fr;gap:18px}.side,.card{background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);backdrop-filter:blur(14px)}.side{padding:14px;height:max-content;position:sticky;top:16px}.navbtn{width:100%;text-align:left;border:0;background:transparent;color:var(--muted);padding:11px;border-radius:11px;cursor:pointer;margin:2px 0}.navbtn.active,.navbtn:hover{background:var(--panel2);color:var(--text)}.main{min-width:0}.card{padding:20px;margin-bottom:18px}.modebar{display:flex;gap:8px;flex-wrap:wrap}.chip.active{background:var(--accent);border-color:transparent;color:white}.suboptions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.suboptions .chip{padding:6px 10px;font-size:13px}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin:18px 0}.stat{background:var(--panel2);padding:12px;border-radius:14px}.stat b{font-size:21px;display:block}.stat span{font-size:11px;color:var(--muted)}.progress{height:5px;background:var(--panel2);border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.2s}.typing-wrap{position:relative}.typing{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:var(--fs);line-height:1.75;letter-spacing:.3px;min-height:210px;max-height:330px;overflow:auto;padding:18px 6px;white-space:pre-wrap;word-break:break-word;outline:none}.typing .correct{color:var(--text)}.typing .incorrect{color:var(--bad);background:#ff5d7320;border-radius:3px}.typing .current{border-left:2px solid var(--accent2);animation:blink 1s infinite}.typing .pending{color:var(--muted)}.typing .extra{color:var(--bad);text-decoration:underline}@keyframes blink{50%{border-color:transparent}}#hiddenInput{position:absolute;opacity:0;pointer-events:none}.hint{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:10px}.analytics{display:none}.analytics.show{display:block}.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{padding:18px;background:var(--panel2);border-radius:16px}.metric strong{font-size:30px}.metric small{display:block;color:var(--muted)}.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.chartbox{background:var(--panel2);padding:14px;border-radius:16px}.chartbox canvas{width:100%;height:180px}.heatmap{display:flex;gap:7px;flex-wrap:wrap}.key{min-width:34px;padding:8px;border-radius:8px;text-align:center;background:var(--panel2);border:1px solid var(--line)}.history-table{width:100%;border-collapse:collapse}.history-table th,.history-table td{padding:10px;text-align:left;border-bottom:1px solid var(--line);font-size:13px}.muted{color:var(--muted)}.badges{display:flex;gap:10px;flex-wrap:wrap}.badge{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}.settings-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.field{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--panel2);padding:12px;border-radius:12px}.modal{position:fixed;inset:0;background:#0009;display:none;place-items:center;padding:20px;z-index:10}.modal.show{display:grid}.modalbox{max-width:650px;width:100%;background:var(--panel);border:1px solid var(--line);padding:20px;border-radius:20px}.modal textarea{width:100%;height:180px;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:12px}.focus .typing span:not(.focusline){opacity:.12}.zen .side,.zen .topbar,.zen .modecard,.zen .stats{display:none}.zen .shell{display:block}.zen .typing{min-height:60vh;display:flex;align-items:center}.toast{position:fixed;right:20px;bottom:20px;background:var(--panel);border:1px solid var(--line);padding:12px 16px;border-radius:12px;transform:translateY(100px);opacity:0;transition:.3s;z-index:20}.toast.show{transform:none;opacity:1}
+@media(max-width:850px){.shell{grid-template-columns:1fr}.side{position:static;display:flex;overflow:auto}.navbtn{white-space:nowrap}.stats{grid-template-columns:repeat(3,1fr)}.hero-grid{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.topbar{align-items:flex-start}.settings-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.app{padding:12px}.stats{grid-template-columns:repeat(2,1fr)}.typing{font-size:calc(var(--fs) * .78)}.actions .btn span{display:none}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header class="topbar"><div class="brand"><div class="logo">TS</div><div><h1>Typing Speed Studio</h1><p>Precision • Rhythm • Progress</p></div></div><div class="actions"><button class="btn" id="soundBtn">🔊 <span>Sound</span></button><button class="btn" id="themeBtn">◐ <span>Theme</span></button><button class="btn primary" id="restartTop">↻ <span>Restart</span></button></div></header>
+<div class="shell">
+<aside class="side">
+<button class="navbtn active" data-view="practice">⌨ Practice</button>
+<button class="navbtn" data-view="analytics">◫ Analytics</button>
+<button class="navbtn" data-view="history">↗ History</button>
+<button class="navbtn" data-view="settings">⚙ Settings</button>
+</aside>
+<main class="main">
+<section id="practiceView">
+<div class="card modecard">
+<div class="modebar" id="modes">
+<button class="chip active" data-mode="time">Time</button><button class="chip" data-mode="words">Words</button><button class="chip" data-mode="quote">Quote</button><button class="chip" data-mode="programming">Programming</button><button class="chip" data-mode="custom">Custom</button><button class="chip" data-mode="adaptive">Adaptive</button><button class="chip" data-mode="focus">Focus</button><button class="chip" data-mode="zen">Zen</button>
+</div><div class="suboptions" id="suboptions"></div>
+</div>
+<div class="card">
+<div class="progress"><i id="progressBar"></i></div>
+<div class="stats">
+<div class="stat"><b id="wpm">0</b><span>WPM</span></div><div class="stat"><b id="raw">0</b><span>RAW WPM</span></div><div class="stat"><b id="cpm">0</b><span>CPM</span></div><div class="stat"><b id="accuracy">100%</b><span>ACCURACY</span></div><div class="stat"><b id="mistakes">0</b><span>MISTAKES</span></div><div class="stat"><b id="remaining">30s</b><span>REMAINING</span></div>
+</div>
+<div class="typing-wrap"><div class="typing" id="typing" tabindex="0" aria-label="Typing passage"></div><textarea id="hiddenInput" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea></div>
+<div class="hint"><span id="statusHint">Click text and start typing</span><span><b id="streak">0</b> streak • <b id="elapsed">0.0s</b> elapsed • <b id="completion">0%</b></span></div>
+<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap"><button class="btn primary" id="restart">Restart ↻</button><button class="btn" id="pause">Pause ⏸</button><button class="btn" id="newText">New text ✦</button></div>
+</div>
+</section>
+<section id="analyticsView" class="analytics">
+<div class="card"><h2>Performance Analytics</h2><p class="muted" id="summary">Complete a session to unlock detailed insights.</p><div class="hero-grid"><div class="metric"><strong id="aWpm">—</strong><small>WPM</small></div><div class="metric"><strong id="aAcc">—</strong><small>Accuracy</small></div><div class="metric"><strong id="aCon">—</strong><small>Consistency</small></div><div class="metric"><strong id="aPct">—</strong><small>Percentile estimate</small></div></div><div class="charts"><div class="chartbox"><b>WPM Progress</b><canvas id="wpmChart"></canvas></div><div class="chartbox"><b>Accuracy</b><canvas id="accChart"></canvas></div></div></div>
+<div class="card"><h3>Character Breakdown</h3><p id="charBreak">Correct 0 • Incorrect 0 • Extra 0 • Missed 0</p><h3>Error Heatmap</h3><div class="heatmap" id="heatmap"></div><h3>Achievements</h3><div class="badges" id="badges"></div></div>
+</section>
+<section id="historyView" class="analytics"><div class="card"><h2>Session History</h2><p class="muted">Stored locally on this device.</p><div style="overflow:auto"><table class="history-table"><thead><tr><th>Date</th><th>Mode</th><th>WPM</th><th>Accuracy</th><th>Consistency</th></tr></thead><tbody id="historyBody"></tbody></table></div></div></section>
+<section id="settingsView" class="analytics"><div class="card"><h2>Studio Settings</h2><div class="settings-grid"><label class="field">Font size <input id="fontSize" type="range" min="20" max="40" value="28"></label><label class="field">Sound effects <input id="soundToggle" type="checkbox" checked></label><label class="field">High contrast <input id="contrastToggle" type="checkbox"></label><label class="field">Reduced motion <input id="motionToggle" type="checkbox"></label></div><p class="muted">Shortcuts: Tab + Enter restart • Esc pause/resume • Ctrl + N new passage</p></div></section>
+</main></div></div>
+<div class="modal" id="customModal"><div class="modalbox"><h2>Custom Text</h2><textarea id="customText" placeholder="Paste or write your practice text..."></textarea><div style="margin-top:12px;display:flex;gap:8px"><button class="btn primary" id="useCustom">Use this text</button><button class="btn" id="closeCustom">Cancel</button></div></div></div><div class="toast" id="toast"></div>
+<script>
+const passages=[
+"The quiet discipline of daily practice creates results that sudden bursts of effort rarely achieve. A skilled typist learns to relax the hands, look ahead, and maintain a steady rhythm even when difficult words appear.",
+"Technology changes quickly, but clear thinking remains valuable. People who communicate ideas with precision can collaborate across teams, solve practical problems, and turn complicated information into useful decisions.",
+"Morning light entered through the window while the city slowly gathered its pace. Somewhere a train crossed a bridge, a shopkeeper raised a shutter, and a student opened a notebook to begin again.",
+"Learning becomes powerful when curiosity is paired with consistency. Instead of chasing perfect results, focus on small improvements that can be repeated. Speed follows accuracy, and confidence follows preparation.",
+"A thoughtful conversation can change the direction of an entire day. Listen carefully, choose words with purpose, and leave enough space for another person to contribute a different point of view.",
+"Good work is rarely dramatic. It is often a sequence of ordinary choices made with unusual care: checking details, asking better questions, revising weak ideas, and finishing what was started."
+];
+const quotes=[
+"Success is the sum of small efforts repeated day in and day out.",
+"The future depends on what you do today, but progress begins with the next deliberate action.",
+"Clarity comes from engagement, not from endless thought without practice."
+];
+const code={
+HTML:`<main class="dashboard">\n  <h1>Welcome back</h1>\n  <button type="button">Start session</button>\n</main>`,
+CSS:`.card {\n  display: grid;\n  gap: 1rem;\n  padding: 1.5rem;\n  border-radius: 1rem;\n  transition: transform 200ms ease;\n}`,
+JavaScript:`const scores = [72, 81, 88, 94];\nconst average = scores.reduce((sum, n) => sum + n, 0) / scores.length;\nconsole.log({ average });`,
+Python:`def calculate_wpm(characters, seconds):\n    minutes = max(seconds / 60, 1 / 60)\n    return round((characters / 5) / minutes)\n\nprint(calculate_wpm(420, 60))`,
+Java:`public class Main {\n    public static void main(String[] args) {\n        int[] values = {4, 8, 15, 16, 23, 42};\n        System.out.println(values.length);\n    }\n}`,
+"C++":`#include <iostream>\n#include <vector>\nint main() {\n    std::vector<int> nums{2, 4, 6, 8};\n    for (int n : nums) std::cout << n << " ";\n}`,
+SQL:`SELECT department, COUNT(*) AS employees\nFROM staff\nWHERE active = TRUE\nGROUP BY department\nORDER BY employees DESC;`
+};
+let mode='time', option=30, target='', typed='', started=false, paused=false, finished=false, startTime=0, pauseStart=0, pausedTotal=0, timer=null, errors={}, streak=0, bestStreak=0, samples=[], sound=true;
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+function words(n){let pool=passages.join(' ').replace(/[.,:;!?]/g,'').split(/\s+/),a=[];for(let i=0;i<n;i++)a.push(pool[Math.floor(Math.random()*pool.length)]);return a.join(' ')}
+function chooseTarget(){
+ if(mode==='words') return words(option);
+ if(mode==='quote') return quotes[Math.floor(Math.random()*quotes.length)];
+ if(mode==='programming') return code[option]||code.JavaScript;
+ if(mode==='custom') return $('#customText').value.trim()||passages[0];
+ if(mode==='adaptive'){let hist=history();let avg=hist.length?hist.slice(0,5).reduce((s,x)=>s+x.wpm,0)/Math.min(5,hist.length):35;return avg>60?passages.join(' '):avg>35?passages[Math.floor(Math.random()*passages.length)]+' '+passages[Math.floor(Math.random()*passages.length)]:passages[Math.floor(Math.random()*passages.length)]}
+ return passages[Math.floor(Math.random()*passages.length)]+' '+passages[Math.floor(Math.random()*passages.length)];
+}
+function subopts(){
+ let vals=mode==='time'?[15,30,60,120]:mode==='words'?[25,50,100,250]:mode==='programming'?Object.keys(code):[];
+ $('#suboptions').innerHTML=vals.map((v,i)=>`<button class="chip ${v==option?'active':''}" data-opt="${v}">${mode==='time'?v+'s':v}</button>`).join('');
+ $$('#suboptions .chip').forEach(b=>b.onclick=()=>{option=isNaN(+b.dataset.opt)?b.dataset.opt:+b.dataset.opt;reset()});
+}
+function render(){
+ let html='', focusLine=Math.floor(typed.length/70);
+ for(let i=0;i<target.length;i++){let c=target[i],cl=i<typed.length?(typed[i]===c?'correct':'incorrect'):(i===typed.length?'current':'pending');let fl=Math.floor(i/70)===focusLine?' focusline':'';html+=`<span class="${cl}${fl}">${esc(c)}</span>`}
+ if(typed.length>target.length) html+=`<span class="extra">${esc(typed.slice(target.length))}</span>`;
+ $('#typing').innerHTML=html; updateStats();
+ let cur=$('.current');if(cur)cur.scrollIntoView({block:'center'});
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g,'&nbsp;').replace(/\n/g,'<br>')}
+function elapsed(){return started?(Date.now()-startTime-pausedTotal-(paused?Date.now()-pauseStart:0))/1000:0}
+function metrics(){
+ let e=Math.max(elapsed(),.001), correct=0,incorrect=0;
+ for(let i=0;i<typed.length;i++) typed[i]===target[i]?correct++:incorrect++;
+ let raw=(typed.length/5)/(e/60), wpm=Math.max(0,(correct/5)/(e/60)), acc=typed.length?correct/typed.length*100:100;
+ return {e,correct,incorrect,raw:Math.min(raw,300),wpm:Math.min(wpm,300),acc};
+}
+function updateStats(){
+ let m=metrics(), comp=Math.min(100,typed.length/target.length*100), rem=mode==='time'?Math.max(0,option-m.e):Math.max(0,target.trim().split(/\s+/).length-typed.trim().split(/\s+/).filter(Boolean).length);
+ $('#wpm').textContent=Math.round(m.wpm);$('#raw').textContent=Math.round(m.raw);$('#cpm').textContent=Math.round(m.wpm*5);$('#accuracy').textContent=m.acc.toFixed(1)+'%';$('#mistakes').textContent=m.incorrect;$('#elapsed').textContent=m.e.toFixed(1)+'s';$('#completion').textContent=comp.toFixed(0)+'%';$('#streak').textContent=streak;$('#remaining').textContent=mode==='time'?Math.ceil(rem)+'s':rem+'w';$('#progressBar').style.width=(mode==='time'?Math.min(100,m.e/option*100):comp)+'%';
+ if(started&&!paused&&!finished){samples.push({t:m.e,w:m.wpm,a:m.acc}); if(mode==='time'&&m.e>=option)finish(); else if(mode!=='time'&&typed.length>=target.length)finish();}
+}
+function start(){if(!started){started=true;startTime=Date.now();timer=setInterval(updateStats,200)}}
+function reset(){clearInterval(timer);typed='';started=false;paused=false;finished=false;pausedTotal=0;errors={};streak=0;bestStreak=0;samples=[];target=chooseTarget();document.body.classList.toggle('focus',mode==='focus');document.body.classList.toggle('zen',mode==='zen');subopts();render();$('#pause').textContent='Pause ⏸';$('#statusHint').textContent='Click text and start typing';}
+function typeInput(e){
+ if(paused||finished)return;e.preventDefault();let k=e.key;
+ if(k==='Backspace'){typed=typed.slice(0,-1);render();return}
+ if(k.length!==1&&k!=='Enter'&&k!=='Tab')return;
+ let ch=k==='Enter'?'\n':k==='Tab'?'\t':k;start();let i=typed.length;typed+=ch;
+ if(ch===target[i]){streak++;bestStreak=Math.max(bestStreak,streak);beep(520,.02)}else{streak=0;errors[target[i]||'extra']=(errors[target[i]||'extra']||0)+1;beep(150,.04)}
+ render();
+}
+function beep(freq,d){if(!sound)return;try{let a=new (AudioContext||webkitAudioContext)(),o=a.createOscillator(),g=a.createGain();o.frequency.value=freq;g.gain.value=.025;o.connect(g);g.connect(a.destination);o.start();g.gain.exponentialRampToValueAtTime(.001,a.currentTime+d);o.stop(a.currentTime+d)}catch{}}
+function consistency(){
+ if(samples.length<3)return 100;let ws=samples.map(x=>x.w).filter(x=>x>0),avg=ws.reduce((a,b)=>a+b,0)/(ws.length||1),sd=Math.sqrt(ws.reduce((s,x)=>s+(x-avg)**2,0)/(ws.length||1));return Math.max(0,Math.min(100,100-sd/Math.max(avg,1)*100));
+}
+function percentile(w){return Math.min(99,Math.max(5,Math.round(5+94/(1+Math.exp(-(w-50)/15)))))}
+function finish(){
+ if(finished)return;finished=true;clearInterval(timer);let m=metrics(), con=consistency(), rec={date:new Date().toLocaleString(),mode,wpm:Math.round(m.wpm),raw:Math.round(m.raw),acc:+m.acc.toFixed(1),cons:+con.toFixed(1),duration:+m.e.toFixed(1),errors,chars:{correct:m.correct,incorrect:m.incorrect,extra:Math.max(0,typed.length-target.length),missed:Math.max(0,target.length-typed.length)},samples:samples.filter((_,i)=>i%3===0)};
+ let h=history();h.unshift(rec);localStorage.setItem('tss_history',JSON.stringify(h.slice(0,100)));showAnalytics(rec);toast('Session complete — analytics ready ✦');view('analytics');
+}
+function history(){try{return JSON.parse(localStorage.getItem('tss_history'))||[]}catch{return[]}}
+function showAnalytics(r=history()[0]){
+ if(!r)return;$('#aWpm').textContent=r.wpm;$('#aAcc').textContent=r.acc+'%';$('#aCon').textContent=r.cons+'%';$('#aPct').textContent=percentile(r.wpm)+'th';
+ $('#charBreak').textContent=`Correct ${r.chars.correct} • Incorrect ${r.chars.incorrect} • Extra ${r.chars.extra} • Missed ${r.chars.missed}`;
+ let keys=Object.entries(r.errors||{}).sort((a,b)=>b[1]-a[1]);$('#heatmap').innerHTML=keys.length?keys.map(([k,v])=>`<span class="key" style="opacity:${Math.max(.45,Math.min(1,.4+v/5))}">${esc(k===' '?'Space':k)} <small>${v}</small></span>`).join(''):'<span class="muted">No errors — excellent precision.</span>';
+ let strengths=r.acc>=97?'excellent accuracy':'developing speed',weak=keys[0]?`Watch the “${keys[0][0]}” key.`:'Keep the same controlled rhythm.';
+ $('#summary').textContent=`You typed ${r.wpm} WPM at ${r.acc}% accuracy with ${r.cons}% consistency. Your strength is ${strengths}. ${weak} ${r.cons<75?'Try shorter bursts while keeping an even cadence.':'Your rhythm is stable; gradually increase pace.'}`;
+ let badges=[];if(r.wpm>=40)badges.push('⚡ 40 WPM Club');if(r.wpm>=60)badges.push('🚀 Speed Runner');if(r.wpm>=80)badges.push('🏆 Elite Pace');if(r.acc>=98)badges.push('🎯 Precision');if(r.cons>=90)badges.push('〰 Rhythm Master');if(r.chars.incorrect===0)badges.push('💎 Flawless');$('#badges').innerHTML=(badges.length?badges:['🌱 First Steps']).map(x=>`<span class="badge">${x}</span>`).join('');
+ drawChart($('#wpmChart'),r.samples||[],'w');drawChart($('#accChart'),r.samples||[],'a');
+}
+function drawChart(c,data,key){let dpr=devicePixelRatio||1,w=c.clientWidth,h=180;c.width=w*dpr;c.height=h*dpr;let x=c.getContext('2d');x.scale(dpr,dpr);x.clearRect(0,0,w,h);x.strokeStyle=getComputedStyle(document.body).getPropertyValue('--line');for(let i=1;i<4;i++){x.beginPath();x.moveTo(0,h*i/4);x.lineTo(w,h*i/4);x.stroke()}if(data.length<2)return;let vals=data.map(z=>z[key]),max=Math.max(...vals,key==='a'?100:1),min=key==='a'?Math.min(80,...vals):0;x.strokeStyle=getComputedStyle(document.body).getPropertyValue('--accent2');x.lineWidth=2;x.beginPath();vals.forEach((v,i)=>{let px=i/(vals.length-1)*w,py=h-((v-min)/(max-min||1))*(h-12)-6;i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke()}
+function renderHistory(){let h=history();$('#historyBody').innerHTML=h.length?h.map(r=>`<tr><td>${r.date}</td><td>${r.mode}</td><td>${r.wpm}</td><td>${r.acc}%</td><td>${r.cons}%</td></tr>`).join(''):'<tr><td colspan="5" class="muted">No sessions yet.</td></tr>'}
+function view(v){$$('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.view===v));['practice','analytics','history','settings'].forEach(x=>$('#'+x+'View').style.display=x===v?'block':'none');if(v==='analytics')showAnalytics();if(v==='history')renderHistory()}
+function toast(t){$('#toast').textContent=t;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),2200)}
+$$('.navbtn').forEach(b=>b.onclick=()=>view(b.dataset.view));
+$$('#modes .chip').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$$('#modes .chip').forEach(x=>x.classList.toggle('active',x===b));option=mode==='time'?30:mode==='words'?50:mode==='programming'?'JavaScript':null;if(mode==='custom')$('#customModal').classList.add('show');else reset()});
+$('#typing').onclick=()=>$('#typing').focus();$('#typing').onkeydown=typeInput;
+$('#restart').onclick=$('#restartTop').onclick=reset;$('#newText').onclick=reset;
+$('#pause').onclick=()=>{if(!started||finished)return;paused=!paused;if(paused){pauseStart=Date.now();$('#pause').textContent='Resume ▶';$('#statusHint').textContent='Session paused'}else{pausedTotal+=Date.now()-pauseStart;$('#pause').textContent='Pause ⏸';$('#statusHint').textContent='Keep going'}};
+$('#themeBtn').onclick=()=>document.body.classList.toggle('light');$('#soundBtn').onclick=()=>{sound=!sound;$('#soundToggle').checked=sound;toast(sound?'Sound on':'Sound off')};$('#soundToggle').onchange=e=>sound=e.target.checked;
+$('#fontSize').oninput=e=>document.documentElement.style.setProperty('--fs',e.target.value+'px');$('#contrastToggle').onchange=e=>document.body.style.filter=e.target.checked?'contrast(1.18)':'';$('#motionToggle').onchange=e=>{document.documentElement.style.scrollBehavior=e.target.checked?'auto':'smooth'};
+$('#useCustom').onclick=()=>{$('#customModal').classList.remove('show');reset()};$('#closeCustom').onclick=()=>$('#customModal').classList.remove('show');
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#pause').click();if(e.ctrlKey&&e.key.toLowerCase()==='n'){e.preventDefault();reset()}});
+window.addEventListener('resize',()=>{let r=history()[0];if(r)showAnalytics(r)});
+reset();showAnalytics();
+</script>
+</body></html>
