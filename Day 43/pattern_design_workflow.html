@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Workflow Architect — Surface & Pattern Design</title>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --surface2: #f2f0ec;
+    --text: #1a1918;
+    --text2: #6b6a65;
+    --text3: #9b9990;
+    --border: #e2e0da;
+    --accent: #5b4af7;
+    --accent-bg: #eeedfb;
+    --accent-text: #3b2dbf;
+    --green: #2d8a5e;
+    --green-bg: #e8f5ee;
+    --amber: #b86a10;
+    --amber-bg: #fef3e2;
+    --coral: #c94f30;
+    --coral-bg: #fceee9;
+    --purple: #6d3fc7;
+    --purple-bg: #f0ebfb;
+    --teal: #1a7a6e;
+    --teal-bg: #e3f4f2;
+    --pink: #b83870;
+    --pink-bg: #fce9f2;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  [data-theme="dark"] {
+    --bg: #131211;
+    --surface: #1e1d1b;
+    --surface2: #252422;
+    --text: #e8e6e1;
+    --text2: #9b9890;
+    --text3: #6a6860;
+    --border: #2e2c29;
+    --accent: #8b7ef8;
+    --accent-bg: #1e1b3a;
+    --accent-text: #b4acfa;
+    --green: #4db87e;
+    --green-bg: #0d2318;
+    --amber: #e8972a;
+    --amber-bg: #241800;
+    --coral: #e8714d;
+    --coral-bg: #2a0e06;
+    --purple: #a87de8;
+    --purple-bg: #1a0d35;
+    --teal: #2aaaa0;
+    --teal-bg: #031e1c;
+    --pink: #e86aa0;
+    --pink-bg: #2a071a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+  
+  /* NAV */
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; }
+  .nav-brand { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .nav-brand span { font-size: 20px; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+  .btn-icon { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text2); transition: background 0.15s; }
+  .btn-icon:hover { background: var(--surface2); }
+  
+  /* SIDEBAR */
+  .layout { display: flex; padding-top: 56px; min-height: 100vh; }
+  .sidebar { width: 240px; position: fixed; top: 56px; left: 0; bottom: 0; overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border); padding: 16px 12px; }
+  .sidebar-section { margin-bottom: 20px; }
+  .sidebar-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); padding: 0 8px; margin-bottom: 6px; }
+  .sidebar-item { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 7px; font-size: 13px; color: var(--text2); cursor: pointer; transition: all 0.15s; border: none; background: none; width: 100%; text-align: left; }
+  .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-item.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+  .sidebar-item .dot { width: 20px; height: 20px; border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .progress-track { height: 3px; background: var(--border); border-radius: 3px; margin: 12px 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; }
+  .progress-label { font-size: 11px; color: var(--text3); padding: 0 8px; }
+  
+  /* MAIN */
+  .main { margin-left: 240px; flex: 1; padding: 32px 40px; max-width: 900px; }
+  
+  /* HERO */
+  .hero { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; margin-bottom: 28px; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, var(--accent-bg) 0%, transparent 70%); pointer-events: none; }
+  .hero-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-text); background: var(--accent-bg); padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 12px; }
+  .hero h1 { font-size: 26px; font-weight: 700; margin-bottom: 8px; line-height: 1.25; }
+  .hero p { font-size: 14px; color: var(--text2); max-width: 560px; }
+  .hero-meta { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; }
+  .hero-stat { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); }
+  .hero-stat strong { color: var(--text); }
+  
+  /* STAGE CARDS */
+  .stage { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 24px; overflow: hidden; transition: box-shadow 0.2s; }
+  .stage:hover { box-shadow: var(--shadow); }
+  .stage-header { padding: 20px 24px; display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .stage-num { width: 38px; height: 38px; border-radius: 10px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .stage-info { flex: 1; }
+  .stage-info h3 { font-size: 16px; font-weight: 600; margin-bottom: 2px; }
+  .stage-info p { font-size: 13px; color: var(--text2); }
+  .stage-meta { display: flex; align-items: center; gap: 8px; }
+  .stage-time { font-size: 12px; color: var(--text3); background: var(--surface2); padding: 3px 8px; border-radius: 6px; }
+  .chevron { font-size: 14px; color: var(--text3); transition: transform 0.25s; }
+  .stage.open .chevron { transform: rotate(180deg); }
+  .stage-body { display: none; padding: 0 24px 24px; border-top: 1px solid var(--border); }
+  .stage.open .stage-body { display: block; }
+  
+  /* INNER GRID */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .info-block { background: var(--surface2); border-radius: 10px; padding: 16px; }
+  .info-block h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 10px; }
+  .info-block ul { list-style: none; }
+  .info-block ul li { font-size: 13px; color: var(--text2); padding: 3px 0; display: flex; align-items: flex-start; gap: 6px; }
+  .info-block ul li::before { content: '→'; color: var(--accent); font-size: 11px; margin-top: 2px; flex-shrink: 0; }
+  
+  /* TOOL CARDS */
+  .tool-card { border: 1px solid var(--border); border-radius: 10px; padding: 14px; background: var(--surface); }
+  .tool-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .tool-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .tool-name { font-size: 13px; font-weight: 600; }
+  .tool-tag { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+  .tool-desc { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+  .tool-why { font-size: 11px; color: var(--text3); font-style: italic; }
+  
+  /* PROMPT BOX */
+  .prompt-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 12px; position: relative; }
+  .prompt-box pre { font-size: 12px; color: var(--text); font-family: 'SF Mono', 'Fira Code', monospace; white-space: pre-wrap; line-height: 1.6; }
+  .copy-btn { position: absolute; top: 10px; right: 10px; font-size: 11px; padding: 3px 8px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text2); cursor: pointer; }
+  .copy-btn:hover { background: var(--surface2); }
+  .prompt-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 8px; }
+  
+  /* TAGS */
+  .tag { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 5px; font-weight: 500; margin: 2px; }
+  .tag-green { background: var(--green-bg); color: var(--green); }
+  .tag-amber { background: var(--amber-bg); color: var(--amber); }
+  .tag-red { background: var(--coral-bg); color: var(--coral); }
+  .tag-purple { background: var(--purple-bg); color: var(--purple); }
+  .tag-teal { background: var(--teal-bg); color: var(--teal); }
+  .tag-blue { background: var(--accent-bg); color: var(--accent-text); }
+  .tag-pink { background: var(--pink-bg); color: var(--pink); }
+  
+  /* ALERT BOXES */
+  .alert { border-radius: 10px; padding: 14px 16px; margin-top: 12px; display: flex; gap: 10px; }
+  .alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .alert-text { font-size: 13px; line-height: 1.5; }
+  .alert-tip { background: var(--green-bg); color: var(--green); }
+  .alert-warn { background: var(--amber-bg); color: var(--amber); }
+  .alert-mistake { background: var(--coral-bg); color: var(--coral); }
+  
+  /* OUTPUT BADGE */
+  .output-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 5px 10px; border-radius: 7px; background: var(--green-bg); color: var(--green); font-weight: 500; margin: 3px; }
+  
+  /* DIAGRAM */
+  .diagram-wrap { margin: 20px 0; background: var(--surface2); border-radius: 12px; padding: 20px; overflow-x: auto; }
+  
+  /* SUMMARY SECTION */
+  .summary-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+  .summary-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+  
+  /* STACK ITEM */
+  .stack-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; }
+  .stack-icon { font-size: 22px; width: 40px; text-align: center; }
+  .stack-info { flex: 1; }
+  .stack-info strong { font-size: 14px; font-weight: 600; display: block; }
+  .stack-info span { font-size: 12px; color: var(--text2); }
+  .stack-purpose { font-size: 11px; padding: 3px 8px; border-radius: 5px; }
+  
+  /* RESOURCE */
+  .resource-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .resource-item:last-child { border-bottom: none; }
+  .resource-type { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; min-width: 60px; color: var(--text3); padding-top: 2px; }
+  .resource-content strong { font-size: 13px; font-weight: 600; display: block; }
+  .resource-content span { font-size: 12px; color: var(--text2); }
+  
+  /* NOTES */
+  .note-area { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); resize: vertical; min-height: 80px; }
+  .note-area:focus { outline: none; border-color: var(--accent); }
+  
+  /* PROGRESS TRACKER */
+  .progress-bar { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+  .p-dot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; cursor: pointer; color: var(--text3); transition: all 0.2s; }
+  .p-dot.done { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .p-dot.active { border-color: var(--accent); color: var(--accent-text); }
+  .p-line { flex: 1; height: 2px; background: var(--border); align-self: center; min-width: 16px; border-radius: 2px; }
+  .p-line.done { background: var(--accent); }
+  
+  /* SECTION HEADER */
+  .section-title { font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin: 20px 0 10px; display: flex; align-items: center; gap: 6px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  
+  /* BOOKMARK */
+  .bookmark-btn { background: none; border: 1px solid var(--border); border-radius: 7px; padding: 5px 10px; font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.15s; }
+  .bookmark-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+  .bookmark-btn.bookmarked { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-text); }
+  
+  /* PRINT */
+  @media print {
+    .nav, .sidebar, .progress-bar { display: none !important; }
+    .main { margin-left: 0; padding: 20px; }
+    .stage-body { display: block !important; }
+  }
+  
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px; }
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+  
+  /* DIAGRAM SVG inline */
+  .flow-diagram svg { width: 100%; height: auto; }
+  
+  /* DECISION TREE */
+  .decision-tree { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .dt-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+  .dt-row:last-child { border-bottom: none; }
+  .dt-q { flex: 0 0 220px; padding: 14px; background: var(--surface2); font-size: 13px; font-weight: 600; display: flex; align-items: center; border-right: 1px solid var(--border); }
+  .dt-a { flex: 1; padding: 14px; font-size: 13px; color: var(--text2); }
+  
+  .bookmark-list { list-style: none; padding: 12px; background: var(--surface2); border-radius: 10px; min-height: 40px; }
+  .bookmark-list li { font-size: 13px; padding: 4px 0; color: var(--text2); display: flex; align-items: center; gap: 6px; }
+  
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table th { background: var(--surface2); padding: 8px 12px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); border-bottom: 1px solid var(--border); }
+  .compare-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child { font-weight: 600; color: var(--text); }
+
+  .automation-item { display: flex; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 9px; margin-bottom: 8px; }
+  .auto-icon { font-size: 18px; }
+  .auto-info strong { font-size: 13px; font-weight: 600; display: block; }
+  .auto-info span { font-size: 12px; color: var(--text2); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <span>🎨</span>
+    AI Workflow Architect
+  </div>
+  <div class="nav-right">
+    <span class="nav-badge">Surface & Pattern Design</span>
+    <button class="btn-icon" onclick="toggleTheme()" title="Toggle dark mode">🌙</button>
+    <button class="btn-icon" onclick="window.print()" title="Print workflow">🖨</button>
+    <button class="btn-icon" onclick="exportProgress()" title="Export progress">💾</button>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Workflow Stages</div>
+      <button class="sidebar-item active" id="nav-overview" onclick="scrollTo('overview')">
+        <div class="dot" style="background:#eeedfb;color:#3b2dbf">★</div> Overview
+      </button>
+      <button class="sidebar-item" id="nav-s1" onclick="scrollTo('stage1')">
+        <div class="dot" style="background:#e3f4f2;color:#1a7a6e">1</div> Mindset & Foundations
+      </button>
+      <button class="sidebar-item" id="nav-s2" onclick="scrollTo('stage2')">
+        <div class="dot" style="background:#fce9f2;color:#b83870">2</div> Learning Core Tools
+      </button>
+      <button class="sidebar-item" id="nav-s3" onclick="scrollTo('stage3')">
+        <div class="dot" style="background:#fef3e2;color:#b86a10">3</div> Design Principles
+      </button>
+      <button class="sidebar-item" id="nav-s4" onclick="scrollTo('stage4')">
+        <div class="dot" style="background:#eeedfb;color:#3b2dbf">4</div> Creating Patterns
+      </button>
+      <button class="sidebar-item" id="nav-s5" onclick="scrollTo('stage5')">
+        <div class="dot" style="background:#e8f5ee;color:#2d8a5e">5</div> Product Mockups
+      </button>
+      <button class="sidebar-item" id="nav-s6" onclick="scrollTo('stage6')">
+        <div class="dot" style="background:#fceee9;color:#c94f30">6</div> AI Supercharging
+      </button>
+      <button class="sidebar-item" id="nav-s7" onclick="scrollTo('stage7')">
+        <div class="dot" style="background:#f0ebfb;color:#6d3fc7">7</div> Building a Portfolio
+      </button>
+      <button class="sidebar-item" id="nav-s8" onclick="scrollTo('stage8')">
+        <div class="dot" style="background:#e3f4f2;color:#1a7a6e">8</div> Sharing & Growth
+      </button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Access</div>
+      <button class="sidebar-item" onclick="scrollTo('summary')">
+        <div class="dot" style="background:#f2f0ec;color:#6b6a65">📋</div> Summary
+      </button>
+      <button class="sidebar-item" onclick="scrollTo('stack')">
+        <div class="dot" style="background:#f2f0ec;color:#6b6a65">🛠</div> AI Stack
+      </button>
+      <button class="sidebar-item" onclick="scrollTo('resources')">
+        <div class="dot" style="background:#f2f0ec;color:#6b6a65">📚</div> Resources
+      </button>
+      <button class="sidebar-item" onclick="scrollTo('notes')">
+        <div class="dot" style="background:#f2f0ec;color:#6b6a65">📝</div> My Notes
+      </button>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="global-progress" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="global-label">0 of 8 stages complete</div>
+  </aside>
+  
+  <!-- MAIN -->
+  <main class="main">
+  
+    <!-- HERO -->
+    <div class="hero" id="overview">
+      <div class="hero-tag">🎨 Complete Beginner · Student · Pattern Design</div>
+      <h1>Surface & Pattern Design<br>Learning Workflow</h1>
+      <p>A complete AI-powered roadmap to take you from zero design experience to confidently creating repeatable, print-ready patterns for diaries, phone covers, bags, and more — step by step.</p>
+      <div class="hero-meta">
+        <div class="hero-stat">⏱ <strong>Total time:</strong> 10–16 weeks</div>
+        <div class="hero-stat">🎯 <strong>Goal:</strong> Create print-ready pattern designs</div>
+        <div class="hero-stat">🤖 <strong>AI tools:</strong> 12 recommended</div>
+        <div class="hero-stat">📦 <strong>Output:</strong> Portfolio with 6+ patterns</div>
+      </div>
+    </div>
+    
+    <!-- PROGRESS TRACKER -->
+    <div class="progress-bar">
+      <div class="p-dot" id="dot-0" onclick="markDone(0)">★</div>
+      <div class="p-line" id="line-0"></div>
+      <div class="p-dot" id="dot-1" onclick="markDone(1)">1</div>
+      <div class="p-line" id="line-1"></div>
+      <div class="p-dot" id="dot-2" onclick="markDone(2)">2</div>
+      <div class="p-line" id="line-2"></div>
+      <div class="p-dot" id="dot-3" onclick="markDone(3)">3</div>
+      <div class="p-line" id="line-3"></div>
+      <div class="p-dot" id="dot-4" onclick="markDone(4)">4</div>
+      <div class="p-line" id="line-4"></div>
+      <div class="p-dot" id="dot-5" onclick="markDone(5)">5</div>
+      <div class="p-line" id="line-5"></div>
+      <div class="p-dot" id="dot-6" onclick="markDone(6)">6</div>
+      <div class="p-line" id="line-6"></div>
+      <div class="p-dot" id="dot-7" onclick="markDone(7)">7</div>
+      <div class="p-line" id="line-7"></div>
+      <div class="p-dot" id="dot-8" onclick="markDone(8)">8</div>
+    </div>
+    
+    <!-- WORKFLOW DIAGRAM -->
+    <div class="diagram-wrap flow-diagram">
+      <svg viewBox="0 0 760 90" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#9b9990" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+        </defs>
+        <!-- Boxes -->
+        <rect x="2" y="24" width="78" height="36" rx="8" fill="#e3f4f2" stroke="#1a7a6e" stroke-width="0.8"/>
+        <text x="41" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#1a7a6e" font-family="sans-serif">Mindset &amp;</text>
+        <text x="41" y="51" text-anchor="middle" font-size="9" fill="#1a7a6e" font-family="sans-serif">Foundations</text>
+        <line x1="80" y1="42" x2="96" y2="42" stroke="#9b9990" stroke-width="1" marker-end="url(#arr)"/>
+        
+        <rect x="96" y="24" width="78" height="36" rx="8" fill="#fce9f2" stroke="#b83870" stroke-width="0.8"/>
+        <text x="135" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#b83870" font-family="sans-serif">Learning</text>
+        <text x="135" y="51" text-anchor="middle" font-size="9" fill="#b83870" font-family="sans-serif">Core Tools</text>
+        <line x1="174" y1="42" x2="190" y2="42" stroke="#9b9990" stroke-width="1" marker-end="url(#arr)"/>
+        
+        <rect x="190" y="24" width="78" height="36" rx="8" fill="#fef3e2" stroke="#b86a10" stroke-width="0.8"/>
+        <text x="229" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#b86a10" font-family="sans-serif">Design</text>
+        <text x="229" y="51" text-anchor="middle" font-size="9" fill="#b86a10" font-family="sans-serif">Principles</text>
+        <line x1="268" y1="42" x2="284" y2="42" stroke="#9b9990" stroke-width="1" marker-end="url(#arr)"/>
+        
+        <rect x="284" y="24" width="78" height="36" rx="8" fill="#eeedfb" stroke="#3b2dbf" stroke-width="0.8"/>
+        <text x="323" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#3b2dbf" font-family="sans-serif">Creating</text>
+        <text x="323" y="51" text-anchor="middle" font-size="9" fill="#3b2dbf" font-family="sans-serif">Patterns</text>
+        <line x1="362" y1="42" x2="378" y2="42" stroke="#9b9990" stroke-width="1" marker-end="url(#arr)"/>
+        
+        <rect x="378" y="24" width="78" height="36" rx="8" fill="#e8f5ee" stroke="#2d8a5e" stroke-width="0.8"/>
+        <text x="417" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#2d8a5e" font-family="sans-serif">Product</text>
+        <text x="417" y="51" text-anchor="middle" font-size="9" fill="#2d8a5e" font-family="sans-serif">Mockups</text>
+        <line x1="456" y1="42" x2="472" y2="42" stroke="#9b9990" stroke-width="1" marker-end="url(#arr)"/>
+        
+        <rect x="472" y="24" width="78" height="36" rx="8" fill="#fceee9" stroke="#c94f30" stroke-width="0.8"/>
+        <text x="511" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#c94f30" font-family="sans-serif">AI</text>
+        <text x="511" y="51" text-anchor="middle" font-size="9" fill="#c94f30" font-family="sans-serif">Supercharging</text>
+        <line x1="550" y1="42" x2="566" y2="42" stroke="#9b9990" stroke-width="1" marker-end="url(#arr)"/>
+        
+        <rect x="566" y="24" width="78" height="36" rx="8" fill="#f0ebfb" stroke="#6d3fc7" stroke-width="0.8"/>
+        <text x="605" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#6d3fc7" font-family="sans-serif">Building</text>
+        <text x="605" y="51" text-anchor="middle" font-size="9" fill="#6d3fc7" font-family="sans-serif">Portfolio</text>
+        <line x1="644" y1="42" x2="660" y2="42" stroke="#9b9990" stroke-width="1" marker-end="url(#arr)"/>
+        
+        <rect x="660" y="24" width="80" height="36" rx="8" fill="#e3f4f2" stroke="#1a7a6e" stroke-width="0.8"/>
+        <text x="700" y="39" text-anchor="middle" font-size="9" font-weight="600" fill="#1a7a6e" font-family="sans-serif">Sharing &amp;</text>
+        <text x="700" y="51" text-anchor="middle" font-size="9" fill="#1a7a6e" font-family="sans-serif">Growth</text>
+      </svg>
+    </div>
+
+    <!-- ===== STAGE 1 ===== -->
+    <div class="stage" id="stage1">
+      <div class="stage-header" onclick="toggleStage('stage1')">
+        <div class="stage-num" style="background:#e3f4f2;color:#1a7a6e">1</div>
+        <div class="stage-info">
+          <h3>Mindset & Foundations</h3>
+          <p>Understand what pattern design is and build the right learning approach</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Week 1</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(1)" id="bm-1">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-teal">Understand surface design categories</span>
+        <span class="tag tag-teal">Know what tools exist</span>
+        <span class="tag tag-teal">Set up a learning routine</span>
+        <span class="tag tag-teal">Gather visual inspiration</span>
+        
+        <div class="grid2">
+          <div class="info-block">
+            <h4>Tasks</h4>
+            <ul>
+              <li>Research what surface pattern design is (Pinterest, YouTube)</li>
+              <li>Create an inspiration board (Canva or Pinterest)</li>
+              <li>Understand the difference between seamless, half-drop, and stripe repeat types</li>
+              <li>Learn what "print-ready" and "DPI" mean</li>
+              <li>Join a free pattern design community online</li>
+              <li>Set a weekly practice schedule (30–60 min/day)</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Key concepts to learn</h4>
+            <ul>
+              <li>Tile/repeat pattern vs. allover pattern</li>
+              <li>Resolution: 300 DPI for print, 72 DPI for digital</li>
+              <li>Vector vs. raster graphics (key for scaling)</li>
+              <li>Color palettes and the role of mood boards</li>
+              <li>Surface design categories: apparel, stationery, home decor</li>
+              <li>Target products: diaries, bags, phone cases</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="section-title">Best AI Tools</div>
+        <div class="grid3">
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#eeedfb">🤖</div>
+              <div>
+                <div class="tool-name">Claude / ChatGPT</div>
+                <span class="tool-tag tag-blue">Research</span>
+              </div>
+            </div>
+            <div class="tool-desc">Ask anything about design terms, techniques, and concepts. Your 24/7 design tutor.</div>
+            <div class="tool-why">💡 Why: Instant answers without sifting through videos</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fce9f2">📌</div>
+              <div>
+                <div class="tool-name">Pinterest</div>
+                <span class="tool-tag tag-pink">Inspiration</span>
+              </div>
+            </div>
+            <div class="tool-desc">Build mood boards, find pattern references, explore trending styles.</div>
+            <div class="tool-why">💡 Why: Best free visual library for pattern inspiration</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fef3e2">🎨</div>
+              <div>
+                <div class="tool-name">Coolors.co</div>
+                <span class="tool-tag tag-amber">Color</span>
+              </div>
+            </div>
+            <div class="tool-desc">Generate beautiful color palettes in seconds. Lock colors you like and generate the rest.</div>
+            <div class="tool-why">💡 Why: Color is 60% of pattern design appeal</div>
+          </div>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Research prompt for Claude/ChatGPT</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I'm a complete beginner who wants to learn surface pattern design to create patterns for diaries, phone cases, and bags. Explain the 5 most important beginner concepts I need to understand first, using simple language. Also give me a 4-week beginner study plan.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Inspiration gathering prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>Generate 10 specific pattern design style names I should search on Pinterest to build an inspiration board for illustrated diary covers targeting teenage girls. Include one sentence describing each style's visual feel.</pre>
+        </div>
+
+        <div class="section-title">Best Practices</div>
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">Study 5 existing patterns you love each week. Break down what you like: the colors, the shapes, the mood. This trains your visual eye faster than any tutorial.</div>
+        </div>
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">Save inspiration by category in separate Pinterest boards: one for florals, one for geometric, one for abstract. This makes it easy to develop a signature style later.</div>
+        </div>
+        
+        <div class="section-title">Common Mistakes</div>
+        <div class="alert alert-mistake">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text">Don't jump straight into design software before understanding the basics. Beginners who start Procreate/Illustrator without foundation knowledge get overwhelmed and quit.</div>
+        </div>
+        
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ Inspiration board with 50+ images</span>
+        <span class="output-badge">✓ List of 3–5 pattern styles you want to learn</span>
+        <span class="output-badge">✓ Weekly study schedule</span>
+        <span class="output-badge">✓ Glossary of 20 key design terms</span>
+      </div>
+    </div>
+    
+    <!-- ===== STAGE 2 ===== -->
+    <div class="stage" id="stage2">
+      <div class="stage-header" onclick="toggleStage('stage2')">
+        <div class="stage-num" style="background:#fce9f2;color:#b83870">2</div>
+        <div class="stage-info">
+          <h3>Learning Core Design Tools</h3>
+          <p>Choose and learn one design tool to start creating your first elements</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Weeks 2–3</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(2)" id="bm-2">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-pink">Choose your primary tool</span>
+        <span class="tag tag-pink">Learn basic drawing/editing</span>
+        <span class="tag tag-pink">Create first digital elements</span>
+        <span class="tag tag-pink">Understand layers and file formats</span>
+        
+        <div class="section-title">Tool Decision Tree — Which app should I use?</div>
+        <div class="decision-tree">
+          <div class="dt-row">
+            <div class="dt-q">Do you have an iPad?</div>
+            <div class="dt-a">→ <strong>Yes:</strong> Start with <span class="tag tag-pink">Procreate</span> — best for hand-drawn, illustrated patterns. Natural and beginner-friendly. <br>→ <strong>No:</strong> Go to next question.</div>
+          </div>
+          <div class="dt-row">
+            <div class="dt-q">Do you prefer free tools?</div>
+            <div class="dt-a">→ <strong>Yes:</strong> Use <span class="tag tag-teal">Canva</span> (easiest, web-based) or <span class="tag tag-teal">Inkscape</span> (free vector editor). <br>→ <strong>No:</strong> Try <span class="tag tag-purple">Adobe Illustrator</span> — industry standard for scalable patterns.</div>
+          </div>
+          <div class="dt-row">
+            <div class="dt-q">Do you prefer phone/tablet?</div>
+            <div class="dt-a">→ <strong>Android:</strong> <span class="tag tag-amber">Sketchbook</span> (free, powerful) or <span class="tag tag-amber">Infinite Painter</span>. <br>→ <strong>Browser:</strong> <span class="tag tag-blue">Canva</span> or <span class="tag tag-blue">Adobe Express</span>.</div>
+          </div>
+          <div class="dt-row">
+            <div class="dt-q">Budget for paid apps?</div>
+            <div class="dt-a">→ <strong>Best paid combo:</strong> <span class="tag tag-purple">Procreate (iPad)</span> + <span class="tag tag-blue">Adobe Illustrator</span> for finalizing. Used by 80% of professional pattern designers.</div>
+          </div>
+        </div>
+        
+        <div class="grid2" style="margin-top:16px">
+          <div class="info-block">
+            <h4>Key skills to practice</h4>
+            <ul>
+              <li>Drawing basic shapes: leaves, flowers, stars, dots</li>
+              <li>Using layers (draw elements on separate layers)</li>
+              <li>Saving files as PNG (transparent background) and JPG</li>
+              <li>Zooming in/out, panning, undo</li>
+              <li>Using a brush vs. pen tool</li>
+              <li>Coloring fills and outlines</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Beginner exercises</h4>
+            <ul>
+              <li>Draw 20 simple florals in one session</li>
+              <li>Trace over a reference leaf until it feels natural</li>
+              <li>Create 5 different dots/shapes using only 3 colors</li>
+              <li>Draw the same element in 3 different sizes</li>
+              <li>Export a PNG with transparent background and check it</li>
+              <li>Recreate a simple existing pattern element</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="section-title">Best AI Tools</div>
+        <div class="grid3">
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fce9f2">✏️</div>
+              <div>
+                <div class="tool-name">Procreate</div>
+                <span class="tool-tag tag-pink">Drawing (iPad)</span>
+              </div>
+            </div>
+            <div class="tool-desc">The #1 digital illustration app. Has a pattern repeat feature built in.</div>
+            <div class="tool-why">💡 Why: Most natural drawing experience, huge tutorial library</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#eeedfb">🎨</div>
+              <div>
+                <div class="tool-name">Adobe Illustrator</div>
+                <span class="tool-tag tag-blue">Vector</span>
+              </div>
+            </div>
+            <div class="tool-desc">Industry standard for scalable vector patterns. Best for geometric and clean designs.</div>
+            <div class="tool-why">💡 Why: Vectors scale to any size without blurring — perfect for print</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#e3f4f2">🖱️</div>
+              <div>
+                <div class="tool-name">Canva</div>
+                <span class="tool-tag tag-teal">Free / Easy</span>
+              </div>
+            </div>
+            <div class="tool-desc">Drag-and-drop design. Great for beginners with zero software experience.</div>
+            <div class="tool-why">💡 Why: Zero learning curve, works in any browser</div>
+          </div>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Learning shortcut prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I'm learning Procreate as a complete beginner for pattern design. Give me a 7-day beginner practice plan with one specific 20-minute exercise per day, focusing on drawing simple elements like florals, leaves, and geometric shapes. Each exercise should have a clear goal.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Tool help prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>In Adobe Illustrator, how do I use the Pattern Tool to create a seamless repeat from my custom drawn elements? Give me a step-by-step guide for a complete beginner, including how to adjust the tile spacing.</pre>
+        </div>
+
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">Spend your first week just drawing, not designing patterns. Build a "library" of 30–40 hand-drawn elements (leaves, flowers, dots, squiggles). These become your raw ingredients for every pattern you make.</div>
+        </div>
+        <div class="alert alert-warn">
+          <div class="alert-icon">💡</div>
+          <div class="alert-text">Efficiency tip: Use AI image generators (Midjourney, Adobe Firefly) to create reference sketches, then trace over them in your chosen app. This dramatically speeds up element creation.</div>
+        </div>
+        <div class="alert alert-mistake">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text">Don't try to master every tool at once. Pick ONE app and use only that for 4 weeks. Tool-switching is procrastination in disguise for beginners.</div>
+        </div>
+        
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ 30+ individual design elements drawn</span>
+        <span class="output-badge">✓ Comfortable with layers and exporting</span>
+        <span class="output-badge">✓ First mini "element library" saved</span>
+        <span class="output-badge">✓ 2–3 color palettes chosen</span>
+      </div>
+    </div>
+    
+    <!-- ===== STAGE 3 ===== -->
+    <div class="stage" id="stage3">
+      <div class="stage-header" onclick="toggleStage('stage3')">
+        <div class="stage-num" style="background:#fef3e2;color:#b86a10">3</div>
+        <div class="stage-info">
+          <h3>Design Principles for Pattern Makers</h3>
+          <p>Learn color theory, composition, and what makes a pattern visually appealing</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Week 3–4</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(3)" id="bm-3">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-amber">Understand color relationships</span>
+        <span class="tag tag-amber">Learn visual hierarchy in patterns</span>
+        <span class="tag tag-amber">Create balanced compositions</span>
+        <span class="tag tag-amber">Develop a color palette system</span>
+        
+        <div class="grid2">
+          <div class="info-block">
+            <h4>Color theory essentials</h4>
+            <ul>
+              <li><strong>Analogous:</strong> Colors next to each other on the wheel — safe, harmonious (e.g., blue + teal + green)</li>
+              <li><strong>Complementary:</strong> Opposite colors — high contrast, energetic (e.g., orange + blue)</li>
+              <li><strong>Triadic:</strong> 3 evenly spaced colors — balanced vibrancy (e.g., red + yellow + blue)</li>
+              <li><strong>60–30–10 rule:</strong> 60% dominant, 30% secondary, 10% accent</li>
+              <li><strong>Tint/shade:</strong> Add white (tint) or black (shade) to create depth</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Pattern composition rules</h4>
+            <ul>
+              <li><strong>Scale variety:</strong> Mix large, medium, and small elements</li>
+              <li><strong>Density:</strong> Balance busy areas with breathing space</li>
+              <li><strong>Visual flow:</strong> Guide the eye across the pattern evenly</li>
+              <li><strong>Anchor elements:</strong> One hero shape, secondary fillers, tiny details</li>
+              <li><strong>Negative space:</strong> Empty space is part of the design</li>
+              <li><strong>Repeat seams:</strong> Make sure the tile edges connect invisibly</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="section-title">Best AI Tools for Design Principles</div>
+        <div class="grid3">
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fef3e2">🎨</div>
+              <div>
+                <div class="tool-name">Adobe Color</div>
+                <span class="tool-tag tag-amber">Color Theory</span>
+              </div>
+            </div>
+            <div class="tool-desc">Explore color harmonies, trends, and extract palettes from images you love.</div>
+            <div class="tool-why">💡 Why: Shows you color rules visually, not just theoretically</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#eeedfb">🤖</div>
+              <div>
+                <div class="tool-name">Claude / ChatGPT</div>
+                <span class="tool-tag tag-blue">Learning</span>
+              </div>
+            </div>
+            <div class="tool-desc">Ask for critiques of your pattern ideas, explanations of composition problems, color suggestions.</div>
+            <div class="tool-why">💡 Why: Instant design mentor, available 24/7</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#e8f5ee">📊</div>
+              <div>
+                <div class="tool-name">Canva Color Palette</div>
+                <span class="tool-tag tag-green">Free Tool</span>
+              </div>
+            </div>
+            <div class="tool-desc">Upload any image and get its color palette extracted automatically.</div>
+            <div class="tool-why">💡 Why: Great for pulling palettes from photos of real products</div>
+          </div>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Color palette generation prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I'm designing a pattern for a teenage girl's diary cover with a "cottagecore botanical" theme. Generate 3 different color palettes for this theme. For each palette, give me: 5 specific hex color codes, a name for the palette, and explain the emotion/mood it creates. Label each color as: background, dominant, secondary, accent 1, accent 2.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Composition feedback prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I'm creating my first seamless pattern for a phone case. I have large roses (hero element), medium leaves, and small dot fillers. Explain how I should arrange these elements in my tile to make a balanced, professional-looking pattern. What ratios and spacing rules should I follow?</pre>
+        </div>
+        
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">Copy professional palettes first. Find a pattern you love, extract its colors using a color picker tool, and recreate that palette. Understanding why it works trains your eye faster than theory alone.</div>
+        </div>
+        
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ 5 saved color palettes (with hex codes)</span>
+        <span class="output-badge">✓ Understanding of 3 repeat types</span>
+        <span class="output-badge">✓ Composition sketch for first pattern</span>
+        <span class="output-badge">✓ Notes on color theory basics</span>
+      </div>
+    </div>
+
+    <!-- ===== STAGE 4 ===== -->
+    <div class="stage" id="stage4">
+      <div class="stage-header" onclick="toggleStage('stage4')">
+        <div class="stage-num" style="background:#eeedfb;color:#3b2dbf">4</div>
+        <div class="stage-info">
+          <h3>Creating Your First Patterns</h3>
+          <p>Build and test actual seamless, tileable patterns from your elements</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Weeks 4–7</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(4)" id="bm-4">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-purple">Create first seamless repeat</span>
+        <span class="tag tag-purple">Understand 4 repeat types</span>
+        <span class="tag tag-purple">Export print-ready files</span>
+        <span class="tag tag-purple">Build 3 complete patterns</span>
+        
+        <div class="section-title">The 4 Pattern Repeat Types</div>
+        <table class="compare-table" style="margin-top:12px">
+          <thead>
+            <tr><th>Repeat Type</th><th>How it works</th><th>Best for</th><th>Difficulty</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Basic/Block repeat</td>
+              <td>Tile repeats in a straight grid</td>
+              <td>Geometric, simple patterns</td>
+              <td><span class="tag tag-green">Beginner</span></td>
+            </tr>
+            <tr>
+              <td>Half-drop repeat</td>
+              <td>Each column drops by 50% vertically</td>
+              <td>Florals, organic shapes</td>
+              <td><span class="tag tag-teal">Intermediate</span></td>
+            </tr>
+            <tr>
+              <td>Brick/half-brick</td>
+              <td>Each row offsets horizontally by 50%</td>
+              <td>Tile patterns, structured</td>
+              <td><span class="tag tag-teal">Intermediate</span></td>
+            </tr>
+            <tr>
+              <td>Mirror repeat</td>
+              <td>Tiles reflect horizontally or vertically</td>
+              <td>Symmetrical, kaleidoscope</td>
+              <td><span class="tag tag-amber">Intermediate</span></td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <div class="grid2" style="margin-top:16px">
+          <div class="info-block">
+            <h4>Step-by-step: first seamless pattern</h4>
+            <ul>
+              <li>1. Choose 5–8 elements from your library</li>
+              <li>2. Set canvas to 3000×3000px at 300 DPI</li>
+              <li>3. Arrange elements, leaving space near edges</li>
+              <li>4. Cut the tile in half (shift elements to opposite edges)</li>
+              <li>5. Fill the "cross" gaps with smaller elements</li>
+              <li>6. Test by duplicating tile 3×3 and zooming out</li>
+              <li>7. Fix any visible seams or awkward spots</li>
+              <li>8. Export as PNG at 300 DPI</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Pattern categories to try first</h4>
+            <ul>
+              <li><strong>Floral:</strong> Roses, leaves, botanicals — always popular</li>
+              <li><strong>Geometric:</strong> Triangles, hexagons, lines — easier to make seamless</li>
+              <li><strong>Abstract:</strong> Brush strokes, watercolor blobs — very forgiving</li>
+              <li><strong>Character:</strong> Cute animals, faces — great for phone cases</li>
+              <li><strong>Typography:</strong> Words/phrases as pattern elements</li>
+              <li><strong>Mixed media:</strong> Combine drawing styles for uniqueness</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="section-title">Best AI Tools</div>
+        <div class="grid3">
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#eeedfb">🔁</div>
+              <div>
+                <div class="tool-name">Repper (Repper.app)</div>
+                <span class="tool-tag tag-purple">Pattern Maker</span>
+              </div>
+            </div>
+            <div class="tool-desc">Upload any image and instantly generate seamless repeat patterns with live preview.</div>
+            <div class="tool-why">💡 Why: Makes seamless repeats in seconds — perfect for beginners</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fce9f2">✏️</div>
+              <div>
+                <div class="tool-name">Procreate Pattern Tool</div>
+                <span class="tool-tag tag-pink">Repeat</span>
+              </div>
+            </div>
+            <div class="tool-desc">Built-in pattern repeat canvas in Procreate. Design and preview repeat simultaneously.</div>
+            <div class="tool-why">💡 Why: Live repeat preview while you draw is a game-changer</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#e3f4f2">🤖</div>
+              <div>
+                <div class="tool-name">Adobe Firefly</div>
+                <span class="tool-tag tag-teal">AI Generate</span>
+              </div>
+            </div>
+            <div class="tool-desc">Generate pattern elements and seamless textures using text prompts. Commercially safe.</div>
+            <div class="tool-why">💡 Why: Fast element generation when you can't draw a specific shape</div>
+          </div>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Pattern concept generation prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>Generate 10 specific, detailed pattern design concepts for the following products: diary covers, phone cases, and tote bags targeting a young adult female audience aged 16–25. For each concept include: theme name, 5 specific elements to include, color palette (3–5 colors), mood/style, and one sentence on what makes it marketable. Focus on 2026 design trends.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Pattern critique prompt (with image)</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I've created my first seamless floral pattern [attach image]. I'm a beginner. Please critique it on these 5 areas: color harmony, element variety/scale, seamless repeat quality, overall composition balance, and print-readiness. Give me 3 specific improvements I should make, explained simply.</pre>
+        </div>
+        
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">Always test your pattern at different scales. A pattern that looks good at 100% may look terrible at 50% (on a phone case) or 200% (on a tote bag). Test your repeat at 3 different sizes.</div>
+        </div>
+        <div class="alert alert-mistake">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text">The most common beginner mistake: visible seam lines. When you tile your pattern, the joins should be invisible. Fix this by making sure elements that cross the edge of your tile continue on the opposite edge at exactly the right position.</div>
+        </div>
+        
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ 3 complete seamless patterns</span>
+        <span class="output-badge">✓ Files exported at 300 DPI</span>
+        <span class="output-badge">✓ Understand all 4 repeat types</span>
+        <span class="output-badge">✓ Pattern test sheets (3×3 tile preview)</span>
+      </div>
+    </div>
+
+    <!-- ===== STAGE 5 ===== -->
+    <div class="stage" id="stage5">
+      <div class="stage-header" onclick="toggleStage('stage5')">
+        <div class="stage-num" style="background:#e8f5ee;color:#2d8a5e">5</div>
+        <div class="stage-info">
+          <h3>Product Mockups & Visualization</h3>
+          <p>Apply your patterns to actual products and see how they look in real life</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Week 7–9</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(5)" id="bm-5">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-green">Apply pattern to product mockups</span>
+        <span class="tag tag-green">Understand print templates and bleed areas</span>
+        <span class="tag tag-green">Create shareable product previews</span>
+        <span class="tag tag-green">Learn product-specific dimensions</span>
+        
+        <div class="section-title">Product Dimensions Cheatsheet</div>
+        <table class="compare-table" style="margin-top:12px">
+          <thead>
+            <tr><th>Product</th><th>Standard size</th><th>DPI</th><th>Format</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>A5 Diary Cover</td><td>148 × 210mm</td><td>300 DPI</td><td>PDF/PNG</td></tr>
+            <tr><td>Phone Case (iPhone 15)</td><td>71 × 147mm (case area)</td><td>300 DPI</td><td>PNG</td></tr>
+            <tr><td>Tote Bag Print Area</td><td>~300 × 300mm</td><td>150–300 DPI</td><td>PDF/PNG</td></tr>
+            <tr><td>Sticker Sheet A4</td><td>210 × 297mm</td><td>300 DPI</td><td>PDF</td></tr>
+            <tr><td>Laptop Sleeve 13"</td><td>340 × 240mm</td><td>200–300 DPI</td><td>PNG/PDF</td></tr>
+          </tbody>
+        </table>
+        
+        <div class="grid2" style="margin-top:16px">
+          <div class="info-block">
+            <h4>Mockup workflow steps</h4>
+            <ul>
+              <li>1. Export your pattern as a high-res PNG/JPG</li>
+              <li>2. Find a free mockup template (Freepik, Mockup World)</li>
+              <li>3. Open in Photoshop or Canva and place pattern in the "smart object" or template area</li>
+              <li>4. Adjust scale and position of pattern on the product</li>
+              <li>5. Check that pattern aligns on seams (for bags)</li>
+              <li>6. Export the final mockup image at 72 DPI (for digital sharing)</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Key mockup concepts</h4>
+            <ul>
+              <li><strong>Bleed area:</strong> Extra 3–5mm around the design for cutting</li>
+              <li><strong>Safe zone:</strong> Important elements 5mm from edge</li>
+              <li><strong>Smart object:</strong> Photoshop layer that auto-wraps your design onto product</li>
+              <li><strong>Perspective warp:</strong> Angle/wrap the design to match the product surface</li>
+              <li><strong>Shadow/highlight overlay:</strong> Makes the pattern look 3D on the product</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="section-title">Best AI Tools</div>
+        <div class="grid3">
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#e8f5ee">🎭</div>
+              <div>
+                <div class="tool-name">Placeit.net</div>
+                <span class="tool-tag tag-green">Mockups</span>
+              </div>
+            </div>
+            <div class="tool-desc">Drag-and-drop product mockup generator. 1000s of templates for bags, phone cases, notebooks.</div>
+            <div class="tool-why">💡 Why: No design skill needed for mockups — just upload your pattern</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#eeedfb">🤖</div>
+              <div>
+                <div class="tool-name">Canva Pro Mockups</div>
+                <span class="tool-tag tag-purple">Easy</span>
+              </div>
+            </div>
+            <div class="tool-desc">Smart mockup feature: drop your design directly onto product frames in Canva.</div>
+            <div class="tool-why">💡 Why: Seamlessly integrated with design workflow</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fce9f2">✨</div>
+              <div>
+                <div class="tool-name">Adobe Firefly</div>
+                <span class="tool-tag tag-pink">AI Mockup</span>
+              </div>
+            </div>
+            <div class="tool-desc">Use generative fill to place your pattern on AI-generated product photos.</div>
+            <div class="tool-why">💡 Why: Hyper-realistic product visualization without a photoshoot</div>
+          </div>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Mockup strategy prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I've created a floral pattern and want to show it applied to: (1) a spiral-bound diary cover, (2) an iPhone phone case, and (3) a canvas tote bag. Give me step-by-step instructions for creating professional-looking mockups for each product using free tools only. Include what file size and format I need for each.</pre>
+        </div>
+        
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">Create a "mockup showcase" image with 3–4 products side by side showing the same pattern. This is your most powerful portfolio piece and Instagram post — it shows versatility instantly.</div>
+        </div>
+        
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ Each pattern shown on 3 products</span>
+        <span class="output-badge">✓ Print-template files with correct dimensions</span>
+        <span class="output-badge">✓ Social-media ready mockup images</span>
+        <span class="output-badge">✓ Portfolio-ready product showcase images</span>
+      </div>
+    </div>
+
+    <!-- ===== STAGE 6 ===== -->
+    <div class="stage" id="stage6">
+      <div class="stage-header" onclick="toggleStage('stage6')">
+        <div class="stage-num" style="background:#fceee9;color:#c94f30">6</div>
+        <div class="stage-info">
+          <h3>AI Supercharging Your Design Process</h3>
+          <p>Use AI tools to 10x your creativity, speed, and output quality</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Weeks 9–11</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(6)" id="bm-6">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-red">Generate elements with AI</span>
+        <span class="tag tag-red">Use AI for concept ideation</span>
+        <span class="tag tag-red">Automate repetitive tasks</span>
+        <span class="tag tag-red">Build AI-assisted workflow</span>
+        
+        <div class="section-title">AI Tool Deep Dive</div>
+        <div class="grid2">
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fceee9">🌟</div>
+              <div>
+                <div class="tool-name">Midjourney</div>
+                <span class="tool-tag tag-red">Image Gen</span>
+              </div>
+            </div>
+            <div class="tool-desc">Generate stunning pattern element sketches, mood boards, and full pattern concepts. Use --tile flag for seamless patterns.</div>
+            <div class="tool-why">💡 Why: Fastest way to generate novel design concepts as visual references</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#eeedfb">🎨</div>
+              <div>
+                <div class="tool-name">Adobe Firefly</div>
+                <span class="tool-tag tag-purple">AI Generate</span>
+              </div>
+            </div>
+            <div class="tool-desc">Generate commercially safe images, expand backgrounds, recolor designs in seconds.</div>
+            <div class="tool-why">💡 Why: Commercially licensed — safe to use in products you sell</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#e3f4f2">🔄</div>
+              <div>
+                <div class="tool-name">Vectorizer.ai</div>
+                <span class="tool-tag tag-teal">Convert</span>
+              </div>
+            </div>
+            <div class="tool-desc">Convert raster (PNG) images to clean vector (SVG) automatically with AI. Essential for print quality.</div>
+            <div class="tool-why">💡 Why: Turns hand-drawn or AI-generated elements into scalable vectors</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-card-header">
+              <div class="tool-icon" style="background:#fef3e2">🧹</div>
+              <div>
+                <div class="tool-name">Remove.bg</div>
+                <span class="tool-tag tag-amber">Background</span>
+              </div>
+            </div>
+            <div class="tool-desc">Remove backgrounds from any image with one click — essential for isolating drawn elements.</div>
+            <div class="tool-why">💡 Why: Saves hours of manual background removal</div>
+          </div>
+        </div>
+        
+        <div class="section-title">AI-Accelerated Workflow</div>
+        <div class="info-block" style="margin-top:12px">
+          <h4>The AI Pattern Creation Pipeline</h4>
+          <ul>
+            <li><strong>Step 1 — Concept:</strong> Ask Claude for 10 pattern concepts based on your target market and product</li>
+            <li><strong>Step 2 — Mood board:</strong> Use Midjourney to generate visual reference images for your chosen concept</li>
+            <li><strong>Step 3 — Color palette:</strong> Extract colors from Midjourney images using Coolors.co or Adobe Color</li>
+            <li><strong>Step 4 — Element creation:</strong> Generate individual elements with Adobe Firefly or draw them inspired by AI references</li>
+            <li><strong>Step 5 — Background removal:</strong> Use Remove.bg to isolate each element as PNG with transparency</li>
+            <li><strong>Step 6 — Vectorize:</strong> Run through Vectorizer.ai for crisp, scalable versions</li>
+            <li><strong>Step 7 — Pattern assembly:</strong> Arrange in Illustrator/Procreate/Canva and create the seamless repeat</li>
+            <li><strong>Step 8 — AI critique:</strong> Share your pattern with Claude for feedback before finalizing</li>
+          </ul>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Midjourney pattern element prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>Cute illustrated botanical elements, single flowers and leaves, watercolor style, isolated on white background, flat design, perfect for seamless pattern, pastel colors, kawaii aesthetic, collection sheet --ar 1:1 --style raw --v 6</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Adobe Firefly prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>Seamless pattern of tiny mushrooms and forest leaves, soft muted earth tones, repeating surface design, illustrated, cute, flat vector style, no background</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Claude workflow optimization prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I'm a beginner pattern designer creating surface designs for physical products. My current workflow takes 6 hours per pattern. Analyze where AI tools can save the most time in this process: concept ideation → sketching elements → coloring → repeat tile creation → color variant testing → mockup creation. For each step, recommend the best AI tool and estimate time saved.</pre>
+        </div>
+        
+        <div class="alert alert-warn">
+          <div class="alert-icon">💡</div>
+          <div class="alert-text">Important: Always check commercial licensing before using AI-generated images in products. Midjourney Pro license allows commercial use. Adobe Firefly is explicitly commercially safe. DALL-E (via ChatGPT Plus) allows commercial use. Always verify the platform's current terms.</div>
+        </div>
+        
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ AI-assisted pattern created in under 3 hours</span>
+        <span class="output-badge">✓ 5 color variants of one pattern</span>
+        <span class="output-badge">✓ Personal AI workflow documented</span>
+        <span class="output-badge">✓ Element library expanded to 60+ assets</span>
+      </div>
+    </div>
+
+    <!-- ===== STAGE 7 ===== -->
+    <div class="stage" id="stage7">
+      <div class="stage-header" onclick="toggleStage('stage7')">
+        <div class="stage-num" style="background:#f0ebfb;color:#6d3fc7">7</div>
+        <div class="stage-info">
+          <h3>Building Your Pattern Portfolio</h3>
+          <p>Organize, present, and showcase your designs professionally</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Weeks 11–13</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(7)" id="bm-7">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-purple">Curate best 6–8 patterns</span>
+        <span class="tag tag-purple">Create digital portfolio</span>
+        <span class="tag tag-purple">Write pattern descriptions</span>
+        <span class="tag tag-purple">Develop a personal style statement</span>
+        
+        <div class="grid2">
+          <div class="info-block">
+            <h4>Portfolio essentials</h4>
+            <ul>
+              <li>6–8 patterns showing range and style</li>
+              <li>3 product mockups per pattern</li>
+              <li>Pattern name and brief description for each</li>
+              <li>Your "style in one sentence" statement</li>
+              <li>Contact information and social links</li>
+              <li>Process image or sketch showing your creative process</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Portfolio platforms</h4>
+            <ul>
+              <li><strong>Behance</strong> — Best for visibility, linked to Adobe ecosystem</li>
+              <li><strong>Cargo</strong> — Beautiful, minimal design portfolio sites</li>
+              <li><strong>Canva Website</strong> — Zero-code portfolio, quick to build</li>
+              <li><strong>Instagram</strong> — Visual portfolio that drives followers</li>
+              <li><strong>Pinterest</strong> — Searchable, drives organic traffic</li>
+              <li><strong>Notion</strong> — Simple, text+image portfolio for free</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Portfolio bio prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>Help me write a short professional bio (3 sentences) for my surface pattern design portfolio. I'm a student learning pattern design, creating illustrated patterns for products like diaries, phone cases, and bags. My style is playful and botanical with a modern twist. The bio should sound warm, creative, and approachable — not overly corporate.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Pattern description prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>Write a short portfolio description (2–3 sentences) for my pattern called "Garden Bloom." It features hand-illustrated roses, small wildflowers, and tiny leaves in a soft pastel palette of dusty rose, sage green, and cream. The target products are diary covers and tote bags for young women. Make it poetic but concise.</pre>
+        </div>
+        
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">Show 3 things in your portfolio: the pattern tile, a multi-product mockup, and a close-up detail shot. This gives viewers full context — they can see the repeat structure, the end result, and the quality of your work.</div>
+        </div>
+        
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ 6–8 polished portfolio patterns</span>
+        <span class="output-badge">✓ Online portfolio live</span>
+        <span class="output-badge">✓ Written bio and pattern descriptions</span>
+        <span class="output-badge">✓ Personal style defined</span>
+      </div>
+    </div>
+
+    <!-- ===== STAGE 8 ===== -->
+    <div class="stage" id="stage8">
+      <div class="stage-header" onclick="toggleStage('stage8')">
+        <div class="stage-num" style="background:#e3f4f2;color:#1a7a6e">8</div>
+        <div class="stage-info">
+          <h3>Sharing, Learning & Growing</h3>
+          <p>Build an audience, get feedback, and continue improving your skills</p>
+        </div>
+        <div class="stage-meta">
+          <span class="stage-time">⏱ Weeks 13–16+</span>
+          <button class="bookmark-btn" onclick="event.stopPropagation();toggleBookmark(8)" id="bm-8">☆ Bookmark</button>
+          <span class="chevron">▼</span>
+        </div>
+      </div>
+      <div class="stage-body">
+        <div class="section-title">Objectives</div>
+        <span class="tag tag-teal">Share work consistently</span>
+        <span class="tag tag-teal">Get actionable feedback</span>
+        <span class="tag tag-teal">Build design skills further</span>
+        <span class="tag tag-teal">Explore selling options</span>
+        
+        <div class="grid2">
+          <div class="info-block">
+            <h4>Where to share & grow</h4>
+            <ul>
+              <li><strong>Instagram:</strong> Post process videos using Reels (gets 5× more reach)</li>
+              <li><strong>TikTok:</strong> Design speed-runs go viral in creative niches</li>
+              <li><strong>Pinterest:</strong> Pin each pattern + mockup for passive discovery</li>
+              <li><strong>Behance:</strong> Professional community feedback</li>
+              <li><strong>Reddit r/patterndesign:</strong> Honest beginner-friendly feedback</li>
+              <li><strong>Design communities:</strong> Dribbble, Are.na, The Dots</li>
+            </ul>
+          </div>
+          <div class="info-block">
+            <h4>Future paths to explore</h4>
+            <ul>
+              <li>Sell on Redbubble, Society6, Spoonflower (print-on-demand)</li>
+              <li>License patterns to brands (next level, 6–12 months in)</li>
+              <li>Sell digital pattern files on Etsy or Gumroad</li>
+              <li>Take commission work for local businesses</li>
+              <li>Collaborate with other student designers</li>
+              <li>Enter pattern design competitions (Spoonflower, etc.)</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="section-title">AI Prompt Examples</div>
+        <div class="prompt-box">
+          <div class="prompt-label">Content strategy prompt</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I'm a student pattern designer who wants to build an audience on Instagram while learning. Create a 30-day content plan with 3 posts per week. Mix pattern showcases, behind-the-scenes process, beginner tips, and engagement content. Include specific caption ideas and relevant hashtags for each post type. My niche is illustrated patterns for stationery and accessories.</pre>
+        </div>
+        
+        <div class="alert alert-tip">
+          <div class="alert-icon">✅</div>
+          <div class="alert-text">The fastest way to grow: post your design process, not just results. A 15-second Procreate timelapse showing your pattern coming together gets 10× more engagement than a final product photo.</div>
+        </div>
+
+        <div class="section-title">Expected Outputs</div>
+        <span class="output-badge">✓ Social media presence established</span>
+        <span class="output-badge">✓ First community feedback received</span>
+        <span class="output-badge">✓ Clear next 3-month learning goals</span>
+        <span class="output-badge">✓ 1 print-on-demand product live</span>
+      </div>
+    </div>
+
+    <!-- ===== SUMMARY ===== -->
+    <div id="summary" style="margin-top:40px">
+    
+      <div class="summary-card" id="stack">
+        <h2>🛠 Recommended AI Stack</h2>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:20px">The complete toolkit for a beginner surface pattern designer, from learning to creating to sharing.</p>
+        
+        <div class="stack-item">
+          <div class="stack-icon">🤖</div>
+          <div class="stack-info">
+            <strong>Claude / ChatGPT</strong>
+            <span>Your AI design tutor, concept generator, and writing assistant</span>
+          </div>
+          <span class="stack-purpose tag-teal tag">Learning</span>
+        </div>
+        <div class="stack-item">
+          <div class="stack-icon">✏️</div>
+          <div class="stack-info">
+            <strong>Procreate (iPad) or Canva (free)</strong>
+            <span>Primary design and drawing application</span>
+          </div>
+          <span class="stack-purpose tag-pink tag">Design</span>
+        </div>
+        <div class="stack-item">
+          <div class="stack-icon">🎨</div>
+          <div class="stack-info">
+            <strong>Adobe Firefly</strong>
+            <span>Commercially safe AI image generation for elements and patterns</span>
+          </div>
+          <span class="stack-purpose tag-purple tag">Generate</span>
+        </div>
+        <div class="stack-item">
+          <div class="stack-icon">🌟</div>
+          <div class="stack-info">
+            <strong>Midjourney (optional)</strong>
+            <span>Reference image generation and mood board creation</span>
+          </div>
+          <span class="stack-purpose tag-amber tag">Inspiration</span>
+        </div>
+        <div class="stack-item">
+          <div class="stack-icon">🎭</div>
+          <div class="stack-info">
+            <strong>Placeit.net or Canva Mockups</strong>
+            <span>Product mockup generation (diary, phone case, bag)</span>
+          </div>
+          <span class="stack-purpose tag-green tag">Mockups</span>
+        </div>
+        <div class="stack-item">
+          <div class="stack-icon">🔄</div>
+          <div class="stack-info">
+            <strong>Vectorizer.ai</strong>
+            <span>Convert raster images to print-ready vectors automatically</span>
+          </div>
+          <span class="stack-purpose tag-teal tag">Convert</span>
+        </div>
+        <div class="stack-item">
+          <div class="stack-icon">🧹</div>
+          <div class="stack-info">
+            <strong>Remove.bg</strong>
+            <span>Instantly remove backgrounds from design elements</span>
+          </div>
+          <span class="stack-purpose tag-red tag">Edit</span>
+        </div>
+        <div class="stack-item">
+          <div class="stack-icon">🎨</div>
+          <div class="stack-info">
+            <strong>Coolors.co + Adobe Color</strong>
+            <span>Color palette generation and color theory exploration</span>
+          </div>
+          <span class="stack-purpose tag-amber tag">Color</span>
+        </div>
+      </div>
+      
+      <div class="summary-card" id="resources">
+        <h2>📚 Learning Resources</h2>
+        
+        <div class="section-title">Free Courses & Tutorials</div>
+        <div class="resource-item"><div class="resource-type">YouTube</div><div class="resource-content"><strong>Skillshare Originals (free previews)</strong><span>Pattern design with Procreate — best beginner series</span></div></div>
+        <div class="resource-item"><div class="resource-type">YouTube</div><div class="resource-content"><strong>Yes I'm a Designer (YouTube)</strong><span>Pattern design fundamentals, free and comprehensive</span></div></div>
+        <div class="resource-item"><div class="resource-type">Course</div><div class="resource-content"><strong>Skillshare: Surface Pattern Design</strong><span>$8/month, hundreds of pattern-specific courses</span></div></div>
+        <div class="resource-item"><div class="resource-type">Course</div><div class="resource-content"><strong>Printful Academy (free)</strong><span>Learn about print-on-demand and file preparation</span></div></div>
+        <div class="resource-item"><div class="resource-type">Book</div><div class="resource-content"><strong>"Design Elements: Color Fundamentals" — Sherin</strong><span>Best book on color theory for visual designers</span></div></div>
+        
+        <div class="section-title">Communities</div>
+        <div class="resource-item"><div class="resource-type">Reddit</div><div class="resource-content"><strong>r/patterndesign</strong><span>Friendly community for feedback and learning</span></div></div>
+        <div class="resource-item"><div class="resource-type">Facebook</div><div class="resource-content"><strong>Surface Pattern Design Group</strong><span>50k+ members, active, beginner-friendly</span></div></div>
+        <div class="resource-item"><div class="resource-type">Discord</div><div class="resource-content"><strong>The Pattern Society Discord</strong><span>Live critiques, challenges, and community</span></div></div>
+        <div class="resource-item"><div class="resource-type">Instagram</div><div class="resource-content"><strong>#surfacepatterndesign #patterndesigner</strong><span>Follow and learn from professional designers</span></div></div>
+        
+        <div class="section-title">Search Keywords to Master</div>
+        <div style="margin-top:8px">
+          <span class="tag tag-blue">seamless pattern tutorial beginner</span>
+          <span class="tag tag-blue">surface pattern design Procreate</span>
+          <span class="tag tag-blue">half drop repeat pattern</span>
+          <span class="tag tag-blue">pattern design for print on demand</span>
+          <span class="tag tag-blue">how to make patterns for diary covers</span>
+          <span class="tag tag-blue">color palette for pattern design</span>
+          <span class="tag tag-blue">Adobe Illustrator pattern swatch</span>
+          <span class="tag tag-blue">phone case pattern template</span>
+          <span class="tag tag-blue">botanical illustration pattern</span>
+          <span class="tag tag-blue">tote bag print design size</span>
+          <span class="tag tag-blue">Midjourney seamless pattern</span>
+          <span class="tag tag-blue">surface design student portfolio</span>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <h2>🚀 Future Automation Opportunities</h2>
+        <div class="automation-item">
+          <div class="auto-icon">🔁</div>
+          <div class="auto-info">
+            <strong>AI Batch Color Variants</strong>
+            <span>Use AI recoloring tools (Khroma, Adobe Recolor) to generate 10 color variants of one pattern in minutes instead of hours</span>
+          </div>
+        </div>
+        <div class="automation-item">
+          <div class="auto-icon">🤖</div>
+          <div class="auto-info">
+            <strong>Automated Mockup Generation</strong>
+            <span>APIs and tools like Printful's mockup generator can auto-apply patterns to 50+ products simultaneously</span>
+          </div>
+        </div>
+        <div class="automation-item">
+          <div class="auto-icon">📊</div>
+          <div class="auto-info">
+            <strong>Trend Analysis with AI</strong>
+            <span>Use AI tools to analyze Pinterest trends and predict which pattern themes will be popular next season</span>
+          </div>
+        </div>
+        <div class="automation-item">
+          <div class="auto-icon">✍️</div>
+          <div class="auto-info">
+            <strong>AI-Written Product Descriptions</strong>
+            <span>Use Claude/ChatGPT to auto-generate product listing descriptions, social captions, and portfolio text from pattern images</span>
+          </div>
+        </div>
+        <div class="automation-item">
+          <div class="auto-icon">🎨</div>
+          <div class="auto-info">
+            <strong>Generative Pattern Systems</strong>
+            <span>Advanced: use p5.js or Processing to create code-generated patterns that produce infinite unique variations</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <h2>✨ Additional AI Prompts Bank</h2>
+        <div class="prompt-box">
+          <div class="prompt-label">Trend research</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>What are the top 10 surface pattern design trends for 2025–2026 for lifestyle products (bags, stationery, phone accessories)? For each trend, give a name, visual description, 3 example color palettes, and what products it works best on.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Style development</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I've attached 3 of my pattern designs. Analyze them and identify: (1) my current visual style traits, (2) what makes my work unique, (3) what to develop further to build a recognizable signature style, and (4) what other designers have a similar style that I can study.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Product line planning</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>Help me plan a cohesive product collection using one pattern family. I have a botanical floral pattern. What 8 products should I create from it? For each product, tell me the exact file specifications (size in mm, DPI, file format), the best platform to sell it on, and estimated price range.</pre>
+        </div>
+        <div class="prompt-box">
+          <div class="prompt-label">Skill gap analysis</div>
+          <button class="copy-btn" onclick="copyText(this)">Copy</button>
+          <pre>I am a beginner surface pattern designer who has been learning for 2 months. I can create basic seamless repeats in Procreate and use Adobe Color for palettes. I struggle with: making patterns look professional, getting colors to work together, and making my repeat seamless. Create a focused 4-week skill improvement plan to address exactly these 3 gaps.</pre>
+        </div>
+      </div>
+      
+      <!-- NOTES -->
+      <div class="summary-card" id="notes">
+        <h2>📝 My Notes</h2>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Your notes are saved automatically in your browser.</p>
+        <textarea class="note-area" id="user-notes" placeholder="Write your notes, ideas, questions, or progress here... (auto-saved)" oninput="saveNotes()"></textarea>
+        <div id="bookmarks" style="margin-top:16px">
+          <h4 style="font-size:13px;font-weight:600;margin-bottom:8px">📌 Bookmarked Stages</h4>
+          <ul class="bookmark-list" id="bookmark-list"><li style="color:var(--text3)">No bookmarks yet. Click ☆ Bookmark on any stage.</li></ul>
+        </div>
+      </div>
+      
+    </div>
+    
+  </main>
+</div>
+
+<script>
+  // Theme
+  function toggleTheme() {
+    const d = document.documentElement;
+    d.setAttribute('data-theme', d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    localStorage.setItem('theme', d.getAttribute('data-theme'));
+  }
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  
+  // Stage toggle
+  function toggleStage(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+  
+  // Progress tracking
+  const done = JSON.parse(localStorage.getItem('progress') || '{}');
+  function markDone(n) {
+    done[n] = !done[n];
+    localStorage.setItem('progress', JSON.stringify(done));
+    updateProgress();
+  }
+  function updateProgress() {
+    const total = 8;
+    let count = 0;
+    for (let i = 0; i <= 8; i++) {
+      const dot = document.getElementById('dot-' + i);
+      if (!dot) continue;
+      if (done[i]) { dot.classList.add('done'); count++; }
+      else dot.classList.remove('done');
+      if (i < 8) {
+        const line = document.getElementById('line-' + i);
+        if (line) line.classList.toggle('done', !!done[i]);
+      }
+    }
+    const pct = Math.round((count / (total + 1)) * 100);
+    document.getElementById('global-progress').style.width = pct + '%';
+    document.getElementById('global-label').textContent = (count) + ' of ' + (total + 1) + ' stages complete';
+  }
+  updateProgress();
+  
+  // Scroll
+  function scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  
+  // Copy text
+  function copyText(btn) {
+    const pre = btn.nextElementSibling;
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      btn.textContent = '✓ Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+  
+  // Bookmarks
+  const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '{}');
+  const stageNames = {1:'Mindset & Foundations',2:'Learning Core Tools',3:'Design Principles',4:'Creating Patterns',5:'Product Mockups',6:'AI Supercharging',7:'Building Portfolio',8:'Sharing & Growth'};
+  function toggleBookmark(n) {
+    bookmarks[n] = !bookmarks[n];
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    const btn = document.getElementById('bm-' + n);
+    if (btn) {
+      btn.textContent = bookmarks[n] ? '★ Bookmarked' : '☆ Bookmark';
+      btn.classList.toggle('bookmarked', !!bookmarks[n]);
+    }
+    updateBookmarkList();
+  }
+  function updateBookmarkList() {
+    const list = document.getElementById('bookmark-list');
+    const items = Object.entries(bookmarks).filter(([,v]) => v).map(([k]) => k);
+    if (items.length === 0) {
+      list.innerHTML = '<li style="color:var(--text3)">No bookmarks yet. Click ☆ Bookmark on any stage.</li>';
+    } else {
+      list.innerHTML = items.map(k => `<li>★ <button onclick="scrollTo('stage${k}')" style="background:none;border:none;color:var(--accent-text);cursor:pointer;font-size:13px;padding:0">${stageNames[k]}</button></li>`).join('');
+    }
+  }
+  // Init bookmarks
+  Object.entries(bookmarks).forEach(([k, v]) => {
+    if (v) {
+      const btn = document.getElementById('bm-' + k);
+      if (btn) { btn.textContent = '★ Bookmarked'; btn.classList.add('bookmarked'); }
+    }
+  });
+  updateBookmarkList();
+  
+  // Notes
+  const savedNotes = localStorage.getItem('user-notes');
+  if (savedNotes) document.getElementById('user-notes').value = savedNotes;
+  function saveNotes() {
+    localStorage.setItem('user-notes', document.getElementById('user-notes').value);
+  }
+  
+  // Export
+  function exportProgress() {
+    const data = { progress: done, bookmarks, notes: document.getElementById('user-notes').value, date: new Date().toLocaleDateString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'pattern-design-progress.json';
+    a.click();
+  }
+  
+  // Auto-open first stage
+  document.getElementById('stage1').classList.add('open');
+</script>
+</body>
+</html>
