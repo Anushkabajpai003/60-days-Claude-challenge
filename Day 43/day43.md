@@ -1,4 +1,4 @@
-# Day 42 – AI Workflow Architect
+# Day 43 – AI Workflow Architect
 
 ## 📌 Project Overview
 
@@ -103,6 +103,6 @@ It serves as a practical productivity platform for professionals, teams, student
 
 ## 📅 Challenge
 
-**#60DaysOfClaude**
+**#60DayClaudeChallenge**
 
-**Day 42 Completed ✅**
+**Day 43 Completed ✅**
