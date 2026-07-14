@@ -1,0 +1,400 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--text-primary)}
+.wrap{max-width:680px;padding:1.5rem 0}
+.tab-bar{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:0.5px solid var(--border);padding-bottom:0}
+.tab{padding:8px 14px;font-size:13px;cursor:pointer;border:none;background:none;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s}
+.tab.active{color:var(--text-primary);border-bottom-color:var(--text-primary);font-weight:500}
+.tab:hover:not(.active){color:var(--text-primary)}
+.panel{display:none}.panel.active{display:block}
+.section-card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.score-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.score-badge{font-size:13px;font-weight:500;padding:3px 10px;border-radius:var(--radius)}
+.score-low{background:#FCEBEB;color:#A32D2D}
+.score-mid{background:#FAEEDA;color:#854F0B}
+.score-high{background:#EAF3DE;color:#3B6D11}
+.label{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:6px}
+.problem{color:#A32D2D;font-size:13px;margin-bottom:4px;line-height:1.5}
+.why{color:#854F0B;font-size:13px;margin-bottom:4px;line-height:1.5}
+.cost{color:var(--text-secondary);font-size:13px;line-height:1.5}
+h3{font-size:15px;font-weight:500;margin-bottom:8px}
+h4{font-size:13px;font-weight:500;margin-bottom:6px;color:var(--text-secondary)}
+.divider{border:none;border-top:0.5px solid var(--border);margin:1rem 0}
+.overall{text-align:center;padding:1.25rem;background:var(--surface-1);border-radius:12px;margin-bottom:1.25rem}
+.big-score{font-size:40px;font-weight:500;line-height:1}
+.headline-opt{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:8px;font-size:13px;line-height:1.5}
+.opt-label{font-size:11px;font-weight:500;color:var(--text-accent);background:var(--bg-accent);padding:2px 8px;border-radius:var(--radius);display:inline-block;margin-bottom:4px}
+.kw-pill{display:inline-block;font-size:11px;padding:2px 10px;border-radius:100px;background:var(--bg-accent);color:var(--text-accent);margin:2px}
+.before-after{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.before-box{background:#FCEBEB;border-radius:var(--radius);padding:10px;font-size:12px;color:#A32D2D;line-height:1.5}
+.after-box{background:#EAF3DE;border-radius:var(--radius);padding:10px;font-size:12px;color:#3B6D11;line-height:1.5}
+.box-lbl{font-size:10px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;opacity:0.7}
+.skill-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.skill-row:last-child{border-bottom:none}
+.pin-badge{font-size:10px;padding:2px 7px;background:var(--bg-accent);color:var(--text-accent);border-radius:100px;font-weight:500}
+.remove-badge{font-size:10px;padding:2px 7px;background:#FCEBEB;color:#A32D2D;border-radius:100px;font-weight:500}
+.score-change{display:flex;align-items:center;gap:8px;font-size:13px;padding:8px 0;border-bottom:0.5px solid var(--border)}
+.score-change:last-child{border-bottom:none}
+.arrow{color:var(--text-muted)}
+.delta-pos{color:#3B6D11;font-weight:500}
+.day-block{border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px}
+.day-num{font-size:11px;font-weight:500;color:var(--text-accent);background:var(--bg-accent);padding:2px 8px;border-radius:100px;display:inline-block;margin-bottom:8px}
+.checklist li{font-size:13px;line-height:1.6;list-style:none;padding-left:20px;position:relative;color:var(--text-secondary)}
+.checklist li:before{content:"✓";position:absolute;left:0;color:#3B6D11;font-weight:500}
+.post-draft{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;font-size:13px;line-height:1.6;white-space:pre-line;color:var(--text-primary);margin-top:8px}
+.sharecard{background:#0A66C2;border-radius:12px;padding:1.5rem;color:#fff;text-align:center}
+.sharecard .big{font-size:22px;font-weight:500;margin-bottom:4px}
+.sharecard p{font-size:13px;opacity:0.9;line-height:1.6;margin-bottom:8px}
+.sharecard .sc-label{font-size:11px;opacity:0.7;text-transform:uppercase;letter-spacing:0.05em;font-weight:500}
+.mistake{background:rgba(255,255,255,0.12);border-radius:var(--radius);padding:8px 12px;margin-bottom:6px;font-size:12px;text-align:left;line-height:1.5}
+</style>
+
+<div class="wrap">
+<h2 style="sr-only">LinkedIn Profile Roast & Rebuild — Anushka</h2>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="show('roast',this)">🔥 Roast</button>
+  <button class="tab" onclick="show('rebuild',this)">🔨 Rebuild</button>
+  <button class="tab" onclick="show('scorecard',this)">📊 Scorecard</button>
+  <button class="tab" onclick="show('plan',this)">📅 7-Day Plan</button>
+  <button class="tab" onclick="show('share',this)">📸 Share Card</button>
+</div>
+
+<div id="roast" class="panel active">
+  <div class="overall">
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:4px">Overall profile strength (before)</div>
+    <div class="big-score" style="color:#A32D2D">22<span style="font-size:20px">/100</span></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Invisible to recruiters right now</div>
+  </div>
+
+  <div class="section-card">
+    <div class="score-row">
+      <span class="score-badge score-low">2/10</span>
+      <h3>Headline</h3>
+    </div>
+    <div class="label">Recruiter's 3-second reaction</div>
+    <div style="font-size:13px;font-style:italic;color:var(--text-secondary);margin-bottom:10px">"Another fresh grad with no LinkedIn. What do they actually do?"</div>
+    <div class="problem">❌ Problem: You have no headline — LinkedIn defaults to "Student at [University]" or blank. That's not a headline, that's a non-presence.</div>
+    <div style="height:6px"></div>
+    <div class="why">🧠 Why it hurts: Recruiters do keyword searches. "Cloud computing," "Java," "SQL" — none of these appear in your headline, so you don't show up when they search.</div>
+    <div style="height:6px"></div>
+    <div class="cost">🔍 Invisible cost: You're losing the top 3 inches of prime real estate on your profile. Most recruiters never scroll past the headline + photo.</div>
+  </div>
+
+  <div class="section-card">
+    <div class="score-row">
+      <span class="score-badge score-low">1/10</span>
+      <h3>About — First 2 Lines (The Hook)</h3>
+    </div>
+    <div class="label">Recruiter's 3-second reaction</div>
+    <div style="font-size:13px;font-style:italic;color:var(--text-secondary);margin-bottom:10px">"Nothing here. They didn't bother."</div>
+    <div class="problem">❌ Problem: You have no About section at all. LinkedIn shows the first 2 lines before "see more" — right now that space is blank.</div>
+    <div style="height:6px"></div>
+    <div class="why">🧠 Why it hurts: A blank About tells recruiters you're either lazy or haven't taken yourself seriously as a candidate yet. Both are dealbreakers in the first 3 seconds.</div>
+    <div style="height:6px"></div>
+    <div class="cost">🔍 Invisible cost: You're handing this prime hook real estate to silence. Every recruiter who lands on your profile leaves immediately.</div>
+  </div>
+
+  <div class="section-card">
+    <div class="score-row">
+      <span class="score-badge score-low">3/10</span>
+      <h3>Experience</h3>
+    </div>
+    <div class="label">Recruiter's 3-second reaction</div>
+    <div style="font-size:13px;font-style:italic;color:var(--text-secondary);margin-bottom:10px">"Projects are listed, but I have no idea what they did or what the impact was."</div>
+    <div class="problem">❌ Problem: You have projects (restaurant website, face recognition attendance system, cloud training) but they likely read as one-liners without context, numbers, or outcomes.</div>
+    <div style="height:6px"></div>
+    <div class="why">🧠 Why it hurts: "Built a restaurant website" means nothing. "Built a responsive restaurant website reducing booking inquiry time by 40%" is a candidate. Recruiters need proof, not descriptions.</div>
+    <div style="height:6px"></div>
+    <div class="cost">🔍 Invisible cost: Your best work looks like a class assignment. Recruiters can't differentiate you from 100 other fresh grads who "did projects."</div>
+  </div>
+
+  <div class="section-card">
+    <div class="score-row">
+      <span class="score-badge score-low">4/10</span>
+      <h3>Skills & Keywords</h3>
+    </div>
+    <div class="label">Recruiter's 3-second reaction</div>
+    <div style="font-size:13px;font-style:italic;color:var(--text-secondary);margin-bottom:10px">"Cloud, Java, SQL are there but not specific enough to surface in ATS filters."</div>
+    <div class="problem">❌ Problem: Generic skill names without specificity. "Cloud Computing" isn't a searchable skill — "AWS," "GCP," "Azure" are. Recruiters filter by exact tool names.</div>
+    <div style="height:6px"></div>
+    <div class="why">🧠 Why it hurts: ATS systems and LinkedIn search use exact-match keyword filters. "Cloud Computing" won't surface you when a recruiter types "AWS Engineer."</div>
+    <div style="height:6px"></div>
+    <div class="cost">🔍 Invisible cost: You're being filtered out before a single human eye sees your profile.</div>
+  </div>
+</div>
+
+<div id="rebuild" class="panel">
+  <div class="section-card">
+    <h3 style="margin-bottom:12px">Headline — 3 options</h3>
+    <div class="headline-opt">
+      <div class="opt-label">Option 1 — Keyword-optimized (for search)</div>
+      Cloud Computing & Java Developer | SQL | AWS | Detail-Oriented Problem Solver | Open to Opportunities
+    </div>
+    <div class="headline-opt">
+      <div class="opt-label">Option 2 — Value proposition (for recruiters)</div>
+      CS Graduate | I build reliable systems and catch what others miss | Cloud · Java · SQL
+    </div>
+    <div class="headline-opt">
+      <div class="opt-label">Option 3 — Authority style (for thought leadership)</div>
+      Troubleshooter & Detail-First Developer | Cloud Infrastructure · Java · SQL | Turning overlooked bugs into bulletproof solutions
+    </div>
+    <hr class="divider">
+    <div style="font-size:12px;color:var(--text-secondary);line-height:1.6">
+      <strong style="color:var(--text-primary)">Use Option 1</strong> when applying to jobs — maximum keyword density.<br>
+      <strong style="color:var(--text-primary)">Use Option 2</strong> once you have 1–2 months of job search going — it feels human and memorable.<br>
+      <strong style="color:var(--text-primary)">Use Option 3</strong> when you start posting content and building a niche reputation.
+    </div>
+  </div>
+
+  <div class="section-card">
+    <h3 style="margin-bottom:12px">About Section — full rewrite</h3>
+    <div style="background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;font-size:13px;line-height:1.8;color:var(--text-primary);white-space:pre-line">🔎 I'm the person on the team who catches what everyone else scrolls past.
+
+As a CS graduate specializing in Cloud Computing, Java, and SQL — I don't just build systems, I troubleshoot them until they're bulletproof. My attention to detail isn't a soft skill. It's why my face recognition attendance system worked reliably where others had edge-case failures, and why my restaurant web project handled real-world user flows, not just happy paths.
+
+What I bring to a team:
+→ Cloud infrastructure knowledge (with hands-on training certification)
+→ Java-based backend development with a debugging-first mindset
+→ SQL data handling — clean queries, clean results
+→ A habit of asking "but what if it breaks?" before shipping anything
+
+I've built 2 end-to-end projects from scratch — a face recognition attendance system and a restaurant website — and completed formal cloud computing training that gave me real deployment experience, not just theory.
+
+If you're looking for someone who will read every error log and not stop until it makes sense — let's connect.
+
+📩 Open to roles in Cloud Engineering, Backend Development, or IT Support.
+    </div>
+    <hr class="divider">
+    <div class="label">Keywords embedded</div>
+    <div style="margin-top:4px">
+      <span class="kw-pill">Cloud Computing</span><span class="kw-pill">Java Developer</span><span class="kw-pill">SQL</span><span class="kw-pill">Backend Development</span><span class="kw-pill">Cloud Engineering</span><span class="kw-pill">Face Recognition</span><span class="kw-pill">Troubleshooting</span><span class="kw-pill">AWS</span><span class="kw-pill">IT Support</span><span class="kw-pill">CS Graduate</span>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <h3 style="margin-bottom:12px">Experience — bullet rewrites</h3>
+    <div class="label" style="margin-bottom:8px">Face Recognition Attendance System</div>
+    <div class="before-after">
+      <div class="before-box"><div class="box-lbl">Before</div>Built a face recognition attendance system using Python</div>
+      <div class="after-box"><div class="box-lbl">After</div>Engineered a face recognition attendance system in Python, reducing manual marking errors and handling edge-case lighting conditions that broke earlier prototypes</div>
+    </div>
+    <div class="label" style="margin-bottom:8px">Restaurant Website</div>
+    <div class="before-after">
+      <div class="before-box"><div class="box-lbl">Before</div>Created a restaurant website</div>
+      <div class="after-box"><div class="box-lbl">After</div>Designed and deployed a responsive restaurant website with online menu and booking flow — tested across 5 device types for cross-browser compatibility</div>
+    </div>
+    <div class="label" style="margin-bottom:8px">Cloud Computing Training</div>
+    <div class="before-after">
+      <div class="before-box"><div class="box-lbl">Before</div>Completed cloud computing training</div>
+      <div class="after-box"><div class="box-lbl">After</div>Completed hands-on cloud computing training — gained practical experience in deployment, virtual machines, and cloud architecture fundamentals</div>
+    </div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-top:8px;line-height:1.5">💡 Strategy: Lead with what you built and why it was hard. Every bullet should answer "so what?" If you have any metrics — users, time saved, errors fixed — add them immediately.</div>
+  </div>
+
+  <div class="section-card">
+    <h3 style="margin-bottom:12px">Skills — what to add, pin & remove</h3>
+    <div class="label" style="margin-bottom:8px">Top 10 to add (in priority order)</div>
+    <div class="skill-row"><span>Amazon Web Services (AWS)</span><span class="pin-badge">📌 Pin</span></div>
+    <div class="skill-row"><span>Java Programming</span><span class="pin-badge">📌 Pin</span></div>
+    <div class="skill-row"><span>SQL / MySQL</span><span class="pin-badge">📌 Pin</span></div>
+    <div class="skill-row"><span>Python</span><span></span></div>
+    <div class="skill-row"><span>Cloud Infrastructure</span><span></span></div>
+    <div class="skill-row"><span>Backend Development</span><span></span></div>
+    <div class="skill-row"><span>Debugging & Troubleshooting</span><span></span></div>
+    <div class="skill-row"><span>Linux / Command Line</span><span></span></div>
+    <div class="skill-row"><span>REST APIs</span><span></span></div>
+    <div class="skill-row"><span>Git / Version Control</span><span></span></div>
+    <hr class="divider">
+    <div class="label" style="margin-bottom:8px">Remove or deprioritize</div>
+    <div class="skill-row"><span>"Cloud Computing" (too vague)</span><span class="remove-badge">Replace with AWS/GCP</span></div>
+    <div class="skill-row"><span>MS Office / Word / Excel</span><span class="remove-badge">Dilutes tech brand</span></div>
+  </div>
+</div>
+
+<div id="scorecard" class="panel">
+  <div class="overall">
+    <div style="display:flex;justify-content:center;gap:32px;align-items:center">
+      <div>
+        <div style="font-size:12px;color:var(--text-muted)">Before</div>
+        <div class="big-score" style="color:#A32D2D">22</div>
+      </div>
+      <div style="font-size:24px;color:var(--text-muted)">→</div>
+      <div>
+        <div style="font-size:12px;color:var(--text-muted)">After</div>
+        <div class="big-score" style="color:#3B6D11">76</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-muted)">Change</div>
+        <div class="big-score delta-pos">+54</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:8px">Overall /100</div>
+  </div>
+
+  <div class="section-card">
+    <div class="score-change">
+      <span style="flex:1;font-size:13px">Headline</span>
+      <span style="color:#A32D2D;font-size:13px">2/10</span>
+      <span class="arrow">→</span>
+      <span style="color:#3B6D11;font-size:13px">8/10</span>
+      <span class="delta-pos">+6</span>
+    </div>
+    <div class="score-change">
+      <span style="flex:1;font-size:13px">About — Hook (first 2 lines)</span>
+      <span style="color:#A32D2D;font-size:13px">1/10</span>
+      <span class="arrow">→</span>
+      <span style="color:#3B6D11;font-size:13px">9/10</span>
+      <span class="delta-pos">+8</span>
+    </div>
+    <div class="score-change">
+      <span style="flex:1;font-size:13px">About — Full Section</span>
+      <span style="color:#A32D2D;font-size:13px">0/10</span>
+      <span class="arrow">→</span>
+      <span style="color:#3B6D11;font-size:13px">8/10</span>
+      <span class="delta-pos">+8</span>
+    </div>
+    <div class="score-change">
+      <span style="flex:1;font-size:13px">Experience / Projects</span>
+      <span style="color:#A32D2D;font-size:13px">3/10</span>
+      <span class="arrow">→</span>
+      <span style="color:#3B6D11;font-size:13px">7/10</span>
+      <span class="delta-pos">+4</span>
+    </div>
+    <div class="score-change">
+      <span style="flex:1;font-size:13px">Skills & Keywords</span>
+      <span style="color:#854F0B;font-size:13px">4/10</span>
+      <span class="arrow">→</span>
+      <span style="color:#3B6D11;font-size:13px">9/10</span>
+      <span class="delta-pos">+5</span>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;padding:0 4px">
+    Note: Scores are benchmarked against what recruiters actively hiring for cloud/java/backend roles expect. The gap from 76→100 closes with endorsements, recommendations, and 3–6 months of consistent posting.
+  </div>
+</div>
+
+<div id="plan" class="panel">
+  <div class="day-block">
+    <div class="day-num">Day 1 — Make all profile changes</div>
+    <ul class="checklist">
+      <li>Update headline to Option 1 (keyword-optimized)</li>
+      <li>Paste new About section — edit the details to match your real experience</li>
+      <li>Rewrite all 3 project bullets using the before/after rewrites</li>
+      <li>Add all 10 recommended skills, pin AWS, Java, SQL to top</li>
+      <li>Remove "Cloud Computing" (generic), MS Office skills</li>
+      <li>Add a professional photo if you don't have one</li>
+      <li>Turn on "Open to Work" (visible to recruiters only)</li>
+    </ul>
+  </div>
+
+  <div class="day-block">
+    <div class="day-num">Day 2 — Post #1: The Rebuild Post</div>
+    <div class="post-draft">I just rebuilt my LinkedIn from scratch — and honestly, it was humbling.
+
+I'm Anushka, a CS graduate with skills in Cloud Computing, Java, and SQL. But my old profile? It told none of that story.
+
+No headline. No About section. Projects listed as one-liners.
+
+Here's what I added:
+→ A headline that shows up in recruiter searches
+→ An About section that explains what I actually bring
+→ Project bullets that show what I built AND what I debugged
+
+One thing I've learned: your profile isn't a résumé. It's the story of what you'll do for a team.
+
+If you're a fellow grad still figuring this out — what's the one section of your profile you keep avoiding? Drop it below 👇
+
+#LinkedInTips #FreshGrad #CloudComputing #Java #SQL #OpenToWork</div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-num">Day 3 — Send 10 connection requests</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">Target: Cloud engineers, Java developers, IT recruiters, and HR at tech companies you want to work at. Search "Cloud Engineer India," "Java Developer [your city]," "Tech Recruiter."</div>
+    <div style="background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;font-size:13px;line-height:1.6">
+      <strong style="color:var(--text-primary)">Connection message template (under 300 chars):</strong><br><br>
+      "Hi [Name], I'm a CS grad specializing in Cloud & Java, actively looking for opportunities. Your work in [their field] caught my attention. Would love to connect and learn from your journey."
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-num">Day 4 — Comment on 5 posts</div>
+    <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px;line-height:1.5">Find posts from cloud engineers, Java devs, or hiring managers. Use the Value Comment formula:</div>
+    <div style="background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;font-size:13px;line-height:1.7">
+      <strong>Agree</strong> → "This is exactly what I experienced while building my face recognition project..." <br>
+      <strong>Add Insight</strong> → "One thing I'd add: edge-case testing matters more than people think..." <br>
+      <strong>Ask a Question</strong> → "How do you approach this when the dataset is small?"
+    </div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-num">Day 5 — Post #2: Hot Take</div>
+    <div class="post-draft">Unpopular opinion: "I know Java" means almost nothing on a résumé.
+
+What actually matters is: Can you debug it when it breaks at 11pm?
+
+I've spent more time troubleshooting my projects than building them. And honestly? That's where I learned the most.
+
+The face recognition system I built kept failing under low-light conditions. I didn't Google the fix first. I read every log, traced every frame, and found the preprocessing step that was the real issue.
+
+That instinct — to dig before you guess — is what separates developers who ship from developers who scramble.
+
+What's a bug that taught you more than any tutorial? 🔍
+
+#Java #CloudComputing #SoftwareEngineering #NewGrad #Debugging</div>
+  </div>
+
+  <div class="day-block">
+    <div class="day-num">Day 6 — Engage & connect</div>
+    <ul class="checklist">
+      <li>Reply to every comment on your Day 2 and Day 5 posts</li>
+      <li>Send 5 more connection requests to people who liked/commented</li>
+      <li>Like and comment on 3 more posts in your niche</li>
+    </ul>
+  </div>
+
+  <div class="day-block">
+    <div class="day-num">Day 7 — Review your numbers</div>
+    <div style="font-size:13px;color:var(--text-secondary);line-height:1.6">
+      Check: Profile views · Post impressions · Connection acceptance rate · Search appearances<br><br>
+      <strong style="color:var(--text-primary)">What the numbers mean:</strong><br>
+      • &lt;10 profile views = headline isn't pulling. Try Option 2.<br>
+      • &lt;50% connection acceptance = your message is too generic. Personalize more.<br>
+      • 0 post comments = your hook needs work. Ask a more specific question.<br>
+      • 5+ search appearances = your keywords are working. Keep going.
+    </div>
+  </div>
+</div>
+
+<div id="share" class="panel">
+  <div class="sharecard">
+    <div class="big">I let AI roast my LinkedIn today.</div>
+    <p style="margin-top:8px">Here's what changed:</p>
+    <div style="display:flex;justify-content:center;gap:24px;margin:12px 0">
+      <div><div class="sc-label">Before</div><div style="font-size:28px;font-weight:500">22/100</div></div>
+      <div style="font-size:24px;margin-top:10px">→</div>
+      <div><div class="sc-label">After</div><div style="font-size:28px;font-weight:500">76/100</div></div>
+    </div>
+    <p style="margin-bottom:10px">Top 3 mistakes I was making:</p>
+    <div class="mistake">1. No headline — I was invisible in every recruiter search</div>
+    <div class="mistake">2. Blank About section — zero story, zero reason to scroll</div>
+    <div class="mistake">3. Projects listed as tasks, not achievements — "built X" instead of "solved Y"</div>
+    <div style="margin-top:12px;background:rgba(255,255,255,0.15);border-radius:var(--radius);padding:10px;font-size:12px;line-height:1.5">
+      <strong>The #1 thing that made the biggest difference:</strong><br>
+      Writing an About section that led with my real differentiator — I'm a detail-obsessed troubleshooter who catches what others miss.
+    </div>
+    <p style="margin-top:12px;font-size:11px;opacity:0.6">Screenshot & post this on LinkedIn ↗</p>
+  </div>
+</div>
+
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
