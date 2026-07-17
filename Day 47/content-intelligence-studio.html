@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Intelligence Studio</title>
+<style>
+  :root{
+    --ink:#0c0d10;
+    --panel:#15171b;
+    --panel-2:#1c1f24;
+    --line: rgba(255,255,255,0.08);
+    --line-strong: rgba(255,255,255,0.16);
+    --text:#e9eaec;
+    --text-dim:#9a9ea6;
+    --text-faint:#63676f;
+    --signal:#ff5a2d;
+    --signal-dim: rgba(255,90,45,0.15);
+    --ok:#3ddc84;
+    --warn:#ffc247;
+    --bad:#ff5a5f;
+    --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    --font-mono: 'SF Mono', 'Roboto Mono', Consolas, Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--ink);color:var(--text);font-family:var(--font-body);}
+  ::selection{background:var(--signal);color:#0c0d10;}
+  body{-webkit-font-smoothing:antialiased;}
+
+  a{color:inherit;}
+
+  .app{max-width:1200px;margin:0 auto;padding:0 24px 100px;}
+
+  /* ============ HEADER ============ */
+  header.top{
+    position:sticky;top:0;z-index:50;
+    background:rgba(12,13,16,0.85);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .tally{width:9px;height:9px;border-radius:50%;background:var(--text-faint);flex-shrink:0;transition:background .3s, box-shadow .3s;}
+  .tally.live{background:var(--signal);box-shadow:0 0 0 4px var(--signal-dim);animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 4px var(--signal-dim);}50%{box-shadow:0 0 0 8px transparent;}}
+  .brand-name{font-family:var(--font-display);font-size:19px;letter-spacing:.2px;}
+  .brand-name b{font-style:italic;font-weight:600;color:var(--signal);}
+  .brand-sub{font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+  .top-meta{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);letter-spacing:.5px;}
+
+  /* ============ HERO ============ */
+  .hero{padding:64px 0 32px;}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--signal);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
+  .eyebrow::before{content:'';width:24px;height:1px;background:var(--signal);}
+  h1.hero-title{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);line-height:1.08;margin:0 0 18px;font-weight:500;letter-spacing:-.5px;max-width:780px;}
+  h1.hero-title em{font-style:italic;color:var(--signal);}
+  .hero-desc{font-size:16px;color:var(--text-dim);max-width:560px;line-height:1.6;margin-bottom:8px;}
+
+  /* ============ CARD BASE ============ */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;}
+  .card-pad{padding:28px;}
+
+  /* ============ INTAKE FORM ============ */
+  .intake{margin-top:36px;}
+  .intake-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media(max-width:760px){.intake-grid{grid-template-columns:1fr;}}
+  .field{display:flex;flex-direction:column;gap:10px;}
+  .field label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-faint);}
+  .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+  .chip{
+    padding:8px 14px;border-radius:20px;border:1px solid var(--line-strong);
+    background:transparent;color:var(--text-dim);font-size:13px;cursor:pointer;
+    transition:all .15s; font-family:var(--font-body);
+  }
+  .chip:hover{border-color:var(--signal); color:var(--text);}
+  .chip.active{background:var(--signal);border-color:var(--signal);color:#100701;font-weight:600;}
+
+  textarea, input[type=text]{
+    width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    color:var(--text);padding:14px 16px;font-size:14.5px;font-family:var(--font-body);resize:vertical;
+    transition:border-color .15s;
+  }
+  textarea:focus, input:focus{outline:none;border-color:var(--signal);}
+  textarea{min-height:130px;line-height:1.55;}
+
+  .upload-zone{
+    border:1.5px dashed var(--line-strong);border-radius:12px;padding:26px;text-align:center;
+    cursor:pointer;transition:all .15s;background:var(--panel-2);
+  }
+  .upload-zone:hover, .upload-zone.drag{border-color:var(--signal);background:rgba(255,90,45,0.05);}
+  .upload-zone p{margin:0;color:var(--text-dim);font-size:13.5px;}
+  .upload-zone .up-icon{font-size:22px;margin-bottom:8px;opacity:.7;}
+  .preview-strip{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .preview-thumb{position:relative;width:74px;height:74px;border-radius:8px;overflow:hidden;border:1px solid var(--line-strong);}
+  .preview-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .preview-thumb .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;cursor:pointer;line-height:18px;padding:0;}
+
+  .run-bar{display:flex;align-items:center;justify-content:space-between;margin-top:28px;flex-wrap:wrap;gap:14px;}
+  .hint{font-size:12.5px;color:var(--text-faint);}
+  button.primary{
+    background:var(--signal);color:#160902;border:none;border-radius:10px;padding:14px 28px;
+    font-size:14.5px;font-weight:700;cursor:pointer;transition:transform .12s, box-shadow .2s;
+    font-family:var(--font-body);letter-spacing:.2px;
+  }
+  button.primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,90,45,0.28);}
+  button.primary:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;}
+  button.ghost{background:transparent;border:1px solid var(--line-strong);color:var(--text-dim);border-radius:10px;padding:13px 22px;font-size:13.5px;cursor:pointer;}
+  button.ghost:hover{border-color:var(--signal);color:var(--text);}
+
+  /* ============ REVIEWER PIPELINE (signature) ============ */
+  .pipeline{margin-top:44px;display:none;}
+  .pipeline.show{display:block;}
+  .pipeline-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;}
+  .pipeline-head h2{font-family:var(--font-display);font-size:22px;margin:0;font-weight:500;}
+  .pipeline-head .count{font-family:var(--font-mono);font-size:12px;color:var(--text-faint);}
+  .desk{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel);}
+  .desk-row{display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:1px solid var(--line);position:relative;}
+  .desk-row:last-child{border-bottom:none;}
+  .desk-row .tally-lg{width:11px;height:11px;border-radius:50%;background:var(--text-faint);flex-shrink:0;}
+  .desk-row.working .tally-lg{background:var(--warn);box-shadow:0 0 0 5px rgba(255,194,71,0.15);animation:pulse2 1.2s infinite;}
+  .desk-row.done .tally-lg{background:var(--ok);box-shadow:0 0 0 5px rgba(61,220,132,0.15);}
+  .desk-row.err .tally-lg{background:var(--bad);box-shadow:0 0 0 5px rgba(255,90,95,0.15);}
+  @keyframes pulse2{0%,100%{opacity:1;}50%{opacity:.4;}}
+  .desk-info{flex:1;min-width:0;}
+  .desk-role{font-size:14.5px;font-weight:600;}
+  .desk-task{font-family:var(--font-mono);font-size:11.5px;color:var(--text-faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .desk-status{font-family:var(--font-mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-faint);flex-shrink:0;}
+  .desk-row.working .desk-status{color:var(--warn);}
+  .desk-row.done .desk-status{color:var(--ok);}
+  .desk-row.err .desk-status{color:var(--bad);}
+
+  .activity-log{margin-top:18px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;font-family:var(--font-mono);font-size:12px;color:var(--text-dim);max-height:180px;overflow-y:auto;}
+  .activity-log div{padding:3px 0;opacity:0;animation:fadeIn .3s forwards;}
+  @keyframes fadeIn{to{opacity:1;}}
+  .activity-log .t{color:var(--text-faint);margin-right:8px;}
+
+  /* ============ RESULTS ============ */
+  .results{display:none;margin-top:56px;}
+  .results.show{display:block;}
+  .section-label{font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--signal);margin-bottom:14px;}
+
+  .score-hero{display:grid;grid-template-columns:220px 1fr;gap:36px;align-items:center;padding:36px;}
+  @media(max-width:760px){.score-hero{grid-template-columns:1fr;text-align:center;}}
+  .dial-wrap{display:flex;justify-content:center;}
+  .dial{position:relative;width:200px;height:200px;}
+  .dial svg{transform:rotate(-90deg);}
+  .dial-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .dial-num .n{font-family:var(--font-display);font-size:48px;font-weight:600;}
+  .dial-num .l{font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+  .verdict h3{font-family:var(--font-display);font-size:26px;font-weight:500;margin:0 0 10px;}
+  .verdict p{color:var(--text-dim);line-height:1.65;font-size:15px;margin:0;}
+
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px;}
+  .cat-card{padding:20px;}
+  .cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .cat-name{font-size:13.5px;font-weight:600;}
+  .cat-score{font-family:var(--font-mono);font-size:18px;color:var(--signal);}
+  .bar-track{height:5px;background:var(--panel-2);border-radius:3px;overflow:hidden;margin-bottom:12px;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--signal),#ffb03d);border-radius:3px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1);}
+  .cat-reason{font-size:13px;color:var(--text-dim);line-height:1.55;}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;}
+  @media(max-width:760px){.two-col{grid-template-columns:1fr;}}
+  .list-card{padding:24px;}
+  .list-card h4{margin:0 0 14px;font-size:14px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:1px;}
+  .list-card.strengths h4{color:var(--ok);}
+  .list-card.weak h4{color:var(--bad);}
+  .list-card.opp h4{color:var(--warn);}
+  .list-card ul{margin:0;padding:0;list-style:none;}
+  .list-card li{padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--text-dim);line-height:1.5;}
+  .list-card li:last-child{border-bottom:none;}
+  .list-card li::before{content:'—';color:var(--text-faint);margin-right:8px;}
+
+  .rewrite-card{margin-top:20px;padding:26px;}
+  .rewrite-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+  .rewrite-body{background:var(--panel-2);border-radius:10px;padding:20px;font-size:14.5px;line-height:1.7;white-space:pre-wrap;border:1px solid var(--line);}
+
+  .hooks-list{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
+  .hook-item{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:14px 18px;font-size:14px;display:flex;gap:12px;align-items:baseline;}
+  .hook-item .idx{font-family:var(--font-mono);color:var(--signal);font-size:12px;flex-shrink:0;}
+
+  .checklist{margin-top:20px;padding:24px;}
+  .check-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--text-dim);align-items:flex-start;}
+  .check-item:last-child{border-bottom:none;}
+  .check-item .box{width:16px;height:16px;border:1.5px solid var(--line-strong);border-radius:4px;flex-shrink:0;margin-top:2px;}
+
+  .exec-summary{margin-top:40px;padding:36px;background:linear-gradient(160deg, var(--panel), var(--panel-2));border:1px solid var(--line-strong);}
+  .exec-summary h3{font-family:var(--font-display);font-size:24px;margin:0 0 16px;}
+  .exec-summary p{color:var(--text-dim);line-height:1.7;font-size:15px;}
+
+  .predict-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:20px;}
+  .predict-item{text-align:center;padding:18px;background:var(--panel-2);border-radius:10px;border:1px solid var(--line);}
+  .predict-item .v{font-family:var(--font-display);font-size:26px;color:var(--signal);}
+  .predict-item .l{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-faint);margin-top:4px;}
+  .ai-disclaimer{font-family:var(--font-mono);font-size:10.5px;color:var(--text-faint);margin-top:14px;text-align:center;letter-spacing:.3px;}
+
+  .before-after{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;}
+  @media(max-width:760px){.before-after{grid-template-columns:1fr;}}
+  .ba-col{padding:22px;}
+  .ba-col.before{border-color:rgba(255,90,95,0.25);}
+  .ba-col.after{border-color:rgba(61,220,132,0.25);}
+  .ba-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+  .ba-col.before .ba-label{color:var(--bad);}
+  .ba-col.after .ba-label{color:var(--ok);}
+  .ba-col .txt{font-size:13.5px;line-height:1.6;color:var(--text-dim);white-space:pre-wrap;}
+
+  .deeper{margin-top:20px;padding:24px;}
+  .deeper .prompt-item{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:12px 16px;font-family:var(--font-mono);font-size:12.5px;margin-bottom:10px;display:flex;justify-content:space-between;gap:10px;align-items:center;color:var(--text-dim);}
+  .deeper .prompt-item button{background:none;border:1px solid var(--line-strong);color:var(--text-faint);border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;flex-shrink:0;}
+  .deeper .prompt-item button:hover{border-color:var(--signal);color:var(--signal);}
+
+  /* loading / error states */
+  .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,0.15);border-top-color:var(--signal);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .error-box{background:rgba(255,90,95,0.08);border:1px solid rgba(255,90,95,0.3);border-radius:10px;padding:16px 20px;color:#ffb3b5;font-size:13.5px;margin-top:16px;display:none;}
+  .error-box.show{display:block;}
+  .error-box button{margin-top:10px;}
+
+  footer.foot{text-align:center;padding:60px 0 20px;color:var(--text-faint);font-family:var(--font-mono);font-size:11px;letter-spacing:.5px;}
+
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:4px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001s !important; transition-duration:0.001s !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <div class="tally" id="tally"></div>
+      <div>
+        <div class="brand-name">Content <b>Intelligence</b> Studio</div>
+        <div class="brand-sub">AI Editorial Desk</div>
+      </div>
+    </div>
+    <div class="top-meta" id="topMeta">Instagram / Reels · Engagement · Balanced Review</div>
+  </div>
+</header>
+
+<div class="app">
+
+  <section class="hero">
+    <div class="eyebrow">Pre-publish review desk</div>
+    <h1 class="hero-title">Send your caption to the desk before it <em>goes live</em>.</h1>
+    <p class="hero-desc">A panel of specialist AI reviewers reads your post the way a growth editor, a platform algorithm analyst, and a copy chief would — then hands back a scored report with rewrites.</p>
+  </section>
+
+  <section class="intake card card-pad">
+    <div class="intake-grid">
+      <div class="field">
+        <label>Caption / Post Text</label>
+        <textarea id="captionText" placeholder="Paste your Instagram/Reels caption here..."></textarea>
+      </div>
+      <div class="field">
+        <label>Upload image, thumbnail, or analytics screenshot (optional)</label>
+        <div class="upload-zone" id="dropZone">
+          <div class="up-icon">◎</div>
+          <p><strong>Click to upload</strong> or drag files here<br>PNG / JPG — post image, thumbnail, or screenshot</p>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" multiple style="display:none;">
+        <div class="preview-strip" id="previewStrip"></div>
+      </div>
+    </div>
+
+    <div class="intake-grid" style="margin-top:24px;">
+      <div class="field">
+        <label>Content Format</label>
+        <div class="chip-row" id="formatChips">
+          <button class="chip active" data-v="Feed caption">Feed caption</button>
+          <button class="chip" data-v="Reel/TikTok script">Reel/TikTok script</button>
+          <button class="chip" data-v="Carousel copy">Carousel copy</button>
+          <button class="chip" data-v="Story text">Story text</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Review Intensity</label>
+        <div class="chip-row" id="intensityChips">
+          <button class="chip" data-v="gentle">Gentle</button>
+          <button class="chip active" data-v="balanced">Balanced</button>
+          <button class="chip" data-v="brutal">Brutally honest</button>
+          <button class="chip" data-v="data">Growth-hacker strict</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-top:24px;">
+      <label>Anything else? (audience, niche, constraints — optional)</label>
+      <input type="text" id="extraContext" placeholder="e.g. fitness niche, audience is beginners, must stay under 150 words...">
+    </div>
+
+    <div class="run-bar">
+      <div class="hint">The desk will design its own reviewer lineup based on what you submit.</div>
+      <div style="display:flex;gap:12px;">
+        <button class="ghost" id="resetBtn">Clear</button>
+        <button class="primary" id="runBtn">Send to the Desk →</button>
+      </div>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+  </section>
+
+  <section class="pipeline" id="pipeline">
+    <div class="pipeline-head">
+      <h2>Reviewer Desk</h2>
+      <div class="count" id="pipelineCount"></div>
+    </div>
+    <div class="desk" id="desk"></div>
+    <div class="activity-log" id="activityLog"></div>
+  </section>
+
+  <section class="results" id="results">
+
+    <div class="section-label">Overall Verdict</div>
+    <div class="card score-hero">
+      <div class="dial-wrap">
+        <div class="dial">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="88" fill="none" stroke="var(--panel-2)" stroke-width="12"/>
+            <circle id="dialArc" cx="100" cy="100" r="88" fill="none" stroke="var(--signal)" stroke-width="12" stroke-linecap="round" stroke-dasharray="553" stroke-dashoffset="553"/>
+          </svg>
+          <div class="dial-num"><div class="n" id="scoreNum">--</div><div class="l">/ 100</div></div>
+        </div>
+      </div>
+      <div class="verdict">
+        <h3 id="verdictTitle">Awaiting review</h3>
+        <p id="verdictText">Submit content above to begin.</p>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:40px;">Category Breakdown</div>
+    <div class="cat-grid" id="catGrid"></div>
+
+    <div class="two-col">
+      <div class="card list-card strengths"><h4>Strengths</h4><ul id="strengthsList"></ul></div>
+      <div class="card list-card weak"><h4>Weaknesses</h4><ul id="weaknessList"></ul></div>
+    </div>
+    <div class="card list-card opp" style="margin-top:20px;"><h4>Missed Opportunities</h4><ul id="oppList"></ul></div>
+
+    <div class="section-label" style="margin-top:40px;">Platform-Specific Recommendations</div>
+    <div class="card list-card" style="padding:24px;"><ul id="platformList"></ul></div>
+
+    <div class="section-label" style="margin-top:40px;">Rewritten Version</div>
+    <div class="card rewrite-card">
+      <div class="rewrite-body" id="rewriteBody">—</div>
+    </div>
+
+    <div class="section-label" style="margin-top:40px;">Alternative Hooks &amp; Openers</div>
+    <div class="hooks-list" id="hooksList"></div>
+
+    <div class="section-label" style="margin-top:40px;">Publishing Checklist</div>
+    <div class="card checklist" id="checklist"></div>
+
+    <div class="section-label" style="margin-top:40px;">Before vs. After</div>
+    <div class="before-after">
+      <div class="card ba-col before"><div class="ba-label">Before</div><div class="txt" id="baBefore">—</div></div>
+      <div class="card ba-col after"><div class="ba-label">After</div><div class="txt" id="baAfter">—</div></div>
+    </div>
+
+    <div class="section-label" style="margin-top:40px;">Predicted Performance Potential</div>
+    <div class="card" style="padding:26px;">
+      <div class="predict-grid" id="predictGrid"></div>
+      <div class="ai-disclaimer">These are AI-generated directional estimates, not guaranteed outcomes.</div>
+    </div>
+
+    <div class="exec-summary card">
+      <div class="section-label">Executive Summary</div>
+      <h3 id="execTitle">Content Health Report</h3>
+      <p id="execText">—</p>
+    </div>
+
+    <div class="section-label" style="margin-top:40px;">Go Deeper</div>
+    <div class="card deeper" id="deeperPrompts"></div>
+
+  </section>
+
+</div>
+
+<footer class="foot">CONTENT INTELLIGENCE STUDIO · POWERED BY CLAUDE · ALL SCORES ARE AI-GENERATED ESTIMATES</footer>
+
+<script>
+(function(){
+  const state = {
+    format: 'Feed caption',
+    intensity: 'balanced',
+    images: [], // {dataUrl, mediaType, base64}
+  };
+
+  // ---- chip selection ----
+  document.getElementById('formatChips').addEventListener('click', e=>{
+    if(e.target.classList.contains('chip')){
+      document.querySelectorAll('#formatChips .chip').forEach(c=>c.classList.remove('active'));
+      e.target.classList.add('active');
+      state.format = e.target.dataset.v;
+      updateTopMeta();
+    }
+  });
+  document.getElementById('intensityChips').addEventListener('click', e=>{
+    if(e.target.classList.contains('chip')){
+      document.querySelectorAll('#intensityChips .chip').forEach(c=>c.classList.remove('active'));
+      e.target.classList.add('active');
+      state.intensity = e.target.dataset.v;
+      updateTopMeta();
+    }
+  });
+  function updateTopMeta(){
+    const intensityLabel = {gentle:'Gentle Review', balanced:'Balanced Review', brutal:'Brutal Review', data:'Growth-Hacker Strict'}[state.intensity];
+    document.getElementById('topMeta').textContent = `Instagram/Reels · ${state.format} · ${intensityLabel}`;
+  }
+
+  // ---- upload handling ----
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const previewStrip = document.getElementById('previewStrip');
+
+  dropZone.addEventListener('click', ()=>fileInput.click());
+  dropZone.addEventListener('dragover', e=>{e.preventDefault(); dropZone.classList.add('drag');});
+  dropZone.addEventListener('dragleave', ()=>dropZone.classList.remove('drag'));
+  dropZone.addEventListener('drop', e=>{
+    e.preventDefault(); dropZone.classList.remove('drag');
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', e=>handleFiles(e.target.files));
+
+  function handleFiles(files){
+    [...files].forEach(file=>{
+      if(!file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        const dataUrl = ev.target.result;
+        const base64 = dataUrl.split(',')[1];
+        const mediaType = file.type;
+        const entry = {dataUrl, base64, mediaType, name:file.name};
+        state.images.push(entry);
+        renderPreviews();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderPreviews(){
+    previewStrip.innerHTML = '';
+    state.images.forEach((img, i)=>{
+      const div = document.createElement('div');
+      div.className = 'preview-thumb';
+      div.innerHTML = `<img src="${img.dataUrl}"><button class="rm" data-i="${i}">×</button>`;
+      previewStrip.appendChild(div);
+    });
+    previewStrip.querySelectorAll('.rm').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        state.images.splice(parseInt(btn.dataset.i),1);
+        renderPreviews();
+      });
+    });
+  }
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    document.getElementById('captionText').value='';
+    document.getElementById('extraContext').value='';
+    state.images = [];
+    renderPreviews();
+    hideError();
+  });
+
+  // ---- error handling ----
+  function showError(msg, retryFn){
+    const box = document.getElementById('errorBox');
+    box.innerHTML = `<div>⚠ ${msg}</div>`;
+    if(retryFn){
+      const btn = document.createElement('button');
+      btn.className = 'ghost';
+      btn.textContent = 'Retry';
+      btn.onclick = ()=>{hideError(); retryFn();};
+      box.appendChild(btn);
+    }
+    box.classList.add('show');
+  }
+  function hideError(){ document.getElementById('errorBox').classList.remove('show'); }
+
+  // ---- Claude API call helper with retry ----
+  async function callClaude(systemPrompt, userContent, attempt=1){
+    const maxAttempts = 3;
+    try{
+      const messages = [{ role: 'user', content: userContent }];
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 3000,
+          system: systemPrompt,
+          messages
+        })
+      });
+      if(!resp.ok){
+        throw new Error(`API returned status ${resp.status}`);
+      }
+      const data = await resp.json();
+      const textBlocks = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text);
+      const full = textBlocks.join('\n').trim();
+      if(!full) throw new Error('Empty response from model');
+      return full;
+    }catch(err){
+      if(attempt < maxAttempts){
+        await new Promise(r=>setTimeout(r, 700*attempt));
+        return callClaude(systemPrompt, userContent, attempt+1);
+      }
+      throw err;
+    }
+  }
+
+  // Build content blocks (text + images) for a user message
+  function buildUserBlocks(instructionText){
+    const blocks = [];
+    state.images.forEach(img=>{
+      blocks.push({ type:'image', source:{ type:'base64', media_type: img.mediaType, data: img.base64 } });
+    });
+    blocks.push({ type:'text', text: instructionText });
+    return blocks;
+  }
+
+  // ---- Reviewer pipeline UI ----
+  const deskEl = document.getElementById('desk');
+  const logEl = document.getElementById('activityLog');
+  let logCount = 0;
+
+  function log(msg){
+    logCount++;
+    const time = new Date().toLocaleTimeString([], {hour12:false});
+    const div = document.createElement('div');
+    div.style.animationDelay = '0s';
+    div.innerHTML = `<span class="t">${time}</span>${msg}`;
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  function buildDesk(reviewers){
+    deskEl.innerHTML = '';
+    reviewers.forEach((r,i)=>{
+      const row = document.createElement('div');
+      row.className = 'desk-row';
+      row.id = `desk-row-${i}`;
+      row.innerHTML = `
+        <div class="tally-lg"></div>
+        <div class="desk-info">
+          <div class="desk-role">${r.role}</div>
+          <div class="desk-task">${r.task}</div>
+        </div>
+        <div class="desk-status">Queued</div>
+      `;
+      deskEl.appendChild(row);
+    });
+    document.getElementById('pipelineCount').textContent = `${reviewers.length} specialists assigned`;
+  }
+  function setDeskStatus(i, status){
+    const row = document.getElementById(`desk-row-${i}`);
+    if(!row) return;
+    row.classList.remove('working','done','err');
+    const statusEl = row.querySelector('.desk-status');
+    if(status==='working'){ row.classList.add('working'); statusEl.innerHTML = '<span class="spinner"></span>Reviewing'; }
+    else if(status==='done'){ row.classList.add('done'); statusEl.textContent = 'Complete'; }
+    else if(status==='err'){ row.classList.add('err'); statusEl.textContent = 'Error'; }
+  }
+
+  // ---- Reviewer lineup (design our own multi-stage workflow) ----
+  function getReviewerLineup(hasImages){
+    const base = [
+      { role:'Hook & Retention Analyst', task:'Evaluating opening line, scroll-stop power, and pacing',
+        system:`You are a senior social media hook strategist who has analyzed thousands of viral Instagram and TikTok posts. You review captions/scripts for their opening line strength, scroll-stopping power, curiosity gap, and pacing. Be specific and reference the exact words used. Give a score out of 100 for "Hook Strength" on its own line as "HOOK_SCORE: <number>", then a short paragraph explaining why, in plain text. Do not use JSON or markdown code blocks.` },
+      { role:'Engagement Psychology Reviewer', task:'Assessing comment-bait, relatability, and emotional pull',
+        system:`You are a behavioral psychologist specializing in what drives people to comment, share, and save social content. Analyze the caption for emotional resonance, relatability, comment-bait mechanisms (questions, controversy, identity signaling), and shareability. Give a score out of 100 as "ENGAGEMENT_SCORE: <number>" on its own line, then explain your reasoning in plain text. No JSON, no markdown code blocks.` },
+      { role:'Platform Algorithm Strategist', task:'Checking format fit, caption length, hashtags, and CTA structure',
+        system:`You are a platform growth specialist who understands Instagram and TikTok's current ranking signals (watch time, saves, shares, comments, dwell time). Evaluate caption length appropriateness, hashtag strategy, call-to-action clarity, and structural fit for the algorithm. Give a score out of 100 as "PLATFORM_SCORE: <number>" on its own line, then explain your reasoning in plain text. No JSON, no markdown code blocks.` },
+      { role:'Copy Chief — Clarity & Voice', task:'Reviewing grammar, tone, readability, and brand voice consistency',
+        system:`You are a meticulous copy chief. Review the writing quality: clarity, grammar, tone consistency, readability, and whether the voice feels authentic versus generic AI-sounding copy. Give a score out of 100 as "CLARITY_SCORE: <number>" on its own line, then explain your reasoning in plain text. No JSON, no markdown code blocks.` }
+    ];
+    if(hasImages){
+      base.push({ role:'Visual Content Analyst', task:'Analyzing uploaded image/thumbnail for scroll-stop and composition',
+        system:`You are a visual content strategist who analyzes images and thumbnails for social media performance. Look directly at the uploaded image(s). Assess composition, color contrast, text overlay legibility (if any), facial expression/emotion (if a person is shown), thumbnail scroll-stopping power, and consistency with the caption's message. Give a score out of 100 as "VISUAL_SCORE: <number>" on its own line, then explain your reasoning in plain text, referencing specific visual details you observed. No JSON, no markdown code blocks.` });
+    }
+    return base;
+  }
+
+  // ---- Main orchestration ----
+  const runBtn = document.getElementById('runBtn');
+  runBtn.addEventListener('click', runReview);
+
+  async function runReview(){
+    hideError();
+    const caption = document.getElementById('captionText').value.trim();
+    const extra = document.getElementById('extraContext').value.trim();
+
+    if(!caption && state.images.length===0){
+      showError('Please add a caption or upload at least one image before sending to the desk.');
+      return;
+    }
+
+    runBtn.disabled = true;
+    runBtn.textContent = 'Reviewing...';
+    document.getElementById('tally').classList.add('live');
+
+    const pipeline = document.getElementById('pipeline');
+    pipeline.classList.add('show');
+    pipeline.scrollIntoView({behavior:'smooth', block:'start'});
+    logEl.innerHTML = '';
+    log('Desk opened. Preparing reviewer lineup...');
+
+    const hasImages = state.images.length > 0;
+    const reviewers = getReviewerLineup(hasImages);
+    buildDesk(reviewers);
+
+    const contentDescription = `
+CONTENT FORMAT: ${state.format}
+REVIEW INTENSITY REQUESTED: ${state.intensity} (gentle = encouraging, balanced = honest and constructive, brutal = agency-level blunt critique, data = strict growth-hacker numbers focus)
+${extra ? 'ADDITIONAL CONTEXT FROM CREATOR: ' + extra : ''}
+
+CAPTION/CONTENT TEXT:
+"""
+${caption || '(No caption text provided — analyze the uploaded image(s) only)'}
+"""
+${hasImages ? '\n(One or more images are attached above for visual analysis.)' : ''}
+`.trim();
+
+    const reviewResults = [];
+
+    // Run each reviewer sequentially, updating UI live
+    for(let i=0;i<reviewers.length;i++){
+      setDeskStatus(i,'working');
+      log(`${reviewers[i].role} started review...`);
+      try{
+        const userBlocks = buildUserBlocks(contentDescription + '\n\nProvide your specialist review now.');
+        const result = await callClaude(reviewers[i].system, userBlocks);
+        reviewResults.push({ role: reviewers[i].role, text: result });
+        setDeskStatus(i,'done');
+        log(`${reviewers[i].role} completed.`);
+      }catch(err){
+        setDeskStatus(i,'err');
+        log(`${reviewers[i].role} failed: ${err.message}`);
+        reviewResults.push({ role: reviewers[i].role, text: '(This reviewer could not complete analysis due to a connection error.)' });
+      }
+    }
+
+    log('All specialist reviews collected. Compiling final report...');
+
+    // Final synthesis stage — Editor-in-Chief compiles everything into the structured report
+    const synthSystem = `You are the Editor-in-Chief of a premium social media content consultancy. You have received specialist reviews from your team (Hook Analyst, Engagement Psychologist, Platform Strategist, Copy Chief${hasImages ? ', Visual Analyst' : ''}). Your job is to synthesize all of it into ONE final, comprehensive, well-organized report for the creator.
+
+Review intensity requested: ${state.intensity}. Calibrate your tone and scoring strictness accordingly (gentle = warm and encouraging even when critical; balanced = honest and fair; brutal = blunt, no-sugarcoating agency-style critique; data = focus heavily on numeric growth metrics and be strict).
+
+You MUST respond in this EXACT plain-text section format, using these exact section headers (all caps, followed by a colon, each on its own line), with no markdown formatting, no asterisks, no JSON, no code blocks. Fill in real content under every header based on the specialist reviews and the original content. Do not skip any section.
+
+OVERALL_SCORE: [a single integer 0-100]
+VERDICT_TITLE: [a punchy 3-8 word verdict headline]
+VERDICT_TEXT: [2-3 sentences summarizing the overall assessment]
+
+CATEGORY: Hook Strength
+CATEGORY_SCORE: [0-100]
+CATEGORY_REASON: [1-2 sentence explanation]
+
+CATEGORY: Engagement Potential
+CATEGORY_SCORE: [0-100]
+CATEGORY_REASON: [1-2 sentence explanation]
+
+CATEGORY: Platform Fit
+CATEGORY_SCORE: [0-100]
+CATEGORY_REASON: [1-2 sentence explanation]
+
+CATEGORY: Writing Quality
+CATEGORY_SCORE: [0-100]
+CATEGORY_REASON: [1-2 sentence explanation]
+${hasImages ? `
+CATEGORY: Visual Impact
+CATEGORY_SCORE: [0-100]
+CATEGORY_REASON: [1-2 sentence explanation]
+` : ''}
+STRENGTH: [one specific strength]
+STRENGTH: [another specific strength]
+STRENGTH: [another specific strength]
+
+WEAKNESS: [one specific weakness]
+WEAKNESS: [another specific weakness]
+WEAKNESS: [another specific weakness]
+
+OPPORTUNITY: [one missed opportunity]
+OPPORTUNITY: [another missed opportunity]
+OPPORTUNITY: [another missed opportunity]
+
+PLATFORM_TIP: [one specific Instagram/TikTok recommendation]
+PLATFORM_TIP: [another]
+PLATFORM_TIP: [another]
+PLATFORM_TIP: [another]
+
+REWRITE: [a full rewritten version of the caption, ready to publish, matching the requested format and tone]
+
+HOOK: [an alternative opening line/hook]
+HOOK: [another alternative hook]
+HOOK: [another alternative hook]
+HOOK: [another alternative hook]
+
+CHECKLIST: [one publishing checklist item, e.g. "Add a clear CTA in the last line"]
+CHECKLIST: [another]
+CHECKLIST: [another]
+CHECKLIST: [another]
+CHECKLIST: [another]
+
+PREDICT_LABEL: Engagement Lift
+PREDICT_VALUE: [a short value like "+35%" or "Moderate" or "High"]
+
+PREDICT_LABEL: Save Potential
+PREDICT_VALUE: [short value]
+
+PREDICT_LABEL: Share Likelihood
+PREDICT_VALUE: [short value]
+
+PREDICT_LABEL: Reach Ceiling
+PREDICT_VALUE: [short value]
+
+EXEC_TITLE: [a short executive summary title]
+EXEC_SUMMARY: [3-5 sentences: overall content health, the single highest-impact improvement to make first, and a closing note on potential]
+
+DEEPER_PROMPT: [a follow-up question the creator could ask the AI to go deeper, e.g. "Generate 5 more hook variations for this niche"]
+DEEPER_PROMPT: [another]
+DEEPER_PROMPT: [another]
+
+Base every single line strictly on the specialist reviews and the original content below. Do not invent information not supported by the reviews. Be specific to THIS piece of content, never generic.`;
+
+    const combinedReviews = reviewResults.map(r=>`--- ${r.role} ---\n${r.text}`).join('\n\n');
+    const synthUserText = `ORIGINAL CONTENT SUBMITTED:\n${contentDescription}\n\nSPECIALIST REVIEWS:\n${combinedReviews}\n\nNow produce the final synthesized report in the exact format specified.`;
+
+    let reportText;
+    try{
+      log('Editor-in-Chief synthesizing final report...');
+      reportText = await callClaude(synthSystem, [{type:'text', text: synthUserText}]);
+      log('Final report ready.');
+    }catch(err){
+      log('Synthesis failed: ' + err.message);
+      runBtn.disabled = false;
+      runBtn.textContent = 'Send to the Desk →';
+      document.getElementById('tally').classList.remove('live');
+      showError('The desk could not compile the final report. This is usually a temporary connection issue.', runReview);
+      return;
+    }
+
+    renderReport(reportText, contentDescription);
+
+    runBtn.disabled = false;
+    runBtn.textContent = 'Send to the Desk →';
+    document.getElementById('tally').classList.remove('live');
+
+    document.getElementById('results').classList.add('show');
+    setTimeout(()=>{
+      document.getElementById('results').scrollIntoView({behavior:'smooth', block:'start'});
+    }, 300);
+  }
+
+  // ---- Parser for the plain-text structured report ----
+  function parseReport(text){
+    const lines = text.split('\n');
+    const report = {
+      overallScore: 50, verdictTitle:'', verdictText:'',
+      categories: [], strengths:[], weaknesses:[], opportunities:[],
+      platformTips:[], rewrite:'', hooks:[], checklist:[],
+      predictions:[], execTitle:'', execSummary:'', deeperPrompts:[]
+    };
+    let currentCat = null;
+    let collecting = null; // for multi-line fields like REWRITE, VERDICT_TEXT, EXEC_SUMMARY
+
+    function flushCollecting(){
+      if(collecting){
+        const val = collecting.buf.join('\n').trim();
+        if(collecting.key==='rewrite') report.rewrite = val;
+        else if(collecting.key==='verdictText') report.verdictText = val;
+        else if(collecting.key==='execSummary') report.execSummary = val;
+        collecting = null;
+      }
+    }
+
+    for(let raw of lines){
+      const line = raw.trim();
+      if(!line){ if(collecting) collecting.buf.push(''); continue; }
+
+      const match = line.match(/^([A-Z_]+):\s?(.*)$/);
+      if(match){
+        flushCollecting();
+        const key = match[1];
+        const val = match[2].trim();
+        switch(key){
+          case 'OVERALL_SCORE': report.overallScore = parseInt(val)||50; break;
+          case 'VERDICT_TITLE': report.verdictTitle = val; break;
+          case 'VERDICT_TEXT': collecting = {key:'verdictText', buf:[val]}; break;
+          case 'CATEGORY': currentCat = {name:val, score:0, reason:''}; report.categories.push(currentCat); break;
+          case 'CATEGORY_SCORE': if(currentCat) currentCat.score = parseInt(val)||0; break;
+          case 'CATEGORY_REASON': if(currentCat) currentCat.reason = val; break;
+          case 'STRENGTH': report.strengths.push(val); break;
+          case 'WEAKNESS': report.weaknesses.push(val); break;
+          case 'OPPORTUNITY': report.opportunities.push(val); break;
+          case 'PLATFORM_TIP': report.platformTips.push(val); break;
+          case 'REWRITE': collecting = {key:'rewrite', buf:[val]}; break;
+          case 'HOOK': report.hooks.push(val); break;
+          case 'CHECKLIST': report.checklist.push(val); break;
+          case 'PREDICT_LABEL': report.predictions.push({label:val, value:''}); break;
+          case 'PREDICT_VALUE': if(report.predictions.length) report.predictions[report.predictions.length-1].value = val; break;
+          case 'EXEC_TITLE': report.execTitle = val; break;
+          case 'EXEC_SUMMARY': collecting = {key:'execSummary', buf:[val]}; break;
+          case 'DEEPER_PROMPT': report.deeperPrompts.push(val); break;
+          default: break;
+        }
+      } else if(collecting){
+        collecting.buf.push(line);
+      }
+    }
+    flushCollecting();
+    return report;
+  }
+
+  function renderReport(text, contentDescription){
+    const r = parseReport(text);
+
+    // Score dial
+    const circumference = 553;
+    const offset = circumference - (circumference * Math.min(Math.max(r.overallScore,0),100) / 100);
+    const arc = document.getElementById('dialArc');
+    setTimeout(()=>{ arc.style.transition = 'stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)'; arc.style.strokeDashoffset = offset; }, 100);
+    let color = 'var(--bad)';
+    if(r.overallScore>=75) color='var(--ok)'; else if(r.overallScore>=50) color='var(--warn)';
+    arc.style.stroke = color;
+
+    animateNumber(document.getElementById('scoreNum'), r.overallScore);
+    document.getElementById('verdictTitle').textContent = r.verdictTitle || 'Review complete';
+    document.getElementById('verdictText').textContent = r.verdictText || '';
+
+    // Categories
+    const catGrid = document.getElementById('catGrid');
+    catGrid.innerHTML = '';
+    r.categories.forEach(cat=>{
+      const div = document.createElement('div');
+      div.className = 'card cat-card';
+      div.innerHTML = `
+        <div class="cat-top"><div class="cat-name">${cat.name}</div><div class="cat-score">${cat.score}</div></div>
+        <div class="bar-track"><div class="bar-fill" data-w="${cat.score}"></div></div>
+        <div class="cat-reason">${cat.reason}</div>
+      `;
+      catGrid.appendChild(div);
+    });
+    setTimeout(()=>{
+      document.querySelectorAll('.bar-fill').forEach(b=>{ b.style.width = b.dataset.w + '%'; });
+    }, 150);
+
+    fillList('strengthsList', r.strengths);
+    fillList('weaknessList', r.weaknesses);
+    fillList('oppList', r.opportunities);
+    fillList('platformList', r.platformTips);
+
+    document.getElementById('rewriteBody').textContent = r.rewrite || '—';
+
+    const hooksList = document.getElementById('hooksList');
+    hooksList.innerHTML = '';
+    r.hooks.forEach((h,i)=>{
+      const div = document.createElement('div');
+      div.className = 'hook-item';
+      div.innerHTML = `<span class="idx">0${i+1}</span><span>${h}</span>`;
+      hooksList.appendChild(div);
+    });
+
+    const checklist = document.getElementById('checklist');
+    checklist.innerHTML = '';
+    r.checklist.forEach(item=>{
+      const div = document.createElement('div');
+      div.className = 'check-item';
+      div.innerHTML = `<div class="box"></div><div>${item}</div>`;
+      checklist.appendChild(div);
+    });
+
+    document.getElementById('baBefore').textContent = document.getElementById('captionText').value.trim() || '(no original text provided)';
+    document.getElementById('baAfter').textContent = r.rewrite || '—';
+
+    const predictGrid = document.getElementById('predictGrid');
+    predictGrid.innerHTML = '';
+    r.predictions.forEach(p=>{
+      const div = document.createElement('div');
+      div.className = 'predict-item';
+      div.innerHTML = `<div class="v">${p.value||'—'}</div><div class="l">${p.label}</div>`;
+      predictGrid.appendChild(div);
+    });
+
+    document.getElementById('execTitle').textContent = r.execTitle || 'Content Health Report';
+    document.getElementById('execText').textContent = r.execSummary || '';
+
+    const deeperEl = document.getElementById('deeperPrompts');
+    deeperEl.innerHTML = '';
+    r.deeperPrompts.forEach(p=>{
+      const div = document.createElement('div');
+      div.className = 'prompt-item';
+      div.innerHTML = `<span>${p}</span><button>Copy</button>`;
+      div.querySelector('button').addEventListener('click', ()=>{
+        navigator.clipboard.writeText(p).then(()=>{
+          div.querySelector('button').textContent = 'Copied';
+          setTimeout(()=>{div.querySelector('button').textContent = 'Copy';}, 1500);
+        });
+      });
+      deeperEl.appendChild(div);
+    });
+  }
+
+  function fillList(id, arr){
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    if(!arr.length){ el.innerHTML = '<li>No items provided.</li>'; return; }
+    arr.forEach(item=>{
+      const li = document.createElement('li');
+      li.textContent = item;
+      el.appendChild(li);
+    });
+  }
+
+  function animateNumber(el, target){
+    let cur = 0;
+    const step = Math.max(1, Math.round(target/40));
+    const iv = setInterval(()=>{
+      cur += step;
+      if(cur >= target){ cur = target; clearInterval(iv); }
+      el.textContent = cur;
+    }, 20);
+  }
+
+})();
+</script>
+</body>
+</html>
